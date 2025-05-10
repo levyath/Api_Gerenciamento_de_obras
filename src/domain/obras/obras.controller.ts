@@ -1,34 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { ObrasService } from './obras.service';
-import { CreateObraDto } from './dto/create-obra.dto';
-import { UpdateObraDto } from './dto/update-obra.dto';
+import { Obra } from './entities/obra.entity';
+
 
 @Controller('obras')
 export class ObrasController {
-  constructor(private readonly obrasService: ObrasService) {}
-
-  @Post()
-  create(@Body() createObraDto: CreateObraDto) {
-    return this.obrasService.create(createObraDto);
-  }
-
+  constructor(private readonly obraService: ObrasService) {}
   @Get()
-  findAll() {
-    return this.obrasService.findAll();
+  findAll(): any{
+    return this.obraService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.obrasService.findOne(+id);
+  findOne(@Param('id') id: string): Promise<Obra> {
+    return this.obraService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateObraDto: UpdateObraDto) {
-    return this.obrasService.update(+id, updateObraDto);
+  @Post()
+  create(@Body() obra: Obra): Promise<Obra> {
+    return this.obraService.create(obra);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() obra: Partial<Obra>): Promise<Obra> {''
+    return this.obraService.update(id, obra);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.obrasService.remove(+id);
+  remove(@Param('id') id: string): Promise<void> {
+    return this.obraService.remove(id);
   }
 }

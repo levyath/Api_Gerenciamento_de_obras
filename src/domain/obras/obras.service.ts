@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { CreateObraDto } from './dto/create-obra.dto';
-import { UpdateObraDto } from './dto/update-obra.dto';
+import { ObrasRepository } from './obras.repository';
 
 @Injectable()
 export class ObrasService {
-  create(createObraDto: CreateObraDto) {
-    return 'This action adds a new obra';
-  }
+  constructor(private readonly obraRepository: ObrasRepository) {}
 
   findAll() {
-    return `This action returns all obras`;
+    return this.obraRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} obra`;
+  findOne(id: string) {
+    return this.obraRepository.findOne(id);
   }
 
-  update(id: number, updateObraDto: UpdateObraDto) {
-    return `This action updates a #${id} obra`;
+  create(obra) {
+    return this.obraRepository.create(obra);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} obra`;
+  update(id: string, obra) {
+    return this.obraRepository.update(id, obra);
+  }
+
+  remove(id: string) {
+    return this.obraRepository.remove(id);
   }
 }
