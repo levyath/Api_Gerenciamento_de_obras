@@ -6,15 +6,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'postgres', // Mude para o banco escolhido
-      host: 'localhost',
-      port: 5432, // Troque para a porta correta do seu banco
-      username: 'seu_usuario',
-      password: 'sua_senha',
-      database: 'seu_banco',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
-    }),
+    type: process.env.DB_TYPE as any,
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || '5432', 10),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    synchronize: process.env.DB_SYNCHRONIZE === 'true',
+    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      }),
 
   ],
   controllers: [AppController],
