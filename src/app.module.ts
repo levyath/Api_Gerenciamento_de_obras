@@ -3,6 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ObrasModule } from './domain/obras/obras.module';
+import 'dotenv/config'
+
+const {
+    DB_HOST,
+    DB_PORT,
+    DB_DATABASE,
+    DB_USER,
+    DB_PASSWORD,
+}  = process.env;
 
 @Module({
   imports: [
@@ -11,11 +20,11 @@ import { ObrasModule } from './domain/obras/obras.module';
         const { DataSource } = require('typeorm');
         const dataSource = new DataSource({
           type: 'postgres',
-          host: 'localhost',
-          port: 15432,
-          username: 'postgres',
-          password: 'postgres',
-          database: 'postgres',
+          host: DB_HOST,
+          port: DB_PORT,
+          username: DB_USER,
+          password: DB_PASSWORD,
+          database: DB_DATABASE,
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: true,
           logging: true,
