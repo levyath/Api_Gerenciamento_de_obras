@@ -16,6 +16,11 @@ export class ObrasController {
     return this.obraService.findOne(id);
   }
 
+  @Get(':id/fornecedores')
+  findOneSuppliers(@Param('id') id: number): Promise<Obra | null> {
+    return this.obraService.findOneSuppliers(id);
+  }
+
   @Post()
   create(@Body() obra: CreateObraDto): Promise<Obra | null> {
     return this.obraService.create(obra);
