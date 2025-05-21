@@ -29,6 +29,13 @@ export class ObrasRepository {
   }
 
 
+  async findOneSuppliers(id: number): Promise<Obra | null>{
+    return this.obraRepository.findOne({
+    where: { id: Number(id) },
+    relations: ['fornecedores'], 
+  });
+  }
+
 
   async create(obraInput: Obra): Promise<Obra| null> {
   
