@@ -1,27 +1,86 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { ObrasRepository } from './obras.repository';
+import { FornecedoresRepository } from '../fornecedores/fornecedores.repository';
 
 @Injectable()
 export class ObrasService {
-  constructor(private readonly obraRepository: ObrasRepository) {}
+  constructor(private readonly obraRepository: ObrasRepository,
+    private readonly fornecedoresRepository: FornecedoresRepository
+  ) {}
 
-  findAll() {
+
+  async findAll() {
     return this.obraRepository.findAll();
   }
 
-  findOne(id: string) {
-    return this.obraRepository.findOne(id);
+
+  async findOne(id: number) {
+    const existeObra = await this.obraRepository.findOne(id);
+    
+    if (!existeObra) {
+      throw new NotFoundException(`A obra buscada não existe!`);
+    }
+
+    return existeObra;
   }
 
-  create(obra) {
+
+  async create(obraInput: any) {
+
+    const obra = obraInput;
+
+    //verificando se os fornecedores informados pelo usuário existem 
+    if (obra.fornecedores?.length) {
+      const fornecedoresIds = obra.fornecedores.map((obra) => obra.id);
+
+      const todasObras = await this.fornecedoresRepository.findAll();
+      const obrasExistentes = todasObras.filter((obra) => fornecedoresIds.includes(obra.id));
+
+      if (obrasExistentes.length !== fornecedoresIds.length) {
+        throw new HttpException('Um ou mais fornecedores informado(s) não existem!', HttpStatus.NOT_FOUND);
+      }
+
+      obra.fornecedores = obrasExistentes;
+    }
+
     return this.obraRepository.create(obra);
   }
 
-  update(id: string, obra) {
+
+  async update(id: number, obraInput: any) {
+    const existeObra = await this.obraRepository.findOne(id);
+    
+    if (!existeObra) {
+      throw new NotFoundException(`A obra buscada não existe!`);
+    }
+
+    const obra = obraInput;
+
+    //verificando se os fornecedores informados pelo usuário existem 
+    if (obra.fornecedores?.length) {
+      const fornecedoresIds = obra.fornecedores.map((obra) => obra.id);
+
+      const todasObras = await this.fornecedoresRepository.findAll();
+      const obrasExistentes = todasObras.filter((obra) => fornecedoresIds.includes(obra.id));
+
+      if (obrasExistentes.length !== fornecedoresIds.length) {
+        throw new HttpException('Um ou mais fornecedores informado(s) não existem!', HttpStatus.NOT_FOUND);
+      }
+
+      obra.fornecedores = obrasExistentes;
+    }
+
     return this.obraRepository.update(id, obra);
   }
+  
 
-  remove(id: string) {
+  async remove(id: number) {
+    const existeObra = await this.obraRepository.findOne(id);
+    
+    if (!existeObra) {
+      throw new NotFoundException(`A obra buscada não existe!`);
+    }
+
     return this.obraRepository.remove(id);
   }
 }

@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Fornecedores } from '../../fornecedores/entities/fornecedores.entity';
 
 @Entity('obras')
 export class Obra {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ length: 255 })
   nome: string;
@@ -40,4 +41,12 @@ export class Obra {
 
   @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
   longitude: number;
+
+  @ManyToMany(() => Fornecedores, fornecedor => fornecedor.obras)
+  @JoinTable({
+    name: 'obra_fornecedor',
+    joinColumn: { name: 'obra_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'fornecedor_id', referencedColumnName: 'id' }
+  })
+  fornecedores: Fornecedores[];
 }

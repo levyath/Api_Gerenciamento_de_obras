@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ObrasModule } from './domain/obras/obras.module';
+import { FornecedoresModule } from './domain/fornecedores/fornecedores.module';
 import 'dotenv/config'
 
 const {
@@ -39,6 +40,7 @@ const {
         return dataSource.options;
       },}),
       ObrasModule,
+      FornecedoresModule,
   ],
   controllers: [AppController],
   providers: [AppService],
