@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ObrasModule } from './domain/obras/obras.module';
 import { FornecedoresModule } from './domain/fornecedores/fornecedores.module';
+import { EquipamentosModule } from './domain/equipamentos/equipamentos.module';
 import 'dotenv/config'
 
 const {
@@ -41,6 +42,7 @@ const {
       },}),
       ObrasModule,
       FornecedoresModule,
+      EquipamentosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

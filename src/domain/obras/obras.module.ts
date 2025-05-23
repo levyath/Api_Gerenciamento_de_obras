@@ -1,19 +1,36 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { Obra } from './entities/obra.entity';
-
-import { FornecedoresRepository } from '../fornecedores/fornecedores.repository';
-import { ObraFornecedor } from '../obra-fornecedor/entities/obra-fornecedor.entity';
-import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
-
 import { ObrasController } from './obras.controller';
 import { ObrasService } from './obras.service';
 import { ObrasRepository } from './obras.repository';
 
+import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
+import { ObraFornecedor } from '../obra-fornecedor/entities/obra-fornecedor.entity';
+import { FornecedoresRepository } from '../fornecedores/fornecedores.repository';
+
+import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
+import { ObraEquipamento } from '../obra-equipamentos/entities/obra-equipamento.entity';
+import { EquipamentosRepository } from '../equipamentos/equipamentos.repository';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Obra, Fornecedores, ObraFornecedor])], 
+  imports: [
+    TypeOrmModule.forFeature([
+      Obra,
+      Fornecedores,
+      ObraFornecedor,
+      Equipamentos,
+      ObraEquipamento,
+    ]),
+  ],
   controllers: [ObrasController],
-  providers: [ObrasService, ObrasRepository, FornecedoresRepository], 
-  exports: [ObrasRepository, FornecedoresRepository], 
+  providers: [
+    ObrasService,
+    ObrasRepository,
+    FornecedoresRepository,
+    EquipamentosRepository,
+  ],
+  exports: [ObrasRepository, FornecedoresRepository, EquipamentosRepository],
 })
 export class ObrasModule {}

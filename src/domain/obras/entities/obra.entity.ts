@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { Fornecedores } from '../../fornecedores/entities/fornecedores.entity';
+import { Equipamentos } from '../../equipamentos/entities/equipamento.entity';
 
 @Entity('obras')
 export class Obra {
@@ -12,7 +19,11 @@ export class Obra {
   @Column({ type: 'text' })
   descricao: string;
 
-  @Column({ type: 'enum', enum: ['Planejada', 'Em andamento', 'Concluída', 'Paralisada'], default: 'Planejada' })
+  @Column({
+    type: 'enum',
+    enum: ['Planejada', 'Em andamento', 'Concluída', 'Paralisada'],
+    default: 'Planejada',
+  })
   status: string;
 
   @Column({ type: 'date' })
@@ -46,7 +57,10 @@ export class Obra {
   @JoinTable({
     name: 'obra_fornecedor',
     joinColumn: { name: 'obra_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'fornecedor_id', referencedColumnName: 'id' }
+    inverseJoinColumn: { name: 'fornecedor_id', referencedColumnName: 'id' },
   })
   fornecedores: Fornecedores[];
-}
+
+ @ManyToMany(() => Equipamentos, equipamento => equipamento.obras)
+  equipamentos: Equipamentos[];
+} 
