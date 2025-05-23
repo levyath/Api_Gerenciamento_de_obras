@@ -39,7 +39,7 @@ export class EquipamentosController {
   }
 
   @Get('obras/:id')
-    async findEquipamentosByObra(@Param('id') id: number): Promise<Equipamentos[]> {
+    async findEquipamentosByObra(@Param('id') id: number) {
       return this.equipamentosService.getEquipamentosByObraId(id);
     }
 }

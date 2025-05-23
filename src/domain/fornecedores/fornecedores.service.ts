@@ -155,4 +155,15 @@ export class FornecedoresService {
 
     return this.fornecedoresRepository.remove(id);
   }
+
+
+  async findSuppliersByObra(obraId: number) {
+  const existeObra = await this.obrasRepository.findOne(obraId);
+
+  if (!existeObra) {
+    throw new NotFoundException(`A obra buscada não existe!`);
+  }
+
+  return this.fornecedoresRepository.findSuppliersByObra(obraId);
+}
 }

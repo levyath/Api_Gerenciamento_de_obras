@@ -77,6 +77,14 @@ export class FornecedoresRepository {
   }
 
 
+   async findSuppliersByObra(obraId: number): Promise<Fornecedores[]> {
+    return this.fornecedoresRepository.createQueryBuilder('fornecedor')
+      .leftJoin('fornecedor.obras', 'obra')
+      .where('obra.id = :obraId', { obraId })
+      .getMany();
+  }
+
+
   async findOneByOptions(options: FindOneOptions<Fornecedores>): Promise<Fornecedores | null> {
     return this.fornecedoresRepository.findOne(options);
   }
