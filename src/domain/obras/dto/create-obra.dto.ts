@@ -56,4 +56,10 @@ export class CreateObraDto {
   @ValidateNested({ each: true })
   @Type(() => Number)
   fornecedores?: number[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Number)
+  equipamentos?: number[];
 }

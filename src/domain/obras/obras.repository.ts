@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager, In } from 'typeorm';
 import { Obra } from './entities/obra.entity';
 import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
 import { ObraFornecedor } from '../obra-fornecedor/dto/obra-fornecedor.dto';
@@ -12,6 +12,7 @@ export class ObrasRepository {
     private readonly obraRepository: Repository<Obra>,
     @InjectRepository(ObraFornecedor)
     private readonly obraFornecedor: Repository<ObraFornecedor>,
+    private manager: EntityManager,
   ) {}
 
 
@@ -75,10 +76,16 @@ export class ObrasRepository {
 
     return this.findOne(id);
   }
-
-
+  
 
   async remove(id: number): Promise<void> {
     await this.obraRepository.delete(id);
+  }
+
+
+  async findByIds(obrasIds: number[]): Promise<Obra[]> {
+    return this.manager.find(Obra, {
+      where: { id: In(obrasIds) },
+    });
   }
 }
