@@ -24,18 +24,6 @@ export class ObrasService {
     return existeObra;
   }
 
-
-  async findOneSuppliers(id: number) {
-    const existeObra = await this.obraRepository.findOne(id);
-    
-    if (!existeObra) {
-      throw new NotFoundException(`A obra buscada não existe!`);
-    }
-
-    return await this.obraRepository.findOneSuppliers(id);;
-  }
-  
-
   async create(obraInput: any) {
 
     const obra = obraInput;

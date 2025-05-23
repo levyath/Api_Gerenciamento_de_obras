@@ -37,4 +37,9 @@ export class FornecedoresController {
   remove(@Param('id') id: number): Promise<void> {
     return this.fornecedoresService.remove(id);
   }
+
+  @Get('obras/:id')
+  async findSuppliersByObra(@Param('id') id: number) {
+    return this.fornecedoresService.findSuppliersByObra(id);
+  }
 }
