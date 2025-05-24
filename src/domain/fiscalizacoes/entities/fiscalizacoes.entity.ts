@@ -31,11 +31,11 @@ export class Fiscalizacao {
     // @JoinTable({
     //     name: 'obra_fiscalizacoes',
     //     joinColumn: {
-    //         name: 'fiscalizacoes_id',
+    //         name: 'fiscalizacoesId',
     //         referencedColumnName: 'id',
     //     },
     //     inverseJoinColumn: {
-    //         name: 'obra_id',
+    //         name: 'obraId',
     //         referencedColumnName: 'id',
     //     }
     // })
@@ -54,5 +54,5 @@ export class Fiscalizacao {
   
     @UpdateDateColumn()
     atualizadoEm: Date;
-  }
+}
   
