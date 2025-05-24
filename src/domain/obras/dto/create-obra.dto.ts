@@ -40,9 +40,6 @@ export class CreateObraDto {
   @IsNumber()
   percentual_concluido?: number;
 
-  @IsString()
-  endereco: string;
-
   @IsOptional()
   @IsNumber()
   latitude?: number;
@@ -62,4 +59,8 @@ export class CreateObraDto {
   @ValidateNested({ each: true })
   @Type(() => Number)
   equipamentos?: number[];
+
+  @IsOptional()
+  @IsNumber()
+  endereco_id?: number;
 }

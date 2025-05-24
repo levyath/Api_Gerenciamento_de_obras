@@ -1,17 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOneOptions } from 'typeorm';
+import { Repository, FindOneOptions, EntityManager } from 'typeorm';
+import { InjectEntityManager } from '@nestjs/typeorm';
 import { Fornecedores } from './entities/fornecedores.entity';
 import { ObraFornecedor } from '../obra-fornecedor/dto/obra-fornecedor.dto';
 import { Obra } from '../obras/entities/obra.entity';
+import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
 
 @Injectable()
 export class FornecedoresRepository {
   constructor(
     @InjectRepository(Fornecedores)
     private readonly fornecedoresRepository: Repository<Fornecedores>,
+    @InjectRepository(Equipamentos)
+    private readonly Equipamentos: Repository<Equipamentos>,
     @InjectRepository(ObraFornecedor)
     private readonly obraFornecedor: Repository<ObraFornecedor>,
+    @InjectEntityManager()
+    private readonly manager: EntityManager,
   ) {}
 
 
@@ -72,9 +78,16 @@ export class FornecedoresRepository {
 }
 
 
-  async remove(id: number): Promise<void> {
-    await this.fornecedoresRepository.delete(id);
-  }
+ async remove(id: number): Promise<void> {
+  await this.manager
+    .createQueryBuilder()
+    .update(Equipamentos)
+    .set({ fornecedor: null }) 
+    .where('fornecedorId = :id', { id }) 
+    .execute();
+
+  await this.fornecedoresRepository.delete(id);
+}
 
 
    async findSuppliersByObra(obraId: number): Promise<Fornecedores[]> {

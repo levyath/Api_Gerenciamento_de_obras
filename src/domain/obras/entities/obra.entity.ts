@@ -1,12 +1,7 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
+import {Entity, PrimaryGeneratedColumn,Column,ManyToOne,JoinColumn, ManyToMany, JoinTable,} from 'typeorm';
 import { Fornecedores } from '../../fornecedores/entities/fornecedores.entity';
 import { Equipamentos } from '../../equipamentos/entities/equipamento.entity';
+import { Endereco } from '../../enderecos/entities/endereco.entity';
 
 @Entity('obras')
 export class Obra {
@@ -44,9 +39,6 @@ export class Obra {
   @Column({ type: 'float', default: 0 })
   percentual_concluido: number;
 
-  @Column({ length: 255 })
-  endereco: string;
-
   @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
   latitude: number;
 
@@ -63,4 +55,9 @@ export class Obra {
 
  @ManyToMany(() => Equipamentos, equipamento => equipamento.obras)
   equipamentos: Equipamentos[];
+
+  @ManyToOne(() => Endereco, { eager: true, nullable: true })
+  @JoinColumn({ name: 'endereco' })  
+  endereco: Endereco;
+
 } 

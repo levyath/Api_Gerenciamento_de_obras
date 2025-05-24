@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Obra } from './entities/obra.entity';
@@ -14,6 +14,9 @@ import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
 import { ObraEquipamento } from '../obra-equipamentos/entities/obra-equipamento.entity';
 import { EquipamentosRepository } from '../equipamentos/equipamentos.repository';
 
+import { Endereco } from '../enderecos/entities/endereco.entity';
+import { EnderecoModule } from '../enderecos/endereco.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -22,7 +25,9 @@ import { EquipamentosRepository } from '../equipamentos/equipamentos.repository'
       ObraFornecedor,
       Equipamentos,
       ObraEquipamento,
+      Endereco,
     ]),
+    forwardRef(() => EnderecoModule), 
   ],
   controllers: [ObrasController],
   providers: [
@@ -31,6 +36,11 @@ import { EquipamentosRepository } from '../equipamentos/equipamentos.repository'
     FornecedoresRepository,
     EquipamentosRepository,
   ],
-  exports: [ObrasRepository, FornecedoresRepository, EquipamentosRepository],
+  exports: [
+    ObrasRepository,
+    FornecedoresRepository,
+    EquipamentosRepository,
+    TypeOrmModule
+  ],
 })
 export class ObrasModule {}
