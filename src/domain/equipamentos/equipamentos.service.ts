@@ -44,17 +44,17 @@ export class EquipamentosService {
     }
 
     if (equipamento.fornecedor) {
-  const fornecedor = await this.FornecedoresRepository.findOneByOptions({
-      where: { id: equipamento.fornecedor },
-    });
+    const fornecedor = await this.FornecedoresRepository.findOneByOptions({
+        where: { id: equipamento.fornecedor },
+      });
 
-    if (!fornecedor) {
-      throw new HttpException(
-        'O fornecedor informado não existe.',
-        HttpStatus.NOT_FOUND,
-      );
+      if (!fornecedor) {
+        throw new HttpException(
+          'O fornecedor informado não existe.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
     }
-  }
 
     if (equipamento.obras?.length) {
       const obraIds = equipamento.obras.map((obra) => obra.id);
