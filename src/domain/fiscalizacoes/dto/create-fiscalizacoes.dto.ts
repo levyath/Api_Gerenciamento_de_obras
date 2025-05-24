@@ -12,5 +12,5 @@ export class CreateFiscalizacaoDto {
     data: string;
 
     @IsInt()
-    responsavelId: number;
+    responsavel_id: number;
 }

@@ -1,10 +1,9 @@
 import { IsString, IsOptional, IsDateString, IsInt } from 'class-validator';
 
 export class CreateFiscalizacaoDto {
+    @IsInt()
+    obra_id: number;
 
     @IsInt()
-    obraId: number;
-
-    @IsInt()
-    fiscalizacoesId: number;
+    fiscalizacoes_id: number;
 }

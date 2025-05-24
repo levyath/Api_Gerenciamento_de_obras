@@ -31,11 +31,11 @@ export class Fiscalizacao {
     // @JoinTable({
     //     name: 'obra_fiscalizacoes',
     //     joinColumn: {
-    //         name: 'fiscalizacoesId',
+    //         name: 'fiscalizacoes_id',
     //         referencedColumnName: 'id',
     //     },
     //     inverseJoinColumn: {
-    //         name: 'obraId',
+    //         name: 'obra_id',
     //         referencedColumnName: 'id',
     //     }
     // })
