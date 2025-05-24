@@ -17,6 +17,10 @@ import { EquipamentosRepository } from '../equipamentos/equipamentos.repository'
 import { Endereco } from '../enderecos/entities/endereco.entity';
 import { EnderecoModule } from '../enderecos/endereco.module';
 
+import { Fiscalizacoes } from '../fiscalizacoes/entities/fiscalizacoes.entity';
+import { ObraFiscalizacoes } from '../obra-fiscalizacoes/entities/obra-fiscalizacoes.entity';
+import { FiscalizacoesRepository } from '../fiscalizacoes/fiscalizacoes.repository';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -26,6 +30,8 @@ import { EnderecoModule } from '../enderecos/endereco.module';
       Equipamentos,
       ObraEquipamento,
       Endereco,
+      Fiscalizacoes,
+      ObraFiscalizacoes,
     ]),
     forwardRef(() => EnderecoModule), 
   ],
@@ -35,11 +41,13 @@ import { EnderecoModule } from '../enderecos/endereco.module';
     ObrasRepository,
     FornecedoresRepository,
     EquipamentosRepository,
+    FiscalizacoesRepository,
   ],
   exports: [
     ObrasRepository,
     FornecedoresRepository,
     EquipamentosRepository,
+    FiscalizacoesRepository,
     TypeOrmModule
   ],
 })

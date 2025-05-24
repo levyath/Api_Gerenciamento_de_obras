@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsDateString, IsInt } from 'class-validator';
 
-export class CreateFiscalizacaoDto {
+export class CreateFiscalizacoesDto {
     @IsString()
     titulo: string;
 

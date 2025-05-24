@@ -1,6 +1,6 @@
-import { IsString, IsOptional, IsDateString, IsInt } from 'class-validator';
+import { IsInt } from 'class-validator';
 
-export class CreateFiscalizacaoDto {
+export class CreateObraFiscalizacaoDto {
     @IsInt()
     obra_id: number;
 

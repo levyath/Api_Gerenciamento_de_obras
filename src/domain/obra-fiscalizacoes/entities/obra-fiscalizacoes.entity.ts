@@ -1,20 +1,20 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-//import { Obra } from '../../obras/entities/obra.entity';
-import { Fiscalizacao } from '../../fiscalizacoes/entities/fiscalizacoes.entity';
+import { Obra } from '../../obras/entities/obra.entity';
+import { Fiscalizacoes } from '../../fiscalizacoes/entities/fiscalizacoes.entity';
 
-@Entity('obra_equipamentos')
-export class ObraEquipamento {
+@Entity('obra_fiscalizacoes')
+export class ObraFiscalizacoes {
     @PrimaryColumn()
     obra_id: number;
 
     @PrimaryColumn()
-    fiscalizacoes_id: number;  
+    fiscalizacoes_id: number;
 
-    // @ManyToOne(() => Obra, { eager: false, onDelete: 'CASCADE' })
-    // @JoinColumn({ name: 'obra_id' })
-    // obra: Obra;
+    @ManyToOne(() => Obra, { eager: false, onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'obra_id' })
+    obra: Obra;
 
-    @ManyToOne(() => Fiscalizacao, { eager: false, onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'equipamento_id' })
-    fiscalizacao: Fiscalizacao; 
+    @ManyToOne(() => Fiscalizacoes, { eager: false, onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'fiscalizacoes_id' })
+    fiscalizacao: Fiscalizacoes; 
 }

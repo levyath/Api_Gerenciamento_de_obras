@@ -14,7 +14,7 @@ import { Obra } from 'src/domain/obras/entities/obra.entity';
 //import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel.entity'; pendente Levy
   
 @Entity('fiscalizacoes')
-export class Fiscalizacao {
+export class Fiscalizacoes {
     @PrimaryGeneratedColumn()
     id: number;
 

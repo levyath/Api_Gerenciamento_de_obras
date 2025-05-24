@@ -6,6 +6,7 @@ import { ObrasModule } from './domain/obras/obras.module';
 import { FornecedoresModule } from './domain/fornecedores/fornecedores.module';
 import { EquipamentosModule } from './domain/equipamentos/equipamentos.module';
 import { EnderecoModule } from './domain/enderecos/endereco.module';
+import { FiscalizacoesModule } from './domain/fiscalizacoes/fiscalizacoes.module';
 import 'dotenv/config'
 
 const {
@@ -45,6 +46,7 @@ const {
       FornecedoresModule,
       EquipamentosModule,
       EnderecoModule,
+      FiscalizacoesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
