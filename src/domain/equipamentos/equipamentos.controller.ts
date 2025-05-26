@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Patch, Param, Delete, BadRequestException } from '@nestjs/common';
 import { EquipamentosService } from './equipamentos.service';
 import { Equipamentos } from './entities/equipamento.entity';
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
@@ -8,38 +8,71 @@ export class EquipamentosController {
   constructor(private readonly equipamentosService: EquipamentosService) {}
 
   @Post()
-  create(@Body() equipamentos: CreateEquipamentoDto) {
-    return this.equipamentosService.create(equipamentos);
+  async create(@Body() equipamentos: CreateEquipamentoDto): Promise<Equipamentos | null> {
+    try {
+      return this.equipamentosService.create(equipamentos);
+    } catch (error) {
+      throw new BadRequestException('Erro ao criar equipamento: ' + error.message);
+    }
   }  
 
   @Get()
-  findAll(): Promise<Equipamentos[]> {
-    return this.equipamentosService.findAll();
+  async findAll(): Promise<Equipamentos[]> {
+    try {
+      return this.equipamentosService.findAll();
+    } catch (error) {
+      throw new BadRequestException('Erro ao listar equipamentos: ' + error.message);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Equipamentos | null> {
-    return this.equipamentosService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<Equipamentos | null> {
+    try {
+      return this.equipamentosService.findOne(+id);
+    } catch (error) {
+      throw new BadRequestException('Erro ao visualizar equipamento: ' + error.message);
+    }
   }
 
   @Put(':id')
-    update(
-      @Param('id') id: number, @Body() equipamentos: CreateEquipamentoDto): Promise<Equipamentos | null> {
+  async update(
+    @Param('id') id: number, 
+    @Body() equipamentos: CreateEquipamentoDto
+  ): Promise<Equipamentos | null> {
+    try {
       return this.equipamentosService.update(id, equipamentos);
+    } catch (error) {
+      throw new BadRequestException('Erro ao atualizar equipamento: ' + error.message);
     }
+  }
 
   @Patch(':id')
-  updateObras(@Param('id') id: number,@Body('obras') obras: number[]): Promise<Equipamentos | null> {
-    return this.equipamentosService.updateObras(+id, obras);
+  async updateObras(
+    @Param('id') id: number,
+    @Body('obras') obras: number[]
+  ): Promise<Equipamentos | null> {
+    try {
+      return this.equipamentosService.updateObras(+id, obras);
+    } catch (error) {
+      throw new BadRequestException('Erro ao atualizar obras do equipamento: ' + error.message);
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.equipamentosService.remove(+id);
+  async remove(@Param('id') id: number) {
+    try {
+      return this.equipamentosService.remove(+id);
+    } catch (error) {
+      throw new BadRequestException('Erro ao deletar equipamento: ' + error.message);
+    }
   }
 
   @Get('obras/:id')
-    async findEquipamentosByObra(@Param('id') id: number) {
+  async findEquipamentosByObra(@Param('id') id: number) {
+    try {
       return this.equipamentosService.getEquipamentosByObraId(id);
+    } catch (error) {
+      throw new BadRequestException('Erro ao visualizar equipamentos da obra: ' + error.message);
     }
+  }
 }

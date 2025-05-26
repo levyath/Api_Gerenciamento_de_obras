@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Put, Param, Delete, BadRequestException } from '@nestjs/common';
 import { FornecedoresService } from './fornecedores.service';
 import { Fornecedores } from './entities/fornecedores.entity';
 import { CreateFornecedoreDto } from './dto/create-fornecedores.dto';
@@ -8,38 +8,66 @@ export class FornecedoresController {
   constructor(private readonly fornecedoresService: FornecedoresService) {}
 
   @Get()
-  findAll(): Promise<Fornecedores[]> {
-    return this.fornecedoresService.findAll();
+  async findAll(): Promise<Fornecedores[]> {
+    try {
+      return this.fornecedoresService.findAll();
+    } catch (error) {
+      throw new BadRequestException('Erro ao listar fornecedores: ' + error.message);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Fornecedores | null> {
-    return this.fornecedoresService.findOne(id);
+  async findOne(@Param('id') id: number): Promise<Fornecedores | null> {
+    try {
+      return this.fornecedoresService.findOne(id);
+    } catch (error) {
+      throw new BadRequestException('Erro ao visualizar fornecedor: ' + error.message);
+    }
   }
 
   @Post()
-  create(@Body() fornecedores: CreateFornecedoreDto): Promise<Fornecedores | null> {
-    return this.fornecedoresService.create(fornecedores);
+  async create(@Body() fornecedores: CreateFornecedoreDto): Promise<Fornecedores | null> {
+    try {
+      return this.fornecedoresService.create(fornecedores);
+    } catch (error) {
+      throw new BadRequestException('Erro ao criar fornecedor: ' + error.message);
+    }
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: number, @Body() fornecedores: CreateFornecedoreDto): Promise<Fornecedores | null> {
-    return this.fornecedoresService.update(id, fornecedores);
+    try {
+      return this.fornecedoresService.update(id, fornecedores);
+    } catch (error) {
+      throw new BadRequestException('Erro ao atualizar fornecedor: ' + error.message);
+    }
   }
 
   @Patch(':id')
-  updateActive(@Param('id') id: number, @Body('ativo') ativo: boolean): Promise<Fornecedores | null> {
-    return this.fornecedoresService.updateActive(id, ativo);
+  async updateActive(@Param('id') id: number, @Body('ativo') ativo: boolean): Promise<Fornecedores | null> {
+    try {
+      return this.fornecedoresService.updateActive(id, ativo);
+    } catch (error) {
+      throw new BadRequestException('Erro ao atualizar o estado do fornecedor: ' + error.message);
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<void> {
+  async remove(@Param('id') id: number): Promise<void> {
+    try {
     return this.fornecedoresService.remove(id);
+      } catch (error) {
+      throw new BadRequestException('Erro ao deletar fornecedor: ' + error.message);
+    }
   }
 
   @Get('obras/:id')
   async findSuppliersByObra(@Param('id') id: number) {
-    return this.fornecedoresService.findSuppliersByObra(id);
+    try {
+      return this.fornecedoresService.findSuppliersByObra(id);
+    } catch (error) {
+      throw new BadRequestException('Erro ao visualizar fornecedores da obra: ' + error.message);
+    }
   }
 }
