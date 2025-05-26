@@ -92,4 +92,13 @@ export class EquipamentosRepository {
 
   return this.findOne(id);
   }
+
+  async findEquipamentosEmUso(ids: number[]): Promise<Equipamentos[]> {
+  return this.equipamentosRepository
+    .createQueryBuilder('equipamento')
+    .leftJoin('equipamento.obras', 'obra')
+    .where('equipamento.id IN (:...ids)', { ids })
+    .andWhere('obra.id IS NOT NULL') 
+    .getMany();
+}
 }

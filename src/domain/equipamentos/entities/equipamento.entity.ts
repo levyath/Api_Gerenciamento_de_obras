@@ -27,7 +27,7 @@ export class Equipamentos {
   @Column({ type: 'varchar', length: 100, nullable: true })
   modelo: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100 })
   numeroDeSerie: string;
 
   @ManyToOne(() => Fornecedores, { nullable: true })
