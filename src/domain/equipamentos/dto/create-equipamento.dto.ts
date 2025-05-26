@@ -18,7 +18,7 @@ export class CreateEquipamentoDto {
   modelo?: string;
 
   @IsString()
-  @IsOptional()
+ @IsNotEmpty()
   numeroDeSerie?: string;
 
   @IsNumber()
