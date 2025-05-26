@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, BadRequestException } from '@nestjs/common';
 import { ObrasService } from './obras.service';
 import { Obra } from './entities/obra.entity';
 import { CreateObraDto } from './dto/create-obra.dto';
@@ -7,27 +7,47 @@ import { CreateObraDto } from './dto/create-obra.dto';
 export class ObrasController {
   constructor(private readonly obraService: ObrasService) {}
   @Get()
-  findAll(): any{
-    return this.obraService.findAll();
+  async findAll(): Promise<any>{
+    try {
+      return this.obraService.findAll();
+    } catch (error) {
+          throw new BadRequestException('Erro ao listar obras: ' + error.message);
+      }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Obra | null> {
-    return this.obraService.findOne(id);
+  async findOne(@Param('id') id: number): Promise<Obra | null> {
+    try {
+      return this.obraService.findOne(id);
+    } catch (error) {
+          throw new BadRequestException('Erro ao visualizar obra: ' + error.message);
+      }
   }
 
   @Post()
-  create(@Body() obra: CreateObraDto): Promise<Obra | null> {
-    return this.obraService.create(obra);
+  async create(@Body() obra: CreateObraDto): Promise<Obra | null> {
+    try {
+      return this.obraService.create(obra);
+    } catch (error) {
+          throw new BadRequestException('Erro ao criar obra: ' + error.message);
+      }
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() obra: CreateObraDto): Promise<Obra | null> {
-    return this.obraService.update(id, obra);
+  async update(@Param('id') id: number, @Body() obra: CreateObraDto): Promise<Obra | null> {
+    try {
+      return this.obraService.update(id, obra);
+    } catch (error) {
+          throw new BadRequestException('Erro ao atualizar obra: ' + error.message);
+      }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<void> {
-    return this.obraService.remove(id);
+  async remove(@Param('id') id: number): Promise<void> {
+    try {
+      return this.obraService.remove(id);
+     } catch (error) {
+          throw new BadRequestException('Erro ao deletar obra: ' + error.message);
+      }
   }
 }
