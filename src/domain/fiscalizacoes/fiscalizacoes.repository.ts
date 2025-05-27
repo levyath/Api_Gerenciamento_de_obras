@@ -28,9 +28,6 @@ export class FiscalizacoesRepository {
             where: { obra: { id: obraId } },
             relations: ['fiscalizacao'],
         });
-        if (obraFiscalizacoes.length === 0) {
-            throw new NotFoundException('Nenhuma fiscalização associada à obra ${obraId}');
-        }
         return obraFiscalizacoes.map(of => of.fiscalizacao);
     }
 

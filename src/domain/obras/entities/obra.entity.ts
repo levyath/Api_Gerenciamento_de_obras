@@ -2,7 +2,7 @@ import {Entity, PrimaryGeneratedColumn,Column,ManyToOne,JoinColumn, ManyToMany, 
 import { Fornecedores } from '../../fornecedores/entities/fornecedores.entity';
 import { Equipamentos } from '../../equipamentos/entities/equipamento.entity';
 import { Endereco } from '../../enderecos/entities/endereco.entity';
-import { Fiscalizacao } from 'src/domain/fiscalizacoes/entities/fiscalizacoes.entity';
+import { Fiscalizacoes } from 'src/domain/fiscalizacoes/entities/fiscalizacoes.entity';
 
 @Entity('obras')
 export class Obra {
@@ -61,6 +61,6 @@ export class Obra {
   @JoinColumn({ name: 'endereco' })  
   endereco: Endereco;
 
-  @ManyToMany(() => Fiscalizacao, fiscalizacao => fiscalizacao.obras)
-  fiscalizacoes: Fiscalizacao[];
+  @ManyToMany(() => Fiscalizacoes, fiscalizacao => fiscalizacao.obras)
+  fiscalizacoes: Fiscalizacoes[];
 } 
