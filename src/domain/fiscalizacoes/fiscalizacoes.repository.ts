@@ -18,7 +18,7 @@ export class FiscalizacoesRepository {
     //get geral (/fiscalizacoes)
     async findAll(): Promise<Fiscalizacoes[]> {
         return this.fiscalizacoesRepository.find({
-            relations: ['obras'],
+            relations: ['obras']//'relatorios', 'responsavelTecnico'],
         });
     }
 
@@ -35,10 +35,10 @@ export class FiscalizacoesRepository {
     async findOneById(id: number): Promise<Fiscalizacoes> {
         const fiscalizacao = await this.fiscalizacoesRepository.findOne({
             where: { id },
-            relations: ['obras']//'relatorios', 'responsavelTecnico'], pendente eu e Levy
+            relations: ['obras']//'relatorios', 'responsavelTecnico'],
         });
         if (!fiscalizacao) {
-            throw new NotFoundException('Fiscalização com ID ${id} não encontrada.');
+            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
         }
         return fiscalizacao;
     }
@@ -62,9 +62,12 @@ export class FiscalizacoesRepository {
     async update(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
         const fiscalizacao = await this.fiscalizacoesRepository.findOne({ where: { id } });
         if (!fiscalizacao) {
-            throw new NotFoundException('Fiscalização com ID ${id} não encontrada.');
+            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
         }
         Object.assign(fiscalizacao, dto);
+        // if (dto.responsavel_id !== undefined) {
+        //     fiscalizacao.responsavel = { id: dto.responsavel_id }; // comentado até entidade existir
+        // }
         return this.fiscalizacoesRepository.save(fiscalizacao);
     }
 
@@ -72,7 +75,7 @@ export class FiscalizacoesRepository {
     async patch(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
         const fiscalizacao = await this.fiscalizacoesRepository.findOne({ where: { id } });
         if (!fiscalizacao) {
-            throw new NotFoundException('Fiscalização com ID ${id} não encontrada.');
+            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
         }
         if (dto.titulo !== undefined) {
             fiscalizacao.titulo = dto.titulo;
@@ -80,6 +83,9 @@ export class FiscalizacoesRepository {
         if (dto.descricao !== undefined) {
             fiscalizacao.descricao = dto.descricao;
         }
+        // if (dto.responsavel_id !== undefined) {
+        //     fiscalizacao.responsavel = { id: dto.responsavel_id }; // comentado até entidade existir
+        // }
         return this.fiscalizacoesRepository.save(fiscalizacao);
     }
 
@@ -87,7 +93,7 @@ export class FiscalizacoesRepository {
     async remove(id: number): Promise<void> {
         const fiscalizacao = await this.fiscalizacoesRepository.findOne({ where: { id } });
         if (!fiscalizacao) {
-            throw new NotFoundException('Fiscalização com ID ${id} não encontrada.');
+            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
         }
         await this.fiscalizacoesRepository.remove(fiscalizacao);
     }
