@@ -1,104 +1,110 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOneOptions } from 'typeorm';
-import { Equipamentos } from './entities/equipamento.entity';
-import { ObraEquipamento } from '../obra-equipamentos/dto/obra-equipamento.dto';
-import { Obra } from '../obras/entities/obra.entity';
+import { InjectModel } from '@nestjs/sequelize';
+import { Equipamentos } from './entities/equipamento.model';
+import { ObraEquipamento } from '../obra-equipamentos/entities/obra-equipamento.model';
+import { Obra } from '../obras/entities/obra.model';
+import { Fornecedores } from '../fornecedores/entities/fornecedores.model';
+import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
 
 @Injectable()
 export class EquipamentosRepository {
   constructor(
-    @InjectRepository(Equipamentos)
-    private readonly equipamentosRepository: Repository<Equipamentos>,
-    @InjectRepository(ObraEquipamento)
-    private readonly obraEquipamentoRepository: Repository<ObraEquipamento>,
+    @InjectModel(Equipamentos)
+    private readonly equipamentosModel: typeof Equipamentos,
+
+    @InjectModel(ObraEquipamento)
+    private readonly obraEquipamentoModel: typeof ObraEquipamento,
   ) {}
 
   async findAll(): Promise<Equipamentos[]> {
-    return this.equipamentosRepository.find();
+    return this.equipamentosModel.findAll();
   }
 
   async findOne(id: number): Promise<Equipamentos | null> {
-  return this.equipamentosRepository.findOne({
-    where: { id: Number(id) },
-    relations: ['obras', 'fornecedor'], 
-  });
-}
-
-  async create(equipamento: Equipamentos): Promise<Equipamentos | null> {
-    const createdEquipamento = await this.equipamentosRepository.save(equipamento);
-
-    if (equipamento.obras?.length) {
-      const obraEquipamento: ObraEquipamento[] = equipamento.obras.map((obra: Obra) => ({
-        equipamento_id: createdEquipamento.id,
-        obra_id: obra.id,
-      }));
-
-      await this.obraEquipamentoRepository.save(obraEquipamento as any);
-    }
-
-    return this.findOne(createdEquipamento.id);
+    return this.equipamentosModel.findByPk(id, {
+      include: [
+        { model: Obra, as: 'obras' },
+        { model: Fornecedores, as: 'fornecedor' },
+      ],
+    });
   }
 
-  async update(id: number, equipamentoInput: Partial<Equipamentos>): Promise<Equipamentos | null> {
-    const { obras, ...equipamentoData } = equipamentoInput;
+  async create(
+  equipamentoData: CreateEquipamentoDto & { obras?: number[] }
+): Promise<Equipamentos | null> {
+  const { obras, ...attrs } = equipamentoData;
 
-    await this.equipamentosRepository.update(id, equipamentoData);
+  // Use apenas os campos diretamente relacionados ao modelo
+  const createdEquipamento = await this.equipamentosModel.create(attrs as any);
+
+  // Relacionamento com obras (apenas se obras for um array de IDs)
+  if (obras && obras.length) {
+    await createdEquipamento.$set('obras', obras);
+  }
+
+  return this.findOne(createdEquipamento.id);
+}
+
+  async update(id: number, equipamentoData: Partial<Equipamentos> & { obras?: Obra[] }): Promise<Equipamentos | null> {
+    const { obras, ...equipamentoAttrs } = equipamentoData;
+
+    await this.equipamentosModel.update(equipamentoAttrs, { where: { id } });
+    const equipamento = await this.equipamentosModel.findByPk(id);
+    if (!equipamento) return null;
 
     if (obras) {
-      await this.obraEquipamentoRepository.delete({ equipamento_id: id });
-
-      if (obras.length > 0) {
-        const obraEquipamento = obras.map((obra: Obra) => ({
-          equipamento_id: id,
-          obra_id: obra.id,
-        }));
-
-        await this.obraEquipamentoRepository.save(obraEquipamento as any);
-      }
+      const obrasIds = obras.map((obra) => obra.id);
+      await equipamento.$set('obras', obrasIds);
     }
 
     return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
-    await this.equipamentosRepository.delete(id);
+    await this.equipamentosModel.destroy({ where: { id } });
   }
 
-  async findOneByOptions(options: FindOneOptions<Equipamentos>): Promise<Equipamentos | null> {
-    return this.equipamentosRepository.findOne(options);
+  async findOneByOptions(options: any): Promise<Equipamentos | null> {
+    return this.equipamentosModel.findOne(options);
   }
-
 
   async findByObraId(obraId: number): Promise<Equipamentos[]> {
-  return this.equipamentosRepository
-    .createQueryBuilder('equipamento')
-    .leftJoin('equipamento.obras', 'obra')
-    .leftJoinAndSelect('equipamento.fornecedor', 'fornecedor')
-    .where('obra.id = :obraId', { obraId })
-    .getMany();
-}
-
+    return this.equipamentosModel.findAll({
+      include: [
+        {
+          model: Obra,
+          as: 'obras',
+          where: { id: obraId },
+          required: true,
+        },
+        {
+          model: Fornecedores,
+          as: 'fornecedor',
+        },
+      ],
+    });
+  }
 
   async updateObras(id: number, obras: Obra[]): Promise<Equipamentos | null> {
-  await this.obraEquipamentoRepository.delete({ equipamento_id: id });
+    const equipamento = await this.equipamentosModel.findByPk(id);
+    if (!equipamento) return null;
 
-  const novasRelacoes = obras.map((obra) => ({
-    equipamento_id: id,
-    obra_id: obra.id,
-  }));
+    const obrasIds = obras.map((obra) => obra.id);
+    await equipamento.$set('obras', obrasIds);
 
-  await this.obraEquipamentoRepository.save(novasRelacoes);
-
-  return this.findOne(id);
+    return this.findOne(id);
   }
 
   async findEquipamentosEmUso(ids: number[]): Promise<Equipamentos[]> {
-  return this.equipamentosRepository
-    .createQueryBuilder('equipamento')
-    .leftJoin('equipamento.obras', 'obra')
-    .where('equipamento.id IN (:...ids)', { ids })
-    .andWhere('obra.id IS NOT NULL') 
-    .getMany();
-}
+    return this.equipamentosModel.findAll({
+      where: { id: ids },
+      include: [
+        {
+          model: Obra,
+          as: 'obras',
+          required: true,
+        },
+      ],
+    });
+  }
 }

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Patch, Param, Delete, BadRequestException } from '@nestjs/common';
 import { EquipamentosService } from './equipamentos.service';
-import { Equipamentos } from './entities/equipamento.entity';
+import { Equipamentos } from './entities/equipamento.model';
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
 
 @Controller('equipamentos')

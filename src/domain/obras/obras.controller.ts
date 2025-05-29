@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, BadRequestException } from '@nestjs/common';
 import { ObrasService } from './obras.service';
-import { Obra } from './entities/obra.entity';
+import { Obra } from './entities/obra.model';
 import { CreateObraDto } from './dto/create-obra.dto';
 
 @Controller('obras')

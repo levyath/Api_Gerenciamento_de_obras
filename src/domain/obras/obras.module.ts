@@ -1,25 +1,22 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { SequelizeModule } from '@nestjs/sequelize';
 
-import { Obra } from './entities/obra.entity';
+import { Obra } from './entities/obra.model';
 import { ObrasController } from './obras.controller';
 import { ObrasService } from './obras.service';
-import { ObrasRepository } from './obras.repository';
 
-import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
-import { ObraFornecedor } from '../obra-fornecedor/entities/obra-fornecedor.entity';
-import { FornecedoresRepository } from '../fornecedores/fornecedores.repository';
+import { Fornecedores } from '../fornecedores/entities/fornecedores.model';
+import { ObraFornecedor } from '../obra-fornecedor/entities/obra-fornecedor.model';
 
-import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
-import { ObraEquipamento } from '../obra-equipamentos/entities/obra-equipamento.entity';
-import { EquipamentosRepository } from '../equipamentos/equipamentos.repository';
-
-import { Endereco } from '../enderecos/entities/endereco.entity';
+import { Endereco } from '../enderecos/entities/endereco.model';
 import { EnderecoModule } from '../enderecos/endereco.module';
+import { Equipamentos } from '../equipamentos/entities/equipamento.model';
+import { ObraEquipamento } from '../obra-equipamentos/entities/obra-equipamento.model';
+import { ObrasRepository } from './obras.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
+    SequelizeModule.forFeature([
       Obra,
       Fornecedores,
       ObraFornecedor,
@@ -27,20 +24,10 @@ import { EnderecoModule } from '../enderecos/endereco.module';
       ObraEquipamento,
       Endereco,
     ]),
-    forwardRef(() => EnderecoModule), 
+    forwardRef(() => EnderecoModule),
   ],
   controllers: [ObrasController],
-  providers: [
-    ObrasService,
-    ObrasRepository,
-    FornecedoresRepository,
-    EquipamentosRepository,
-  ],
-  exports: [
-    ObrasRepository,
-    FornecedoresRepository,
-    EquipamentosRepository,
-    TypeOrmModule
-  ],
+  providers: [ObrasService, ObrasRepository],
+  exports: [ObrasService],
 })
 export class ObrasModule {}

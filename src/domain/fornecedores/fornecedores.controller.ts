@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Put, Param, Delete, BadRequestException } from '@nestjs/common';
 import { FornecedoresService } from './fornecedores.service';
-import { Fornecedores } from './entities/fornecedores.entity';
-import { CreateFornecedoreDto } from './dto/create-fornecedores.dto';
+import { Fornecedores } from './entities/fornecedores.model';
+import { CreateFornecedorDto } from './dto/create-fornecedores.dto';
 
 @Controller('fornecedores')
 export class FornecedoresController {
@@ -26,7 +26,7 @@ export class FornecedoresController {
   }
 
   @Post()
-  async create(@Body() fornecedores: CreateFornecedoreDto): Promise<Fornecedores | null> {
+  async create(@Body() fornecedores: CreateFornecedorDto): Promise<Fornecedores | null> {
     try {
       return this.fornecedoresService.create(fornecedores);
     } catch (error) {
@@ -36,7 +36,7 @@ export class FornecedoresController {
 
   @Put(':id')
   async update(
-    @Param('id') id: number, @Body() fornecedores: CreateFornecedoreDto): Promise<Fornecedores | null> {
+    @Param('id') id: number, @Body() fornecedores: CreateFornecedorDto): Promise<Fornecedores | null> {
     try {
       return this.fornecedoresService.update(id, fornecedores);
     } catch (error) {

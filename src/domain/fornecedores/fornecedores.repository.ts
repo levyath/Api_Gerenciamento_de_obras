@@ -1,105 +1,97 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOneOptions, EntityManager } from 'typeorm';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { Fornecedores } from './entities/fornecedores.entity';
-import { ObraFornecedor } from '../obra-fornecedor/dto/obra-fornecedor.dto';
-import { Obra } from '../obras/entities/obra.entity';
-import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
+import { InjectModel } from '@nestjs/sequelize';
+import { Fornecedores } from './entities/fornecedores.model';
+import { ObraFornecedor } from '../obra-fornecedor/entities/obra-fornecedor.model';
+import { Obra } from '../obras/entities/obra.model';
+import { Equipamentos } from '../equipamentos/entities/equipamento.model';
+import { Sequelize } from 'sequelize-typescript';
+import { CreateFornecedorDto } from './dto/create-fornecedores.dto';
 
 @Injectable()
 export class FornecedoresRepository {
   constructor(
-    @InjectRepository(Fornecedores)
-    private readonly fornecedoresRepository: Repository<Fornecedores>,
-    @InjectRepository(Equipamentos)
-    private readonly Equipamentos: Repository<Equipamentos>,
-    @InjectRepository(ObraFornecedor)
-    private readonly obraFornecedor: Repository<ObraFornecedor>,
-    @InjectEntityManager()
-    private readonly manager: EntityManager,
+    @InjectModel(Fornecedores)
+    private readonly fornecedoresModel: typeof Fornecedores,
+
+    @InjectModel(Equipamentos)
+    private readonly equipamentosModel: typeof Equipamentos,
+
+    @InjectModel(ObraFornecedor)
+    private readonly obraFornecedorModel: typeof ObraFornecedor,
+
+    private readonly sequelize: Sequelize,
   ) {}
 
-
   async findAll(): Promise<Fornecedores[]> {
-    return this.fornecedoresRepository.find();
+    return this.fornecedoresModel.findAll();
   }
 
+  async findOne(id: number): Promise<Fornecedores | null> {
+    return this.fornecedoresModel.findByPk(id, {
+      include: [
+        { model: Obra, as: 'obras' },
+      ],
+    });
+  }
 
- async findOne(id: number): Promise<Fornecedores | null> {
-  return this.fornecedoresRepository.findOne({
-    where: { id: Number(id) },
-    relations: ['obras'], 
-  });
-}
+async create(fornecedorData: CreateFornecedorDto): Promise<Fornecedores | null> {
+  const { obras, ...attrs } = fornecedorData;
 
+  const createdFornecedor = await this.fornecedoresModel.create(attrs as any);
 
-  async create(fornecedor: Fornecedores): Promise<Fornecedores | null> {
-
-  const createdFornecedor = await this.fornecedoresRepository.save(fornecedor);
-
-  if (fornecedor.obras?.length) {
-    const obraFornecedor: ObraFornecedor[] = fornecedor.obras.map((obra: Obra) => ({
-      fornecedor_id: createdFornecedor.id,
-      obra_id: obra.id,
-    }));
-
-    await this.obraFornecedor.save(obraFornecedor as any);
+  if (obras && obras.length) {
+    const obrasIds = obras.map((obra) => obra.id);
+    await createdFornecedor.$set('obras', obrasIds);
   }
 
   return this.findOne(createdFornecedor.id);
 }
 
 
-  async update(id: number, fornecedorInput: Partial<Fornecedores>): Promise<Fornecedores | null> {
-  const { obras, ...fornecedorData } = fornecedorInput;
 
-  await this.fornecedoresRepository.update(id, fornecedorData);
+  async update(id: number, fornecedorInput: Partial<Fornecedores> & { obras?: Obra[] }): Promise<Fornecedores | null> {
+    const { obras, ...fornecedorAttrs } = fornecedorInput;
 
-  if (obras) {
-    await this.obraFornecedor.delete({ fornecedor_id: id });
+    await this.fornecedoresModel.update(fornecedorAttrs, { where: { id } });
+    const fornecedor = await this.fornecedoresModel.findByPk(id);
+    if (!fornecedor) return null;
 
-    if (obras.length > 0) {
-      const obraFornecedor = obras.map((obra: Obra) => ({
-        fornecedor_id: id,
-        obra_id: obra.id,
-      }));
-      await this.obraFornecedor.save(obraFornecedor as any);
+    if (obras) {
+      const obrasIds = obras.map((obra) => obra.id);
+      await fornecedor.$set('obras', obrasIds);
     }
+
+    return this.findOne(id);
   }
 
-  return this.findOne(id);
-}
-
-
-   async updateActive(id: number, ativo: boolean): Promise<Fornecedores | null> {
-  await this.fornecedoresRepository.update(id, { ativo });
-  return this.findOne(id);
-}
-
-
- async remove(id: number): Promise<void> {
-  await this.manager
-    .createQueryBuilder()
-    .update(Equipamentos)
-    .set({ fornecedor: null }) 
-    .where('fornecedorId = :id', { id }) 
-    .execute();
-
-  await this.fornecedoresRepository.delete(id);
-}
-
-
-   async findSuppliersByObra(obraId: number): Promise<Fornecedores[]> {
-    return this.fornecedoresRepository.createQueryBuilder('fornecedor')
-      .leftJoin('fornecedor.obras', 'obra')
-      .where('obra.id = :obraId', { obraId })
-      .getMany();
+  async updateActive(id: number, ativo: boolean): Promise<Fornecedores | null> {
+    await this.fornecedoresModel.update({ ativo }, { where: { id } });
+    return this.findOne(id);
   }
 
+  async remove(id: number): Promise<void> {
+    await this.equipamentosModel.update(
+      { fornecedorId: null as unknown as number  },
+      { where: { fornecedorId: id } },
+    );
 
-  async findOneByOptions(options: FindOneOptions<Fornecedores>): Promise<Fornecedores | null> {
-    return this.fornecedoresRepository.findOne(options);
+    await this.fornecedoresModel.destroy({ where: { id } });
   }
 
+  async findSuppliersByObra(obraId: number): Promise<Fornecedores[]> {
+    return this.fornecedoresModel.findAll({
+      include: [
+        {
+          model: Obra,
+          as: 'obras',
+          where: { id: obraId },
+          required: true,
+        },
+      ],
+    });
+  }
+
+  async findOneByOptions(options: any): Promise<Fornecedores | null> {
+    return this.fornecedoresModel.findOne(options);
+  }
 }

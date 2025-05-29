@@ -1,18 +1,17 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Endereco } from './entities/endereco.entity';
-import { EnderecoRepository } from './endereco.repository';
-import { EnderecoController } from './endereco.controller';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { Endereco } from './entities/endereco.model';
 import { EnderecoService } from './endereco.service';
-import { ObrasModule } from '../obras/obras.module'; 
+import { EnderecoController } from './endereco.controller';
+import { ObrasModule } from '../obras/obras.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Endereco, EnderecoRepository]),
+    SequelizeModule.forFeature([Endereco]),
     forwardRef(() => ObrasModule),
   ],
   controllers: [EnderecoController],
-  providers: [EnderecoRepository, EnderecoService],
-  exports: [EnderecoRepository],
+  providers: [EnderecoService],
+  exports: [EnderecoService],
 })
 export class EnderecoModule {}
