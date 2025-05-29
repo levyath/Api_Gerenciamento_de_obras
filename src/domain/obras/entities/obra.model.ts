@@ -81,7 +81,7 @@ export class Obra extends Model<Obra> {
 
   // Relação ManyToMany com Equipamentos
   @BelongsToMany(() => Equipamentos, () => ObraEquipamento)
-  equipamentos: Equipamentos[];
+  declare equipamentos: Equipamentos[];
 
   // FK para Endereco - corrigido para nome claro e tipo explícito
   @ForeignKey(() => Endereco)
