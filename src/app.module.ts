@@ -2,19 +2,14 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize'; // Importa SequelizeModule
-import { ObrasModule } from './domain/obras/obras.module';
-import { FornecedoresModule } from './domain/fornecedores/fornecedores.module';
-import { EquipamentosModule } from './domain/equipamentos/equipamentos.module';
-import { EnderecoModule } from './domain/enderecos/endereco.module';
-import 'dotenv/config'; // Carrega as variáveis do .env para process.env
 
-// As variáveis de ambiente são lidas do process.env
-// É uma boa prática usar o ConfigModule do NestJS (@nestjs/config) para um gerenciamento mais robusto.
+import 'dotenv/config'; 
+import { EnderecosModule } from './domain/enderecos/enderecos.module';
 const {
   DB_HOST,
   DB_PORT,
   DB_DATABASE,
-  DB_USER, // Certifique-se que esta é a variável correta (às vezes é DB_USERNAME)
+  DB_USER,
   DB_PASSWORD,
 } = process.env;
 
@@ -60,10 +55,7 @@ const {
         };
       },
     }),
-    ObrasModule,
-    FornecedoresModule,
-    EquipamentosModule,
-    EnderecoModule,
+    EnderecosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
