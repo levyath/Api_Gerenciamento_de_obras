@@ -3,17 +3,16 @@ import { FiscalizacoesRepository } from './fiscalizacoes.repository';
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
 import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectModel } from '@nestjs/sequelize';
 import { Obra } from 'src/domain/obras/entities/obra.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class FiscalizacoesService {
     constructor(
         private readonly fiscalizacoesRepository: FiscalizacoesRepository,
 
-        @InjectRepository(Obra)
-        private readonly obraRepository: Repository<Obra>
+        @InjectModel(Obra)
+        private readonly obraModel: typeof Obra
     ) {}
 
     async findAll(): Promise<Fiscalizacoes[]> {
@@ -35,12 +34,11 @@ export class FiscalizacoesService {
         }
 
         const fiscalizacoesExistentes = await this.fiscalizacoesRepository.findByObraId(obraId);
-        const tituloExistente = fiscalizacoesExistentes.some(f => f.titulo === dto.titulo);
-        if (tituloExistente) {
+        if (fiscalizacoesExistentes.some(f => f.titulo === dto.titulo)) {
             throw new ConflictException(`Já existe uma fiscalização com o título "${dto.titulo}" para esta obra.`);
         }
 
-        const obra = await this.obraRepository.findOne({ where: { id: obraId } });
+        const obra = await this.obraModel.findByPk(obraId);
         if (!obra) {
             throw new NotFoundException(`Obra com ID ${obraId} não encontrada.`);
         }

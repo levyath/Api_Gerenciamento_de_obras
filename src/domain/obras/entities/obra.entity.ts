@@ -1,66 +1,64 @@
-import {Entity, PrimaryGeneratedColumn,Column,ManyToOne,JoinColumn, ManyToMany, JoinTable,} from 'typeorm';
+import { Table, Column, Model, DataType, BelongsToMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { Fornecedores } from '../../fornecedores/entities/fornecedores.entity';
 import { Equipamentos } from '../../equipamentos/entities/equipamento.entity';
 import { Endereco } from '../../enderecos/entities/endereco.entity';
-import { Fiscalizacoes } from 'src/domain/fiscalizacoes/entities/fiscalizacoes.entity';
+import { Fiscalizacoes } from '../../fiscalizacoes/entities/fiscalizacoes.entity';
+import { ObraFiscalizacoes } from '../../obra-fiscalizacoes/entities/obra-fiscalizacoes.entity';
 
-@Entity('obras')
-export class Obra {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Table({ tableName: 'obras' })
+export class Obra extends Model {
+    @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
+    declare id: number;
 
-  @Column({ length: 255 })
-  nome: string;
+    @Column({ type: DataType.STRING(255), allowNull: false })
+    nome: string;
 
-  @Column({ type: 'text' })
-  descricao: string;
+    @Column({ type: DataType.TEXT, allowNull: false })
+    descricao: string;
 
-  @Column({
-    type: 'enum',
-    enum: ['Planejada', 'Em andamento', 'Concluída', 'Paralisada'],
-    default: 'Planejada',
-  })
-  status: string;
+    @Column({
+        type: DataType.ENUM('Planejada', 'Em andamento', 'Concluída', 'Paralisada'),
+        defaultValue: 'Planejada'
+    })
+    status: string;
 
-  @Column({ type: 'date' })
-  data_inicio: Date;
+    @Column({ type: DataType.DATE, allowNull: false })
+    data_inicio: Date;
 
-  @Column({ type: 'date', nullable: true })
-  data_conclusao: Date;
+    @Column({ type: DataType.DATE, allowNull: true })
+    data_conclusao: Date;
 
-  @Column({ length: 255 })
-  responsavel: string;
+    @Column({ type: DataType.STRING(255), allowNull: false })
+    responsavel: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  orcamento_total: number;
+    @Column({ type: DataType.DECIMAL(10, 2), allowNull: false })
+    orcamento_total: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
-  gastos_atualizados: number;
+    @Column({ type: DataType.DECIMAL(10, 2), defaultValue: 0 })
+    gastos_atualizados: number;
 
-  @Column({ type: 'float', default: 0 })
-  percentual_concluido: number;
+    @Column({ type: DataType.FLOAT, defaultValue: 0 })
+    percentual_concluido: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
-  latitude: number;
+    @Column({ type: DataType.DECIMAL(10, 6), allowNull: true })
+    latitude: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
-  longitude: number;
+    @Column({ type: DataType.DECIMAL(10, 6), allowNull: true })
+    longitude: number;
 
-  @ManyToMany(() => Fornecedores, fornecedor => fornecedor.obras)
-  @JoinTable({
-    name: 'obra_fornecedor',
-    joinColumn: { name: 'obra_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'fornecedor_id', referencedColumnName: 'id' },
-  })
-  fornecedores: Fornecedores[];
+    // @BelongsToMany(() => Fornecedores, { through: 'obra_fornecedor' })
+    // fornecedores: Fornecedores[];
 
- @ManyToMany(() => Equipamentos, equipamento => equipamento.obras)
-  equipamentos: Equipamentos[];
+    // @BelongsToMany(() => Equipamentos, { through: 'obra_equipamentos' })
+    // equipamentos: Equipamentos[];
 
-  @ManyToOne(() => Endereco, { eager: true, nullable: true })
-  @JoinColumn({ name: 'endereco' })  
-  endereco: Endereco;
+    // @ForeignKey(() => Endereco)
+    // @Column({ type: DataType.INTEGER, allowNull: true })
+    // enderecoId: number;
 
-  @ManyToMany(() => Fiscalizacoes, fiscalizacao => fiscalizacao.obras)
-  fiscalizacoes: Fiscalizacoes[];
-} 
+    // @BelongsTo(() => Endereco)
+    // endereco: Endereco;
+
+    @BelongsToMany(() => Fiscalizacoes, { through: () => ObraFiscalizacoes })
+    fiscalizacoes: Fiscalizacoes[];
+}

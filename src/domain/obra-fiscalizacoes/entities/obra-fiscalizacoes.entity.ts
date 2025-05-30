@@ -1,20 +1,20 @@
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Table, Column, Model, ForeignKey, BelongsTo, DataType } from 'sequelize-typescript';
 import { Obra } from '../../obras/entities/obra.entity';
 import { Fiscalizacoes } from '../../fiscalizacoes/entities/fiscalizacoes.entity';
 
-@Entity('obra_fiscalizacoes')
-export class ObraFiscalizacoes {
-    @PrimaryColumn()
-    obra_id: number;
+@Table({ tableName: 'obra_fiscalizacoes' })
+export class ObraFiscalizacoes extends Model {
+    @ForeignKey(() => Obra)
+    @Column({ type: DataType.INTEGER, allowNull: false })
+    obraId: number;
 
-    @PrimaryColumn()
-    fiscalizacoes_id: number;
-
-    @ManyToOne(() => Obra, { eager: false, onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'obra_id' })
+    @BelongsTo(() => Obra)
     obra: Obra;
 
-    @ManyToOne(() => Fiscalizacoes, { eager: false, onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'fiscalizacoes_id' })
-    fiscalizacao: Fiscalizacoes; 
+    @ForeignKey(() => Fiscalizacoes)
+    @Column({ type: DataType.INTEGER, allowNull: false })
+    fiscalizacaoId: number;
+
+    @BelongsTo(() => Fiscalizacoes)
+    fiscalizacao: Fiscalizacoes;
 }

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { SequelizeModule } from '@nestjs/sequelize';
 
 //fiscalizacoes imports
 import { FiscalizacoesService } from './fiscalizacoes.service';
@@ -18,7 +18,7 @@ import { ObrasModule } from '../obras/obras.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Obra, Fiscalizacoes, ObraFiscalizacoes]),
+    SequelizeModule.forFeature([Obra, Fiscalizacoes, ObraFiscalizacoes]),
     ObrasModule,
     //RelatorioModule,
     //ResponsavelTecnicoModule,

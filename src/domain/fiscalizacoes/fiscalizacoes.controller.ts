@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Post, Body, Put, Patch, Delete, ParseIntPipe } from '@nestjs/common';
-  import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
-  import { FiscalizacoesService } from './fiscalizacoes.service';
-  import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
-  import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
+import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
+import { FiscalizacoesService } from './fiscalizacoes.service';
+import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
+import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
 
 @Controller('fiscalizacoes')
 export class FiscalizacoesController {

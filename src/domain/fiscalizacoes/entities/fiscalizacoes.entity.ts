@@ -1,44 +1,29 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    ManyToMany,
-    OneToMany,
-    CreateDateColumn,
-    UpdateDateColumn,
-    JoinTable,
-} from 'typeorm';
-import { Obra } from 'src/domain/obras/entities/obra.entity';
+import { Table, Column, Model, DataType, BelongsToMany, CreatedAt, UpdatedAt, PrimaryKey } from 'sequelize-typescript';
+import { Obra } from '../../obras/entities/obra.entity';
+import { ObraFiscalizacoes } from '../../obra-fiscalizacoes/entities/obra-fiscalizacoes.entity';
+import { InferAttributes, InferCreationAttributes } from 'sequelize';
 //import { Relatorio } from 'src/domain/relatorios/entities/relatorio.entity'; todo
 //import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel.entity'; pendente Levy
-  
-@Entity('fiscalizacoes')
-export class Fiscalizacoes {
-    @PrimaryGeneratedColumn()
-    id: number;
 
-    @Column({ type: 'varchar', length: 50 })
+@Table({ timestamps: false, tableName: 'fiscalizacoes' })
+export class Fiscalizacoes extends Model<
+    InferAttributes<Fiscalizacoes>,
+    InferCreationAttributes<Fiscalizacoes>
+> {
+    @PrimaryKey
+    @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
+    declare id?: number;
+
+    @Column({ type: DataType.STRING(50), allowNull: false })
     titulo: string;
 
-    @Column({ type: 'varchar', length: 255, nullable: true })
+    @Column({ type: DataType.STRING(255), allowNull: false })
     descricao: string;
 
-    @Column({ type: 'date' })
+    @Column({ type: DataType.DATE, allowNull: false })
     data: Date;
 
-    @ManyToMany(() => Obra, obra => obra.fiscalizacoes)
-    @JoinTable({
-        name: 'obra_fiscalizacoes',
-        joinColumn: {
-            name: 'fiscalizacoes_id',
-            referencedColumnName: 'id',
-        },
-        inverseJoinColumn: {
-            name: 'obra_id',
-            referencedColumnName: 'id',
-        }
-    })
+    @BelongsToMany(() => Obra, () => ObraFiscalizacoes)
     obras: Obra[];
 
     //pendente Levy
@@ -48,11 +33,4 @@ export class Fiscalizacoes {
     //pendente Eu
     //@OneToMany(() => Relatorio, relatorio => relatorio.fiscalizacao, { cascade: true })
     //relatorios: Relatorio[];
-  
-    @CreateDateColumn()
-    criadoEm: Date;
-  
-    @UpdateDateColumn()
-    atualizadoEm: Date;
 }
-  

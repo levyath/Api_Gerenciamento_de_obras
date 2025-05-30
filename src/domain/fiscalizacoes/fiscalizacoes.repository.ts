@@ -1,41 +1,41 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/sequelize";
 import { Fiscalizacoes } from "./entities/fiscalizacoes.entity";
 import { ObraFiscalizacoes } from "../obra-fiscalizacoes/entities/obra-fiscalizacoes.entity";
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
+import { Obra } from "../obras/entities/obra.entity";
+import { Sequelize } from "sequelize";
 
 @Injectable()
 export class FiscalizacoesRepository {
     constructor(
-        @InjectRepository(Fiscalizacoes)
-        private readonly fiscalizacoesRepository: Repository<Fiscalizacoes>,
-        @InjectRepository(ObraFiscalizacoes)
-        private readonly obraFiscalizacoesRepository: Repository<ObraFiscalizacoes>
+        @Inject('SEQUELIZE') private sequelize: Sequelize,
+
+        @InjectModel(Fiscalizacoes)
+        private readonly fiscalizacoesModel: typeof Fiscalizacoes,
+        
+        @InjectModel(ObraFiscalizacoes)
+        private readonly obraFiscalizacoesModel: typeof ObraFiscalizacoes
     ) {}
 
-    //get geral (/fiscalizacoes)
     async findAll(): Promise<Fiscalizacoes[]> {
-        return this.fiscalizacoesRepository.find({
-            relations: ['obras']//'relatorios', 'responsavelTecnico'],
+        return this.fiscalizacoesModel.findAll({
+            include: [{ model: Obra }],
         });
     }
 
-    //get fiscalizacoes atreladas a uma obra (/obras/:id/fiscalizacoes)
     async findByObraId(obraId: number): Promise<Fiscalizacoes[]> {
-        const obraFiscalizacoes = await this.obraFiscalizacoesRepository.find({
-            where: { obra: { id: obraId } },
-            relations: ['fiscalizacao'],
+        const obraFiscalizacoes = await this.obraFiscalizacoesModel.findAll({
+            where: { obraId },
+            include: [{ model: Fiscalizacoes }],
         });
         return obraFiscalizacoes.map(of => of.fiscalizacao);
     }
 
-    //get fiscalizacao individual (/fiscalizacoes/:id)
     async findOneById(id: number): Promise<Fiscalizacoes> {
-        const fiscalizacao = await this.fiscalizacoesRepository.findOne({
-            where: { id },
-            relations: ['obras']//'relatorios', 'responsavelTecnico'],
+        const fiscalizacao = await this.fiscalizacoesModel.findByPk(id, {
+            include: [{ model: Obra }],
         });
         if (!fiscalizacao) {
             throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
@@ -43,58 +43,69 @@ export class FiscalizacoesRepository {
         return fiscalizacao;
     }
 
-    //post criar fiscalização (/obras/:id/fiscalizacoes)
     async createForObra(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        const novaFiscalizacao = this.fiscalizacoesRepository.create({
-        ...dto,
-        //responsavel_id: dto.responsavel_id, pendente Levy
-        });
-        const salvarFisc = await this.fiscalizacoesRepository.save(novaFiscalizacao);
-        const novaObraFisc = this.obraFiscalizacoesRepository.create({
-            obra: { id: obraId },
-            fiscalizacao: salvarFisc,
-        });
-        await this.obraFiscalizacoesRepository.save(novaObraFisc);
-        return salvarFisc;
-    }
+        const transaction = await this.sequelize.transaction();
+        try {
+            const obras = await Obra.findAll({
+                where: {
+                    id: dto.obra_ids
+                }
+            });
+            const novaFiscalizacao = await this.fiscalizacoesModel.create(
+                {
+                    titulo: dto.titulo,
+                    descricao: dto.descricao,
+                    data: new Date(dto.data),
+                    obras: obras,
+                },
+                { transaction }
+            );
 
-    //put editar fiscalizacao especifica (/fiscalizacoes/:id)
+            await this.obraFiscalizacoesModel.create(
+                {
+                    obraId,
+                    fiscalizacaoId: novaFiscalizacao.id,
+                },
+                { transaction }
+            );
+
+            await transaction.commit();
+            return novaFiscalizacao;
+        } catch (error) {
+            await transaction.rollback();
+            throw new BadRequestException('Erro ao criar fiscalização!');
+        }
+    }   
+
     async update(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        const fiscalizacao = await this.fiscalizacoesRepository.findOne({ where: { id } });
-        if (!fiscalizacao) {
-            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
+        const transaction = await this.sequelize.transaction();
+        try {
+            const fiscalizacao = await this.findOneById(id);
+
+            // Atualizar os campos da fiscalização
+            await fiscalizacao.update(
+                {
+                    titulo: dto.titulo,
+                    descricao: dto.descricao,
+                    data: dto.data ? new Date(dto.data) : fiscalizacao.data,
+                },
+                { transaction }
+            );
+
+            await transaction.commit();
+            return fiscalizacao;
+        } catch (error) {
+            await transaction.rollback();
+            throw new BadRequestException('Erro ao atualizar fiscalização!');
         }
-        Object.assign(fiscalizacao, dto);
-        // if (dto.responsavel_id !== undefined) {
-        //     fiscalizacao.responsavel = { id: dto.responsavel_id }; // comentado até entidade existir
-        // }
-        return this.fiscalizacoesRepository.save(fiscalizacao);
     }
 
-    //patch atualizar dados especificos fiscalizacao (/fiscalizacoes/:id)
     async patch(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        const fiscalizacao = await this.fiscalizacoesRepository.findOne({ where: { id } });
-        if (!fiscalizacao) {
-            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
-        }
-        if (dto.titulo !== undefined) {
-            fiscalizacao.titulo = dto.titulo;
-        }
-        if (dto.descricao !== undefined) {
-            fiscalizacao.descricao = dto.descricao;
-        }
-        // if (dto.responsavel_id !== undefined) {
-        //     fiscalizacao.responsavel = { id: dto.responsavel_id }; // comentado até entidade existir
-        // }
-        return this.fiscalizacoesRepository.save(fiscalizacao);
+        return this.update(id, dto);
     }
 
-    //delete fiscalizacao especifica (/fiscalizacoes/:id)
     async remove(id: number): Promise<void> {
-        const fiscalizacao = await this.fiscalizacoesRepository.findOne({ where: { id } });
-        if (!fiscalizacao) {
-            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
-        }
-        await this.fiscalizacoesRepository.remove(fiscalizacao);
+        const fiscalizacao = await this.findOneById(id);
+        await fiscalizacao.destroy();
     }
 }

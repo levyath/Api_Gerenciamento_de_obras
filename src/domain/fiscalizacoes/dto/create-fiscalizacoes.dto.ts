@@ -5,22 +5,24 @@ export class CreateFiscalizacoesDto {
     @IsString()
     titulo: string;
 
-    @IsOptional()
     @IsString()
-    descricao?: string;
+    descricao: string;
 
     @IsDateString()
     data: string;
 
-    // pendente levy
-    @IsOptional()
-    @IsInt()
-    responsavel_id?: number;
-
-    // pendente eu
-    @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => Number)
-    relatorio_ids?: number[];
+    obra_ids: number[];
+
+    // // pendente levy
+    // @IsInt()
+    // responsavel_id?: number;
+
+    // // pendente eu
+    // @IsArray()
+    // @ValidateNested({ each: true })
+    // @Type(() => Number)
+    // relatorio_ids?: number[];
 }
