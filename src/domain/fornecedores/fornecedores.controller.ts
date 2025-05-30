@@ -17,7 +17,7 @@ export class FornecedoresController {
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Fornecedores> {
     const fornecedores = await this.fornecedoresService.findOne(id);
     if (!fornecedores) {
-      throw new NotFoundException(`Endereço com id ${id} não encontrado.`);
+      throw new NotFoundException(`Fornecedor com id ${id} não encontrado.`);
     }
     return fornecedores;
   }
@@ -34,7 +34,7 @@ export class FornecedoresController {
   ): Promise<Fornecedores> {
     const updated = await this.fornecedoresService.update(id, data);
     if (!updated) {
-      throw new NotFoundException(`Endereço com id ${id} não encontrado.`);
+      throw new NotFoundException(`Fornecedor com id ${id} não encontrado.`);
     }
     return updated;
   }
@@ -43,8 +43,8 @@ export class FornecedoresController {
   async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
     const deleted = await this.fornecedoresService.remove(id);
     if (!deleted) {
-      throw new NotFoundException(`Endereço com id ${id} não encontrado.`);
+      throw new NotFoundException(`Fornecedor com id ${id} não encontrado.`);
     }
-    return { message: `Endereço com id ${id} removido com sucesso.` };
+    return { message: `Fornecedor com id ${id} removido com sucesso.` };
   }
 }
