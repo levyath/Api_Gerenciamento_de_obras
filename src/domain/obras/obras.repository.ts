@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Obras } from './entities/obras.entity';
-
-
+import { CreateObraDto } from './dto/create-obra.dto';
+import { UpdateObraDto } from './dto/update-obra.dto';
 
 @Injectable()
 export class ObrasRepository {
@@ -19,14 +19,14 @@ export class ObrasRepository {
     return this.obrasModel.findByPk(id);
   }
 
-  async create(data: Obras): Promise<Obras> {
-    return this.obrasModel.create(data);
+  async create(data: CreateObraDto): Promise<Obras> {
+    return this.obrasModel.create(data as any);
   }
 
-  async update(id: number, data: Partial<Obras>): Promise<Obras | null> {
-    const endereco = await this.obrasModel.findByPk(id);
-    if (!endereco) return null;
-    return endereco.update(data);
+  async update(id: number, data: UpdateObraDto): Promise<Obras | null> {
+    const obra = await this.obrasModel.findByPk(id);
+    if (!obra) return null;
+    return obra.update(data);
   }
 
   async delete(id: number): Promise<boolean> {

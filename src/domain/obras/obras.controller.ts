@@ -1,9 +1,18 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+  NotFoundException,
+} from '@nestjs/common';
 import { ObrasService } from './obras.service';
 import { Obras } from './entities/obras.entity';
-
-
-
+import { CreateObraDto } from './dto/create-obra.dto';
+import { UpdateObraDto } from './dto/update-obra.dto';
 
 @Controller('obras')
 export class ObrasController {
@@ -16,26 +25,26 @@ export class ObrasController {
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Obras> {
-    const obras = await this.obrasService.findOne(id);
-    if (!obras) {
-      throw new NotFoundException(`Obras com id ${id} não encontrado.`);
+    const obra = await this.obrasService.findOne(id);
+    if (!obra) {
+      throw new NotFoundException(`Obra com id ${id} não encontrada.`);
     }
-    return obras;
+    return obra;
   }
 
   @Post()
-  async create(@Body() data: Obras): Promise<Obras> {
+  async create(@Body() data: CreateObraDto): Promise<Obras> {
     return this.obrasService.create(data);
   }
 
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: Partial<Obras>,
+    @Body() data: UpdateObraDto,
   ): Promise<Obras> {
     const updated = await this.obrasService.update(id, data);
     if (!updated) {
-      throw new NotFoundException(`Obras com id ${id} não encontrado.`);
+      throw new NotFoundException(`Obra com id ${id} não encontrada.`);
     }
     return updated;
   }
@@ -44,8 +53,8 @@ export class ObrasController {
   async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
     const deleted = await this.obrasService.remove(id);
     if (!deleted) {
-      throw new NotFoundException(`Obras com id ${id} não encontrado.`);
+      throw new NotFoundException(`Obra com id ${id} não encontrada.`);
     }
-    return { message: `Obras com id ${id} removido com sucesso.` };
+    return { message: `Obra com id ${id} removida com sucesso.` };
   }
 }

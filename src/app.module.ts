@@ -7,6 +7,7 @@ import 'dotenv/config';
 import { EnderecosModule } from './domain/enderecos/enderecos.module';
 import { EquipamentosModule } from './domain/equipamentos/equipamentos.module';
 import { FornecedoresModule } from './domain/fornecedores/fornecedores.module';
+import { ObrasModule } from './domain/obras/obras.module';
 const {
   DB_HOST,
   DB_PORT,
@@ -59,7 +60,8 @@ const {
     }),
     EnderecosModule,
     EquipamentosModule,
-    FornecedoresModule
+    FornecedoresModule,
+    ObrasModule
   ],
   controllers: [AppController],
   providers: [AppService],

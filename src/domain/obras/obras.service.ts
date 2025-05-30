@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-
 import { ObrasRepository } from './obras.repository';
 import { Obras } from './entities/obras.entity';
-
+import { CreateObraDto } from './dto/create-obra.dto';
+import { UpdateObraDto } from './dto/update-obra.dto';
 
 @Injectable()
 export class ObrasService {
@@ -16,11 +16,11 @@ export class ObrasService {
     return this.obrasRepo.findById(id);
   }
 
-  create(data: Obras): Promise<Obras> {
+  create(data: CreateObraDto): Promise<Obras> {
     return this.obrasRepo.create(data);
   }
 
-  update(id: number, data: Partial<Obras>): Promise<Obras | null> {
+  update(id: number, data: UpdateObraDto): Promise<Obras | null> {
     return this.obrasRepo.update(id, data);
   }
 

@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { EnderecosService } from './enderecos.service';
 import { Endereco } from './entities/endereco.entity';
+import { CreateEnderecoDto } from './dto/create-endereco.dto';
+import { UpdateEnderecoDto } from './dto/update-endereco.dto';
 
 
 @Controller('enderecos')
@@ -22,14 +24,14 @@ export class EnderecosController {
   }
 
   @Post()
-  async create(@Body() data: Endereco): Promise<Endereco> {
+  async create(@Body() data: CreateEnderecoDto): Promise<Endereco> {
     return this.enderecosService.create(data);
   }
 
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: Partial<Endereco>,
+    @Body() data: Partial<UpdateEnderecoDto>,
   ): Promise<Endereco> {
     const updated = await this.enderecosService.update(id, data);
     if (!updated) {

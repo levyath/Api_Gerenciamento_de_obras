@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { EquipamentosRepository } from './equipamentos.repository';
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
 import { Equipamentos } from './entities/equipamento.entity';
+import { UpdateEquipamentoDto } from './dto/update-equipamento.dto';
 
 
 @Injectable()
@@ -20,11 +21,11 @@ export class EquipamentosService {
     return equipamento;
   }
 
-  async create(data: Equipamentos): Promise<Equipamentos> {
+  async create(data: CreateEquipamentoDto): Promise<Equipamentos> {
     return this.equipamentosRepository.create(data);
   }
 
-  async update(id: number, data: Partial<Equipamentos>): Promise<Equipamentos> {
+  async update(id: number, data: Partial<UpdateEquipamentoDto>): Promise<Equipamentos> {
     const equipamento = await this.equipamentosRepository.update(id, data);
     if (!equipamento) {
       throw new NotFoundException(`Equipamento com id ${id} não encontrado`);

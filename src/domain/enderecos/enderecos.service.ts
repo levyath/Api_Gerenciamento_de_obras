@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Endereco } from './entities/endereco.entity';
 import { EnderecoRepository } from './endereco.repository';
+import { CreateEnderecoDto } from './dto/create-endereco.dto';
+import { UpdateEnderecoDto } from './dto/update-endereco.dto';
 
 @Injectable()
 export class EnderecosService {
@@ -14,11 +16,11 @@ export class EnderecosService {
     return this.enderecoRepo.findById(id);
   }
 
-  create(data: Endereco): Promise<Endereco> {
+  create(data: CreateEnderecoDto): Promise<Endereco> {
     return this.enderecoRepo.create(data);
   }
 
-  update(id: number, data: Partial<Endereco>): Promise<Endereco | null> {
+  update(id: number, data: Partial<UpdateEnderecoDto>): Promise<Endereco | null> {
     return this.enderecoRepo.update(id, data);
   }
 

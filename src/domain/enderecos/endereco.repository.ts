@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Endereco } from './entities/endereco.entity';
 import { CreateEnderecoDto } from './dto/create-endereco.dto';
+import { UpdateEnderecoDto } from './dto/update-endereco.dto';
 
 
 @Injectable()
@@ -19,11 +20,11 @@ export class EnderecoRepository {
     return this.enderecoModel.findByPk(id);
   }
 
-  async create(data: Endereco): Promise<Endereco> {
-    return this.enderecoModel.create(data);
+  async create(data: CreateEnderecoDto): Promise<Endereco> {
+    return this.enderecoModel.create(data as any);
   }
 
-  async update(id: number, data: Partial<Endereco>): Promise<Endereco | null> {
+  async update(id: number, data: Partial<UpdateEnderecoDto>): Promise<Endereco | null> {
     const endereco = await this.enderecoModel.findByPk(id);
     if (!endereco) return null;
     return endereco.update(data);

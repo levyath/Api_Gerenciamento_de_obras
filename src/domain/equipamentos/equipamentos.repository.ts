@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
 import { Equipamentos } from './entities/equipamento.entity';
+import { UpdateEquipamentoDto } from './dto/update-equipamento.dto';
 
 @Injectable()
 export class EquipamentosRepository {
@@ -19,11 +20,11 @@ export class EquipamentosRepository {
     return this.equipamentosModel.findByPk(id);
   }
 
-  async create(data: Equipamentos): Promise<Equipamentos> {
-    return this.equipamentosModel.create(data);
+  async create(data: CreateEquipamentoDto): Promise<Equipamentos> {
+    return this.equipamentosModel.create(data as any);
   }
 
-  async update(id: number, data: Partial<Equipamentos>): Promise<Equipamentos | null> {
+  async update(id: number, data: Partial<UpdateEquipamentoDto>): Promise<Equipamentos | null> {
     const equipamento = await this.equipamentosModel.findByPk(id);
     if (!equipamento) return null;
 

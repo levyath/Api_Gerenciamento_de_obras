@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { EquipamentosService } from './equipamentos.service';
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
+import { UpdateEquipamentoDto } from './dto/update-equipamento.dto';
 import { Equipamentos } from './entities/equipamento.entity';
 
 @Controller('equipamentos')
@@ -17,25 +18,25 @@ export class EquipamentosController {
   constructor(private readonly equipamentosService: EquipamentosService) {}
 
   @Get()
-  async findAll() {
+  async findAll(): Promise<Equipamentos[]> {
     return this.equipamentosService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Equipamentos> {
     return this.equipamentosService.findOne(id);
   }
 
   @Post()
-  async create(@Body() Equipamentos: Equipamentos) {
+  async create(@Body() Equipamentos: CreateEquipamentoDto): Promise<Equipamentos>  {
     return this.equipamentosService.create(Equipamentos);
   }
 
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: Partial<CreateEquipamentoDto>,
-  ) {
+    @Body() data: Partial<UpdateEquipamentoDto>,
+  ): Promise<Equipamentos>  {
     return this.equipamentosService.update(id, data);
   }
 

@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { FornecedoresService } from './fornecedores.service';
 import { Fornecedores } from './entities/fornecedores.entity';
+import { CreateFornecedoresDto } from './dto/create-fornecedores.dto';
+import { UpdateFornecedoresDto } from './dto/update-fornecedores.dto';
 
 
 
@@ -23,14 +25,14 @@ export class FornecedoresController {
   }
 
   @Post()
-  async create(@Body() data: Fornecedores): Promise<Fornecedores> {
+  async create(@Body() data: CreateFornecedoresDto): Promise<Fornecedores> {
     return this.fornecedoresService.create(data);
   }
 
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: Partial<Fornecedores>,
+    @Body() data: Partial<UpdateFornecedoresDto>,
   ): Promise<Fornecedores> {
     const updated = await this.fornecedoresService.update(id, data);
     if (!updated) {
