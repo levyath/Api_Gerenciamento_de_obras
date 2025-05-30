@@ -5,8 +5,8 @@ import { SequelizeModule } from '@nestjs/sequelize'; // Importa SequelizeModule
 
 import 'dotenv/config'; 
 import { EnderecosModule } from './domain/enderecos/enderecos.module';
-import { Equipamentos } from './domain/equipamentos/entities/equipamento.entity';
 import { EquipamentosModule } from './domain/equipamentos/equipamentos.module';
+import { FornecedoresModule } from './domain/fornecedores/fornecedores.module';
 const {
   DB_HOST,
   DB_PORT,
@@ -58,7 +58,8 @@ const {
       },
     }),
     EnderecosModule,
-    EquipamentosModule
+    EquipamentosModule,
+    FornecedoresModule
   ],
   controllers: [AppController],
   providers: [AppService],
