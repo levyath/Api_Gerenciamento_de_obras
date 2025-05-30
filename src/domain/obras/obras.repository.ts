@@ -46,7 +46,16 @@ export class ObrasRepository {
   async update(id: number, data: UpdateObraDto): Promise<Obras | null> {
     const obra = await this.obrasModel.findByPk(id);
     if (!obra) return null;
-    return obra.update(data);
+
+    const { fornecedoresId, ...updateData } = data;
+
+    await obra.update(updateData);
+
+    if (fornecedoresId) {
+      await obra.$set('fornecedores', fornecedoresId); // atualiza os relacionamentos N:N
+    }
+
+    return this.findById(id);
   }
 
   async delete(id: number): Promise<boolean> {
