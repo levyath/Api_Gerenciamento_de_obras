@@ -1,3 +1,7 @@
+import { Type } from "class-transformer";
+import { IsArray, IsOptional, ValidateNested } from "class-validator";
+
+
 export class CreateFornecedoresDto {
   nome: string;
 
@@ -9,5 +13,9 @@ export class CreateFornecedoresDto {
 
   endereco?: string;
 
-  //obras?: number[];
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Number)
+  obrasId?: number[];
 }

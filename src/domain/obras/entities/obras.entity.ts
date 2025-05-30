@@ -9,8 +9,11 @@ import {
   AllowNull,
   BelongsTo,
   ForeignKey,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import { Endereco } from 'src/domain/enderecos/entities/endereco.entity';
+import { Fornecedores } from 'src/domain/fornecedores/entities/fornecedores.entity';
+import { ObrasFornecedores } from 'src/domain/obra-fornecedor/entities/obras-fornecedores.entity';
 
 @Table({
   tableName: 'obras',
@@ -94,4 +97,7 @@ export class Obras extends Model<Obras> {
 
   @BelongsTo(() => Endereco)
   endereco: Endereco;
+  
+  @BelongsToMany(() => Fornecedores, () => ObrasFornecedores)
+  fornecedores: Fornecedores[];
 }

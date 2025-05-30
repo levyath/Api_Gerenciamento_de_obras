@@ -8,7 +8,10 @@ import {
   Unique,
   AllowNull,
   Default,
+  BelongsToMany,
 } from 'sequelize-typescript';
+import { ObrasFornecedores } from 'src/domain/obra-fornecedor/entities/obras-fornecedores.entity';
+import { Obras } from 'src/domain/obras/entities/obras.entity';
 
 @Table({
   tableName: 'fornecedores',
@@ -58,4 +61,7 @@ export class Fornecedores extends Model<Fornecedores> {
     type: DataType.BOOLEAN,
   })
   ativo: boolean;
+
+  @BelongsToMany(() => Obras, () => ObrasFornecedores)
+  obras: Obras[];
 }

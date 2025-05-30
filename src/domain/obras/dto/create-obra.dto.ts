@@ -48,17 +48,17 @@ export class CreateObraDto {
   @IsNumber()
   longitude?: number;
 
-  // @IsOptional()
-  // @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => Number)
-  // fornecedores?: number[];
-
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => Number)
-  equipamentos?: number[];
+  fornecedoresId?: number[];
+
+  // @IsOptional()
+  // @IsArray()
+  // @ValidateNested({ each: true })
+  // @Type(() => Number)
+  // equipamentos?: number[];
 
   @IsOptional()
   @IsNumber()

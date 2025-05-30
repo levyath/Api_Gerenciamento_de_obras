@@ -4,6 +4,7 @@ import { Obras } from './entities/obras.entity';
 import { CreateObraDto } from './dto/create-obra.dto';
 import { UpdateObraDto } from './dto/update-obra.dto';
 import { Endereco } from '../enderecos/entities/endereco.entity';
+import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
 
 @Injectable()
 export class ObrasRepository {
@@ -13,15 +14,33 @@ export class ObrasRepository {
   ) {}
 
   async findAll(): Promise<Obras[]> {
-    return this.obrasModel.findAll();
+    return this.obrasModel.findAll({
+    include: [
+      {
+        association: 'fornecedores',
+        attributes: ['id'],
+        through: { attributes: [] }, 
+      },
+    ],
+  });
   }
 
   async findById(id: number): Promise<Obras | null> {
-    return this.obrasModel.findByPk(id, { include: [Endereco] });
+    return this.obrasModel.findByPk(id, { include: [Endereco, Fornecedores] });
   }
 
   async create(data: CreateObraDto): Promise<Obras> {
-    return this.obrasModel.create(data as any);
+    const { fornecedoresId, ...obraData } = data;
+    const novaObra = await this.obrasModel.create(data as any);
+    if (fornecedoresId && fornecedoresId.length > 0) {
+    await novaObra.$set('fornecedores', fornecedoresId);
+  }
+
+    const obra = await this.findById(novaObra.id);
+    if (!obra) {
+      throw new Error('Obra not found after creation');
+    }
+    return obra;
   }
 
   async update(id: number, data: UpdateObraDto): Promise<Obras | null> {
