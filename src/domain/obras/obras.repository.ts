@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Obras } from './entities/obras.entity';
 import { CreateObraDto } from './dto/create-obra.dto';
 import { UpdateObraDto } from './dto/update-obra.dto';
+import { Endereco } from '../enderecos/entities/endereco.entity';
 
 @Injectable()
 export class ObrasRepository {
@@ -16,7 +17,7 @@ export class ObrasRepository {
   }
 
   async findById(id: number): Promise<Obras | null> {
-    return this.obrasModel.findByPk(id);
+    return this.obrasModel.findByPk(id, { include: [Endereco] });
   }
 
   async create(data: CreateObraDto): Promise<Obras> {

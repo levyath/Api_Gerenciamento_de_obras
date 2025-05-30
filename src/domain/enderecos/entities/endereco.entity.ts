@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, HasOne } from 'sequelize-typescript';
+import { Obras } from 'src/domain/obras/entities/obras.entity';
 
 @Table({ tableName: 'enderecos' })
 export class Endereco extends Model<Endereco> {
@@ -48,4 +49,7 @@ export class Endereco extends Model<Endereco> {
     allowNull: false,
   })
   cep: string;
+
+  @HasOne(() => Obras)
+  obra: Obras;
 }

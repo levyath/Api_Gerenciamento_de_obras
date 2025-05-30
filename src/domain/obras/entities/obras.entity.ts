@@ -7,7 +7,10 @@ import {
   AutoIncrement,
   Default,
   AllowNull,
+  BelongsTo,
+  ForeignKey,
 } from 'sequelize-typescript';
+import { Endereco } from 'src/domain/enderecos/entities/endereco.entity';
 
 @Table({
   tableName: 'obras',
@@ -84,4 +87,11 @@ export class Obras extends Model<Obras> {
     type: DataType.DECIMAL(10, 6),
   })
   longitude: number;
+
+  @ForeignKey(() => Endereco)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  enderecoId: number;
+
+  @BelongsTo(() => Endereco)
+  endereco: Endereco;
 }
