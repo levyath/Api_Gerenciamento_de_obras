@@ -3,8 +3,9 @@ import { CreateObraDto } from './create-obra.dto';
 import { IsOptional, IsArray, IsNumber } from 'class-validator';
 
 export class UpdateObraDto extends PartialType(CreateObraDto) {
-  @IsOptional()
-  @IsArray()
-  @IsNumber({}, { each: true })
-  fornecedoresId?: number[];
+  // TODO: remoção futura
+  // @IsOptional()
+  // @IsArray()
+  // @IsNumber({}, { each: true })
+  // fornecedoresId?: number[];
 }
