@@ -3,50 +3,44 @@ import { FiscalizacoesRepository } from './fiscalizacoes.repository';
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
 import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
-import { InjectModel } from '@nestjs/sequelize';
-import { Obra } from 'src/domain/obras/entities/obra.entity';
+import { Obras } from 'src/domain/obras/entities/obras.entity';
 
 @Injectable()
 export class FiscalizacoesService {
     constructor(
         private readonly fiscalizacoesRepository: FiscalizacoesRepository,
-
-        @InjectModel(Obra)
-        private readonly obraModel: typeof Obra
     ) {}
 
     async findAll(): Promise<Fiscalizacoes[]> {
         return this.fiscalizacoesRepository.findAll();
     }
 
-    async findOne(id: number): Promise<Fiscalizacoes> {
-        return this.fiscalizacoesRepository.findOneById(id);
+    async findOne(id: number): Promise<Fiscalizacoes | null> {
+        return this.fiscalizacoesRepository.findOne(id);
     }
 
     async findByObraId(obraId: number): Promise<Fiscalizacoes[]> {
         return this.fiscalizacoesRepository.findByObraId(obraId);
     }
 
-    async createForObra(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
+    async create(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
+        const { data, titulo } = dto;
         const hoje = new Date();
-        if (dto.data && new Date(dto.data) > hoje) {
-            throw new BadRequestException('A data da fiscalização não pode estar no futuro.');
-        }
+        const dataFiscalizacao = new Date(data);
+        const fiscalizacoesExistentes = await this.findByObraId(obraId);
+        const tituloDuplicado = fiscalizacoesExistentes.some(f => f.titulo === titulo);
+        const obra = await Obras.findByPk(obraId);
 
-        const fiscalizacoesExistentes = await this.fiscalizacoesRepository.findByObraId(obraId);
-        if (fiscalizacoesExistentes.some(f => f.titulo === dto.titulo)) {
-            throw new ConflictException(`Já existe uma fiscalização com o título "${dto.titulo}" para esta obra.`);
-        }
-
-        const obra = await this.obraModel.findByPk(obraId);
-        if (!obra) {
+        if (dataFiscalizacao > hoje)
+            throw new BadRequestException('A fiscalização não pode ter uma data futura.');
+        if (tituloDuplicado)
+            throw new BadRequestException(`A obra já possui uma fiscalização com o título "${titulo}".`);
+        if (!obra)
             throw new NotFoundException(`Obra com ID ${obraId} não encontrada.`);
-        }
-        if (obra.status === 'Concluída') {
-            throw new BadRequestException('Não é possível cadastrar fiscalizações para obras concluídas.');
-        }
+        if (obra.status === 'Concluída')
+            throw new BadRequestException('Não é possível adicionar fiscalização a uma obra concluída.');
 
-        return this.fiscalizacoesRepository.createForObra(obraId, dto);
+        return this.fiscalizacoesRepository.create(obraId, dto);
     }
 
     async update(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
@@ -57,7 +51,7 @@ export class FiscalizacoesService {
         return this.fiscalizacoesRepository.patch(id, dto);
     }
 
-    async remove(id: number): Promise<void> {
-        return this.fiscalizacoesRepository.remove(id);
+    async delete(id: number): Promise<void> {
+        return this.fiscalizacoesRepository.delete(id);
     }
 }
