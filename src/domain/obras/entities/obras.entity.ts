@@ -104,5 +104,5 @@ export class Obras extends Model<Obras> {
   fornecedores: Fornecedores[];
 
   @BelongsToMany(() => Equipamentos, () => ObrasEquipamentos)
-  equipamentos: Fornecedores[];
+  equipamentos: Equipamentos[];
 }

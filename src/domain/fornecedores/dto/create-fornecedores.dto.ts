@@ -20,14 +20,14 @@ export class CreateFornecedoresDto {
   email: string;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   @ApiPropertyOptional({ example: '(11) 91234-5678' })
-  telefone?: string;
+  telefone: string;
 
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({ example: 'Rua das Flores, 123 - São Paulo/SP' })
-  enderecoId?: string;
+  endereco?: string;
 
   @IsBoolean()
   @IsOptional()

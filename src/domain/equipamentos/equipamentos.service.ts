@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { EquipamentosRepository } from './equipamentos.repository';
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
 import { Equipamentos } from './entities/equipamento.entity';
@@ -22,6 +22,12 @@ export class EquipamentosService {
   }
 
   async findOne(id: number): Promise<Equipamentos | null> {
+    const existeEquipamento = await this.equipamentosRepository.findById(id);
+
+    if (!existeEquipamento) {
+      throw new NotFoundException('O equipamento buscado não existe!');
+    }
+
     return this.equipamentosRepository.findById(id);
   }
 
@@ -74,6 +80,12 @@ export class EquipamentosService {
 
   async update(id: number, data: Partial<UpdateEquipamentoDto>): Promise<Equipamentos | null> {
 
+    const existeEquipamento = await this.equipamentosRepository.findById(id);
+
+    if (!existeEquipamento) {
+      throw new NotFoundException('O equipamento buscado não existe!');
+    }
+
     if (data.numeroDeSerie) {
       const existe = await this.equipamentosRepository.findOneByOptions({
         where: { numeroDeSerie: data.numeroDeSerie },
@@ -121,7 +133,12 @@ export class EquipamentosService {
   }
 
   async delete(id: number): Promise<boolean> {
-    return this.equipamentosRepository.delete(id);
+    const existeEquipamento = await this.equipamentosRepository.findById(id);
+    if (!existeEquipamento) {
+      throw new NotFoundException('O equipamento buscado não existe!');
+    }
+
+    return this.equipamentosRepository.remove(id);
   }
 }
 

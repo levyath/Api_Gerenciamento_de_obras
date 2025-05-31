@@ -7,7 +7,8 @@ import {
   Patch,
   Delete,
   ParseIntPipe,
-  NotFoundException,
+  BadRequestException,
+  Put,
 } from '@nestjs/common';
 import { EquipamentosService } from './equipamentos.service';
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
@@ -30,49 +31,62 @@ export class EquipamentosController {
   @ApiOperation({ summary: 'Listar todos os equipamentos' })
   @ApiResponse({ status: 200, description: 'Lista de equipamentos retornada com sucesso.', type: [Equipamentos] })
   async findAll(): Promise<Equipamentos[]> {
-    return this.equipamentosService.findAll();
+    try {
+      return await this.equipamentosService.findAll();
+    } catch (error) {
+      throw new BadRequestException('Erro ao listar equipamentos: ' + error.message);
+    }
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar equipamento por ID' })
   @ApiResponse({ status: 200, description: 'Equipamento encontrado.', type: Equipamentos })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Equipamentos> {
-    const equipamento = await this.equipamentosService.findOne(id);
-    if (!equipamento) {
-      throw new NotFoundException(`Equipamento com id ${id} não encontrado.`);
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Equipamentos | null> {
+    try {
+      return await this.equipamentosService.findOne(id);
+    } catch (error) {
+      throw new BadRequestException('Erro ao buscar equipamento: ' + error.message);
     }
-    return equipamento;
   }
 
   @Post()
   @ApiOperation({ summary: 'Criar um novo equipamento' })
   @ApiResponse({ status: 201, description: 'Equipamento criado com sucesso.', type: Equipamentos })
   @ApiBody({ type: CreateEquipamentoDto })
-  async create(@Body() Equipamentos: CreateEquipamentoDto): Promise<Equipamentos>  {
-    return this.equipamentosService.create(Equipamentos);
+  async create(@Body() equipamentos: CreateEquipamentoDto): Promise<Equipamentos> {
+    try {
+      return await this.equipamentosService.create(equipamentos);
+    } catch (error) {
+      throw new BadRequestException('Erro ao criar equipamento: ' + error.message);
+    }
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({ summary: 'Atualizar um equipamento existente' })
   @ApiResponse({ status: 200, description: 'Equipamento atualizado com sucesso.', type: Equipamentos })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: Partial<UpdateEquipamentoDto>,
-  ): Promise<Equipamentos> {
-    const updated = await this.equipamentosService.update(id, data);
-    if (!updated) {
-      throw new NotFoundException(`Equipamento com id ${id} não encontrado.`);
+  ): Promise<Equipamentos | null> {
+    try {
+      return this.equipamentosService.update(id, data);
+    } catch (error) {
+      throw new BadRequestException('Erro ao atualizar equipamento: ' + error.message);
     }
-    return updated;
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remover equipamento por ID' })
   @ApiResponse({ status: 200, description: 'Equipamento removido com sucesso.' })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.equipamentosService.delete(id);
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
+    try {
+      await this.equipamentosService.delete(id);
+      return { message: 'Equipamento removido com sucesso.' };
+    } catch (error) {
+      throw new BadRequestException('Erro ao remover equipamento: ' + error.message);
+    }
   }
 }

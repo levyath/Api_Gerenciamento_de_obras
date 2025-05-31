@@ -68,7 +68,7 @@ export class ObrasRepository {
       await obra.$set('fornecedores', fornecedoresId); 
     }
 
-    if (equipamentosId && equipamentosId.length > 0) {
+    if (equipamentosId) {
     await obra.$set('equipamentos', equipamentosId);
   }
 

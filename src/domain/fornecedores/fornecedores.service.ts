@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { FornecedoresRepository } from './fornecedores.repository';
 import { Fornecedores } from './entities/fornecedores.entity';
 import { CreateFornecedoresDto } from './dto/create-fornecedores.dto';
@@ -17,6 +17,12 @@ export class FornecedoresService {
   }
 
   async findOne(id: number): Promise<Fornecedores | null> {
+    const existeFornecedor = await this.fornecedoresRepo.findById(id);
+    
+    if (!existeFornecedor) {
+      throw new NotFoundException('O Fornecedor buscado não existe!');
+    }
+
     return this.fornecedoresRepo.findById(id);
   }
 
@@ -65,6 +71,12 @@ export class FornecedoresService {
 
   async update(id: number, data: Partial<UpdateFornecedoresDto>): Promise<Fornecedores | null> {
 
+    const existeFornecedor = await this.fornecedoresRepo.findById(id);
+    
+    if (!existeFornecedor) {
+      throw new NotFoundException('O Fornecedor buscado não existe!');
+    }
+
     if (data.email) {
       const existeEmail = await this.fornecedoresRepo.findOneByOptions({
         where: { email: data.email },
@@ -107,6 +119,12 @@ export class FornecedoresService {
   }
 
   async remove(id: number): Promise<boolean> {
+    const existeFornecedor = await this.fornecedoresRepo.findById(id);
+    
+    if (!existeFornecedor) {
+      throw new NotFoundException('O Fornecedor buscado não existe!');
+    }
+
     return this.fornecedoresRepo.delete(id);
   }
 }

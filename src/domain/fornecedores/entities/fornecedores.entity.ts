@@ -27,41 +27,41 @@ export class Fornecedores extends Model<Fornecedores> {
     type: DataType.STRING(255),
     allowNull: false,
   })
-  nome: string;
+  declare nome: string;
 
   @Unique
   @AllowNull
   @Column({
     type: DataType.STRING(20),
   })
-  cnpj: string;
+  declare cnpj: string | null;
 
   @Unique
   @AllowNull
   @Column({
     type: DataType.STRING(100),
   })
-  email: string;
+  declare email: string | null;
 
   @Unique
   @AllowNull
   @Column({
     type: DataType.STRING(20),
   })
-  telefone: string;
+  declare telefone: string | null;
 
   @AllowNull
   @Column({
     type: DataType.STRING(255),
   })
-  endereco: string;
+  declare endereco: string | null;
 
   @Default(true)
   @Column({
     type: DataType.BOOLEAN,
   })
-  ativo: boolean;
+  declare ativo: boolean;
 
   @BelongsToMany(() => Obras, () => ObrasFornecedores)
-  obrasId: Obras[];
+  declare obrasId: Obras[];
 }

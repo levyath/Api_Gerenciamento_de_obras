@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { ObrasRepository } from './obras.repository';
 import { Obras } from './entities/obras.entity';
 import { CreateObraDto } from './dto/create-obra.dto';
@@ -19,116 +19,141 @@ export class ObrasService {
   }
 
   async findOne(id: number): Promise<Obras | null> {
+
+    const existeObra = await this.obrasRepo.findById(id);
+
+    if (!existeObra) {
+      throw new NotFoundException('A obra buscada não existe!');
+    }
+    
     return this.obrasRepo.findById(id);
   }
 
-  async create(data: CreateObraDto): Promise<Obras> {
+ async create(data: CreateObraDto): Promise<Obras> {
+  if (data.fornecedoresId?.length) {
+    const fornecedoresIds = data.fornecedoresId;
 
-    if (data.fornecedoresId?.length) {
-      const fornecedoresIds = data.fornecedoresId;
-      const todosFornecedores = await this.fornecedoresRepository.findAll();
-      const fornecedoresExistentes = todosFornecedores.filter(f => fornecedoresIds.includes(f.id));
+    const todosFornecedores = (await this.fornecedoresRepository.findAll())
+      .filter(fornecedor => fornecedoresIds.includes(fornecedor.id));
 
-      if (fornecedoresExistentes.length !== fornecedoresIds.length) {
-        throw new HttpException(
-          'Um ou mais fornecedores informados não existem!',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      const fornecedoresInativos = fornecedoresExistentes.filter(f => !f.ativo);
-
-      if (fornecedoresInativos.length > 0) {
-        throw new HttpException(
-          'Um ou mais fornecedores estão inativos!',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      data.fornecedoresId = fornecedoresExistentes.map(f => f.id);
+    // Verifica se todos os fornecedores existem
+    if (todosFornecedores.length !== fornecedoresIds.length) {
+      const idsIncorretos = fornecedoresIds.filter(id => !todosFornecedores.some(f => f.id === id));
+      throw new HttpException(
+        `Os fornecedores a seguir não existem: ${idsIncorretos.join(', ')}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    if (data.equipamentosId?.length) {
-      const equipamentosIds = data.equipamentosId;
-      const todosEquipamentos = await this.equipamentosRepository.findAll();
-      const equipamentosExistentes = todosEquipamentos.filter(e => equipamentosIds.includes(e.id));
+    const fornecedoresInativos = todosFornecedores.filter(f => f.ativo === false || f.ativo === null || f.ativo === undefined);
 
-      if (equipamentosExistentes.length !== equipamentosIds.length) {
-        throw new HttpException(
-          'Um ou mais equipamentos informados não existem!',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      const equipamentosEmUso = await this.equipamentosRepository.findEquipamentosEmUso(equipamentosIds);
-
-      if (equipamentosEmUso.length > 0) {
-        throw new HttpException(
-          'Um ou mais equipamentos informados já estão em uso por outra obra!',
-          HttpStatus.CONFLICT,
-        );
-      }
-
-      data.equipamentosId = equipamentosExistentes.map(e => e.id);
+    if (fornecedoresInativos.length > 0) {
+      throw new HttpException(
+        `Os fornecedores a seguir estão inativos: ${fornecedoresInativos.map(f => f.id).join(', ')}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
+
+    data.fornecedoresId = todosFornecedores.map(f => f.id);
+  }
+
+  if (data.equipamentosId?.length) {
+    const equipamentosIds = data.equipamentosId;
+    const todosEquipamentos = await this.equipamentosRepository.findAll();
+    const equipamentosExistentes = todosEquipamentos.filter(e => equipamentosIds.includes(e.id));
+
+    if (equipamentosExistentes.length !== equipamentosIds.length) {
+      const idsIncorretos = equipamentosIds.filter(id => !equipamentosExistentes.some(e => e.id === id));
+      throw new HttpException(
+        `Os equipamentos a seguir não existem: ${idsIncorretos.join(', ')}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const equipamentosEmUso = await this.equipamentosRepository.findEquipamentosEmUso(equipamentosIds);
+
+    if (equipamentosEmUso.length > 0) {
+      throw new HttpException(
+        `Os equipamentos a seguir já estão em uso por outra obra: ${equipamentosEmUso.map(e => e.id).join(', ')}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    data.equipamentosId = equipamentosExistentes.map(e => e.id);
+  }
 
     return this.obrasRepo.create(data);
   }
 
   async update(id: number, data: UpdateObraDto): Promise<Obras | null> {
 
+    const existeObra = await this.obrasRepo.findById(id);
+
+    if (!existeObra) {
+      throw new NotFoundException('A obra buscada não existe!');
+    }
+
     if (data.fornecedoresId?.length) {
-      const fornecedoresIds = data.fornecedoresId;
-      const todosFornecedores = await this.fornecedoresRepository.findAll();
-      const fornecedoresExistentes = todosFornecedores.filter(f => fornecedoresIds.includes(f.id));
+    const fornecedoresIds = data.fornecedoresId;
 
-      if (fornecedoresExistentes.length !== fornecedoresIds.length) {
-        throw new HttpException(
-          'Um ou mais fornecedores informados não existem!',
-          HttpStatus.NOT_FOUND,
-        );
-      }
+    const todosFornecedores = (await this.fornecedoresRepository.findAll())
+      .filter(fornecedor => fornecedoresIds.includes(fornecedor.id));
 
-      const fornecedoresInativos = fornecedoresExistentes.filter(f => !f.ativo);
-
-      if (fornecedoresInativos.length > 0) {
-        throw new HttpException(
-          'Um ou mais fornecedores estão inativos!',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      data.fornecedoresId = fornecedoresExistentes.map(f => f.id);
+    // Verifica se todos os fornecedores existem
+    if (todosFornecedores.length !== fornecedoresIds.length) {
+      const idsIncorretos = fornecedoresIds.filter(id => !todosFornecedores.some(f => f.id === id));
+      throw new HttpException(
+        `Os fornecedores a seguir não existem: ${idsIncorretos.join(', ')}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    if (data.equipamentosId?.length) {
-      const equipamentosIds = data.equipamentosId;
-      const todosEquipamentos = await this.equipamentosRepository.findAll();
-      const equipamentosExistentes = todosEquipamentos.filter(e => equipamentosIds.includes(e.id));
+    const fornecedoresInativos = todosFornecedores.filter(f => f.ativo === false || f.ativo === null || f.ativo === undefined);
 
-      if (equipamentosExistentes.length !== equipamentosIds.length) {
-        throw new HttpException(
-          'Um ou mais equipamentos informados não existem!',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      const equipamentosEmUso = await this.equipamentosRepository.findEquipamentosEmUso(equipamentosIds);
-
-      if (equipamentosEmUso.length > 0) {
-        throw new HttpException(
-          'Um ou mais equipamentos informados já estão em uso por outra obra!',
-          HttpStatus.CONFLICT,
-        );
-      }
-
-      data.equipamentosId = equipamentosExistentes.map(e => e.id);
+    if (fornecedoresInativos.length > 0) {
+      throw new HttpException(
+        `Os fornecedores a seguir estão inativos: ${fornecedoresInativos.map(f => f.id).join(', ')}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
+
+    data.fornecedoresId = todosFornecedores.map(f => f.id);
+  }
+
+  if (data.equipamentosId?.length) {
+    const equipamentosIds = data.equipamentosId;
+    const todosEquipamentos = await this.equipamentosRepository.findAll();
+    const equipamentosExistentes = todosEquipamentos.filter(e => equipamentosIds.includes(e.id));
+
+    if (equipamentosExistentes.length !== equipamentosIds.length) {
+      const idsIncorretos = equipamentosIds.filter(id => !equipamentosExistentes.some(e => e.id === id));
+      throw new HttpException(
+        `Os equipamentos a seguir não existem: ${idsIncorretos.join(', ')}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const equipamentosEmUso = await this.equipamentosRepository.findEquipamentosEmUso(equipamentosIds);
+
+    if (equipamentosEmUso.length > 0) {
+      throw new HttpException(
+        `Os equipamentos a seguir já estão em uso por outra obra: ${equipamentosEmUso.map(e => e.id).join(', ')}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    data.equipamentosId = equipamentosExistentes.map(e => e.id);
+  }
 
     return this.obrasRepo.update(id, data);
   }
 
   async remove(id: number): Promise<boolean> {
+    const existeObra = await this.obrasRepo.findById(id);
+
+    if (!existeObra) {
+      throw new NotFoundException('A obra buscada não existe!');
+    }
     return this.obrasRepo.delete(id);
   }
 }

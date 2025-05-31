@@ -70,5 +70,5 @@ export class Equipamentos extends Model<Equipamentos> {
 
 
   @BelongsToMany(() => Obras, () => ObrasEquipamentos)
-    obrasId: Obras[];
+    obras: Obras[];
 }

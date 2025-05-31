@@ -14,23 +14,30 @@ export class FornecedoresRepository {
   ) {}
 
   async findAll(): Promise<Fornecedores[]> {
-    return this.fornecedoresModel.findAll({
+  return this.fornecedoresModel.findAll({
     include: [
       {
-        association: 'obras',
+        model: Obras,
         attributes: ['id'],
+        through: { attributes: [] },
+      },
+    ],
+  });
+}
+
+  async findById(id: number): Promise<Fornecedores | null> {
+  return this.fornecedoresModel.findByPk(id, {
+    include: [
+      {
+        model: Obras,
         through: { attributes: [] }, 
       },
     ],
   });
-  }
-
-  async findById(id: number): Promise<Fornecedores | null> {
-    return this.fornecedoresModel.findByPk(id, { include: [Obras] });
-  }
+}
 
   async create(data: CreateFornecedoresDto): Promise<Fornecedores> {
-    const { obrasId, ...obraData } = data;
+    const { obrasId } = data;
     const novaObra = await this.fornecedoresModel.create(data as any);
     if (obrasId && obrasId.length > 0) {
     await novaObra.$set('obrasId', obrasId);
@@ -44,10 +51,19 @@ export class FornecedoresRepository {
   }
 
   async update(id: number, data: Partial<UpdateFornecedoresDto>): Promise<Fornecedores | null> {
-    const endereco = await this.fornecedoresModel.findByPk(id);
-    if (!endereco) return null;
-    return endereco.update(data as any);
+  const fornecedor = await this.fornecedoresModel.findByPk(id);
+  if (!fornecedor) return null;
+
+  const { obrasId, ...fornecedorData } = data;
+
+  await fornecedor.update(fornecedorData as any);
+
+  if (obrasId) {
+    await fornecedor.$set('obrasId', obrasId);
   }
+
+  return this.findById(id);
+}
 
   async delete(id: number): Promise<boolean> {
     const deletedCount = await this.fornecedoresModel.destroy({ where: { id } });
