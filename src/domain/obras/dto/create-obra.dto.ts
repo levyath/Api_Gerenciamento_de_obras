@@ -54,13 +54,13 @@ export class CreateObraDto {
   @Type(() => Number)
   fornecedoresId?: number[];
 
-  // @IsOptional()
-  // @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => Number)
-  // equipamentos?: number[];
-
   @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Number)
+  equipamentosId?: number[];
+
   @IsNumber()
-  endereco_id?: number;
+  @IsOptional()
+  enderecoId?: number;
 }

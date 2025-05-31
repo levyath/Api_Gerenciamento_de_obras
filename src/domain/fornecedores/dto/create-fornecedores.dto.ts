@@ -1,17 +1,37 @@
-import { Type } from "class-transformer";
-import { IsArray, IsOptional, ValidateNested } from "class-validator";
-
+import { 
+  IsString, 
+  IsNotEmpty, 
+  IsOptional, 
+  IsArray, 
+  IsBoolean,
+  ValidateNested 
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateFornecedoresDto {
+  @IsString()
+  @IsNotEmpty()
   nome: string;
 
-  cnpj?: string;
+  @IsString()
+  @IsNotEmpty()
+  cnpj: string;
 
-  email?: string;
+  @IsString()
+  @IsNotEmpty()
+  email: string;
 
+  @IsString()
+  @IsOptional()
   telefone?: string;
 
-  endereco?: string;
+  @IsString()
+  @IsOptional()
+  enderecoId?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  ativo?: boolean;
 
   @IsOptional()
   @IsArray()

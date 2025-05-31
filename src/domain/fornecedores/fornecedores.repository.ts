@@ -33,7 +33,7 @@ export class FornecedoresRepository {
     const { obrasId, ...obraData } = data;
     const novaObra = await this.fornecedoresModel.create(data as any);
     if (obrasId && obrasId.length > 0) {
-    await novaObra.$set('obras', obrasId);
+    await novaObra.$set('obrasId', obrasId);
   }
 
     const obra = await this.findById(novaObra.id);

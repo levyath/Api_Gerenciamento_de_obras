@@ -7,4 +7,9 @@ export class UpdateObraDto extends PartialType(CreateObraDto) {
   @IsArray()
   @IsNumber({}, { each: true })
   fornecedoresId?: number[];
+
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  equipamentosId?: number[];
 }
