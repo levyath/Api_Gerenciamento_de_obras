@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body, Put, Patch, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Put, Patch, Delete, BadRequestException, NotFoundException } from '@nestjs/common';
 import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
 import { FiscalizacoesService } from './fiscalizacoes.service';
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
@@ -10,41 +10,71 @@ export class FiscalizacoesController {
 
     @Get()
     async findAll(): Promise<Fiscalizacoes[]> {
-        return this.fiscalizacoesService.findAll();
+        try {
+            return await this.fiscalizacoesService.findAll();
+        } catch (error) {
+            throw new BadRequestException('Erro ao listar fiscalizações...');
+        }
     }
 
     @Get(':id')
-    async findOne(@Param('id', ParseIntPipe) id: number): Promise<Fiscalizacoes> {
-        return this.fiscalizacoesService.findOne(id);
+    async findOne(@Param('id') id: number): Promise<Fiscalizacoes> {
+        try {
+            const fiscalizacao = await this.fiscalizacoesService.findOne(id);
+            if (!fiscalizacao) {
+                throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
+            }
+            return fiscalizacao;
+        } catch (error) {
+            throw new BadRequestException(`Erro ao buscar a fiscalização ${id}.`);
+        }
+    }
+
+    @Get('/obras/:id/fiscalizacoes')
+    async findByObraId(@Param('id') obraId: number): Promise<Fiscalizacoes[]> {
+        try {
+            return await this.fiscalizacoesService.findByObraId(obraId);
+        } catch (error) {
+            throw new BadRequestException(`Erro ao listar fiscalizações da obra ${obraId}.`);
+        }
+    }
+
+    @Post('/obras/:id/fiscalizacoes')
+    async create(@Param('id') obraId: number, @Body() dto: CreateFiscalizacoesDto) {
+        try {
+            return await this.fiscalizacoesService.create(obraId, dto);
+        } catch (error) {
+            if (error instanceof BadRequestException || error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new BadRequestException(`Erro ao criar fiscalização para a obra ${obraId}.`);
+        }
     }
 
     @Put(':id')
-    async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        return this.fiscalizacoesService.update(id, dto);
+    async update(@Param('id') id: number, @Body() dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
+        try {
+            return await this.fiscalizacoesService.update(id, dto);
+        } catch (error) {
+            throw new BadRequestException(`Erro ao atualizar a fiscalização ${id}.`);
+        }
     }
 
     @Patch(':id')
-    async patch(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        return this.fiscalizacoesService.patch(id, dto);
+    async partialUpdate(@Param('id') id: number, @Body() dto: Partial<UpdateFiscalizacoesDto>): Promise<Fiscalizacoes> {
+        try {
+            return await this.fiscalizacoesService.patch(id, dto);
+        } catch (error) {
+            throw new BadRequestException(`Erro ao atualizar parcialmente a fiscalização ${id}.`);
+        }
     }
 
     @Delete(':id')
-    async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-        return this.fiscalizacoesService.remove(id);
-    }
-}
-
-@Controller('obras/:obraId/fiscalizacoes')
-export class ObrasFiscalizacoesController {
-    constructor(private readonly fiscalizacoesService: FiscalizacoesService) {}
-
-    @Get()
-    async findByObra(@Param('obraId', ParseIntPipe) obraId: number): Promise<Fiscalizacoes[]> {
-        return this.fiscalizacoesService.findByObraId(obraId);
-    }
-
-    @Post()
-    async createForObra(@Param('obraId', ParseIntPipe) obraId: number, @Body() dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        return this.fiscalizacoesService.createForObra(obraId, dto);
+    async delete(@Param('id') id: number): Promise<void> {
+        try {
+            await this.fiscalizacoesService.delete(id);
+        } catch (error) {
+            throw new BadRequestException(`Erro ao excluir fiscalização ID ${id}.`);
+        }
     }
 }
