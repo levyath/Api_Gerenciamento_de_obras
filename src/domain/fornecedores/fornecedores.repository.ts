@@ -1,105 +1,56 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOneOptions, EntityManager } from 'typeorm';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import { InjectModel } from '@nestjs/sequelize';
 import { Fornecedores } from './entities/fornecedores.entity';
-import { ObraFornecedor } from '../obra-fornecedor/dto/obra-fornecedor.dto';
-import { Obra } from '../obras/entities/obra.entity';
-import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
+import { CreateFornecedoresDto } from './dto/create-fornecedores.dto';
+import { UpdateFornecedoresDto } from './dto/update-fornecedores.dto';
+import { Obras } from '../obras/entities/obras.entity';
+
 
 @Injectable()
 export class FornecedoresRepository {
   constructor(
-    @InjectRepository(Fornecedores)
-    private readonly fornecedoresRepository: Repository<Fornecedores>,
-    @InjectRepository(Equipamentos)
-    private readonly Equipamentos: Repository<Equipamentos>,
-    @InjectRepository(ObraFornecedor)
-    private readonly obraFornecedor: Repository<ObraFornecedor>,
-    @InjectEntityManager()
-    private readonly manager: EntityManager,
+    @InjectModel(Fornecedores)
+    private readonly fornecedoresModel: typeof Fornecedores,
   ) {}
 
-
   async findAll(): Promise<Fornecedores[]> {
-    return this.fornecedoresRepository.find();
-  }
-
-
- async findOne(id: number): Promise<Fornecedores | null> {
-  return this.fornecedoresRepository.findOne({
-    where: { id: Number(id) },
-    relations: ['obras'], 
+    return this.fornecedoresModel.findAll({
+    include: [
+      {
+        association: 'obras',
+        attributes: ['id'],
+        through: { attributes: [] }, 
+      },
+    ],
   });
-}
-
-
-  async create(fornecedor: Fornecedores): Promise<Fornecedores | null> {
-
-  const createdFornecedor = await this.fornecedoresRepository.save(fornecedor);
-
-  if (fornecedor.obras?.length) {
-    const obraFornecedor: ObraFornecedor[] = fornecedor.obras.map((obra: Obra) => ({
-      fornecedor_id: createdFornecedor.id,
-      obra_id: obra.id,
-    }));
-
-    await this.obraFornecedor.save(obraFornecedor as any);
   }
 
-  return this.findOne(createdFornecedor.id);
-}
+  async findById(id: number): Promise<Fornecedores | null> {
+    return this.fornecedoresModel.findByPk(id, { include: [Obras] });
+  }
 
+  async create(data: CreateFornecedoresDto): Promise<Fornecedores> {
+    const { obrasId, ...obraData } = data;
+    const novaObra = await this.fornecedoresModel.create(data as any);
+    if (obrasId && obrasId.length > 0) {
+    await novaObra.$set('obrasId', obrasId);
+  }
 
-  async update(id: number, fornecedorInput: Partial<Fornecedores>): Promise<Fornecedores | null> {
-  const { obras, ...fornecedorData } = fornecedorInput;
-
-  await this.fornecedoresRepository.update(id, fornecedorData);
-
-  if (obras) {
-    await this.obraFornecedor.delete({ fornecedor_id: id });
-
-    if (obras.length > 0) {
-      const obraFornecedor = obras.map((obra: Obra) => ({
-        fornecedor_id: id,
-        obra_id: obra.id,
-      }));
-      await this.obraFornecedor.save(obraFornecedor as any);
+    const obra = await this.findById(novaObra.id);
+    if (!obra) {
+      throw new Error('Obra not found after creation');
     }
+    return obra;
   }
 
-  return this.findOne(id);
-}
-
-
-   async updateActive(id: number, ativo: boolean): Promise<Fornecedores | null> {
-  await this.fornecedoresRepository.update(id, { ativo });
-  return this.findOne(id);
-}
-
-
- async remove(id: number): Promise<void> {
-  await this.manager
-    .createQueryBuilder()
-    .update(Equipamentos)
-    .set({ fornecedor: null }) 
-    .where('fornecedorId = :id', { id }) 
-    .execute();
-
-  await this.fornecedoresRepository.delete(id);
-}
-
-
-   async findSuppliersByObra(obraId: number): Promise<Fornecedores[]> {
-    return this.fornecedoresRepository.createQueryBuilder('fornecedor')
-      .leftJoin('fornecedor.obras', 'obra')
-      .where('obra.id = :obraId', { obraId })
-      .getMany();
+  async update(id: number, data: Partial<UpdateFornecedoresDto>): Promise<Fornecedores | null> {
+    const endereco = await this.fornecedoresModel.findByPk(id);
+    if (!endereco) return null;
+    return endereco.update(data as any);
   }
 
-
-  async findOneByOptions(options: FindOneOptions<Fornecedores>): Promise<Fornecedores | null> {
-    return this.fornecedoresRepository.findOne(options);
+  async delete(id: number): Promise<boolean> {
+    const deletedCount = await this.fornecedoresModel.destroy({ where: { id } });
+    return deletedCount > 0;
   }
-
 }

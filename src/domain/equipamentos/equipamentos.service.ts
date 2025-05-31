@@ -1,178 +1,42 @@
-import {Injectable, HttpException,HttpStatus,NotFoundException} from '@nestjs/common';
-import { In } from 'typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { EquipamentosRepository } from './equipamentos.repository';
-import { FornecedoresRepository } from '../fornecedores/fornecedores.repository';
-import { ObrasRepository } from '../obras/obras.repository';
+import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
+import { Equipamentos } from './entities/equipamento.entity';
+import { UpdateEquipamentoDto } from './dto/update-equipamento.dto';
+
 
 @Injectable()
 export class EquipamentosService {
-  constructor(
-    private readonly equipamentosRepository: EquipamentosRepository,
-    private readonly obrasRepository: ObrasRepository,
-    private readonly FornecedoresRepository: FornecedoresRepository,
-  ) {}
+  constructor(private readonly equipamentosRepository: EquipamentosRepository) {}
 
-  async findAll() {
+  async findAll(): Promise<Equipamentos[]> {
     return this.equipamentosRepository.findAll();
   }
 
-  async findOne(id: number) {
-    const equipamento = await this.equipamentosRepository.findOne(id);
-
+  async findOne(id: number): Promise<Equipamentos> {
+    const equipamento = await this.equipamentosRepository.findById(id);
     if (!equipamento) {
-      throw new NotFoundException('O equipamento buscado não existe!');
+      throw new NotFoundException(`Equipamento com id ${id} não encontrado`);
     }
-
     return equipamento;
   }
 
-
-  async create(equipamentoInput: any) {
-    const equipamento = equipamentoInput;
-
-    if (equipamento.numeroDeSerie) {
-      const existe = await this.equipamentosRepository.findOneByOptions({
-        where: { numeroDeSerie: equipamento.numeroDeSerie },
-      });
-
-      if (existe) {
-        throw new HttpException(
-          'Já existe um equipamento com o mesmo número de série.',
-          HttpStatus.CONFLICT,
-        );
-      }
-    }
-
-    if (equipamento.fornecedor) {
-    const fornecedor = await this.FornecedoresRepository.findOneByOptions({
-        where: { id: equipamento.fornecedor },
-      });
-
-      if (!fornecedor) {
-        throw new HttpException(
-          'O fornecedor informado não existe.',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-    }
-
-    if (equipamento.obras?.length) {
-      const obraIds = equipamento.obras.map((obra) => obra.id);
-
-      const todasObras = await this.obrasRepository.findAll();
-      const obrasExistentes = todasObras.filter((obra) =>
-        obraIds.includes(obra.id),
-      );
-
-      if (obrasExistentes.length !== obraIds.length) {
-        throw new HttpException(
-          'Uma ou mais obras informadas não existem.',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      equipamento.obras = obrasExistentes;
-    }
-
-    return this.equipamentosRepository.create(equipamento);
+  async create(data: CreateEquipamentoDto): Promise<Equipamentos> {
+    return this.equipamentosRepository.create(data);
   }
 
-
-  async update(id: number, equipamentoInput: any) {
-    const existe = await this.equipamentosRepository.findOne(id);
-
-    if (!existe) {
-      throw new NotFoundException('O equipamento buscado não existe!');
+  async update(id: number, data: Partial<UpdateEquipamentoDto>): Promise<Equipamentos> {
+    const equipamento = await this.equipamentosRepository.update(id, data);
+    if (!equipamento) {
+      throw new NotFoundException(`Equipamento com id ${id} não encontrado`);
     }
-
-    const equipamento = equipamentoInput;
-
-    if (equipamento.numeroDeSerie) {
-      const existeOutro = await this.equipamentosRepository.findOneByOptions({
-        where: { numeroDeSerie: equipamento.numeroDeSerie },
-      });
-
-      if (existeOutro && existeOutro.id !== id) {
-        throw new HttpException(
-          'Já existe um equipamento com o mesmo número de série.',
-          HttpStatus.CONFLICT,
-        );
-      }
-    }
-
-    if (equipamento.fornecedor) {
-  const fornecedor = await this.FornecedoresRepository.findOneByOptions({
-      where: { id: equipamento.fornecedor },
-    });
-
-    if (!fornecedor) {
-      throw new HttpException(
-        'O fornecedor informado não existe.',
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    return equipamento;
   }
 
-     if (equipamento.obras?.length) {
-      const obraIds = equipamento.obras.map((obra) => obra.id);
-
-      const todasObras = await this.obrasRepository.findAll();
-      const obrasExistentes = todasObras.filter((obra) =>
-        obraIds.includes(obra.id),
-      );
-
-      if (obrasExistentes.length !== obraIds.length) {
-        throw new HttpException(
-          'Uma ou mais obras informadas não existem.',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      equipamento.obras = obrasExistentes;
+  async delete(id: number): Promise<void> {
+    const deleted = await this.equipamentosRepository.delete(id);
+    if (!deleted) {
+      throw new NotFoundException(`Equipamento com id ${id} não encontrado`);
     }
-
-    return this.equipamentosRepository.update(id, equipamento);
-  }
-
-
-  async updateObras(id: number, obrasIds: number[]) {
-  const equipamento = await this.equipamentosRepository.findOne(id);
-
-  if (!equipamento) {
-    throw new NotFoundException('O equipamento buscado não existe!');
-  }
-
-  const obrasFiltradas = await this.obrasRepository.findByIds(obrasIds);
-
-  if (obrasFiltradas.length !== obrasIds.length) {
-    throw new HttpException(
-      'Uma ou mais obras informadas não existem.',
-      HttpStatus.NOT_FOUND,
-    );
-  }
-
-  return this.equipamentosRepository.updateObras(id, obrasFiltradas);
-}
-
-
-  async remove(id: number) {
-    const existe = await this.equipamentosRepository.findOne(id);
-
-    if (!existe) {
-      throw new NotFoundException('O equipamento buscado não existe!');
-    }
-
-    return this.equipamentosRepository.remove(id);
-  }
-
-
-  async getEquipamentosByObraId(obraId: number){
-    const equipamentos = await this.obrasRepository.findOne(obraId);
-
-    if (!equipamentos) {
-      throw new NotFoundException('A obra buscada não existe!');
-    }
-
-    return this.equipamentosRepository.findByObraId(obraId);;
   }
 }

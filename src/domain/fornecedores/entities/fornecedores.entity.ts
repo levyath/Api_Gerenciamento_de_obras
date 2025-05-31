@@ -1,29 +1,67 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
-import { Obra } from '../../obras/entities/obra.entity';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  Unique,
+  AllowNull,
+  Default,
+  BelongsToMany,
+} from 'sequelize-typescript';
+import { ObrasFornecedores } from 'src/domain/obra-fornecedor/entities/obras-fornecedores.entity';
+import { Obras } from 'src/domain/obras/entities/obras.entity';
 
-@Entity('fornecedores')
-export class Fornecedores {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Table({
+  tableName: 'fornecedores',
+  timestamps: false,
+})
+export class Fornecedores extends Model<Fornecedores> {
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  declare id: number;
 
-  @Column({ length: 255 })
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: false,
+  })
   nome: string;
 
-  @Column({ length: 20, nullable: true, unique: true })
+  @Unique
+  @AllowNull
+  @Column({
+    type: DataType.STRING(20),
+  })
   cnpj: string;
 
-  @Column({ length: 100, nullable: true, unique: true })
+  @Unique
+  @AllowNull
+  @Column({
+    type: DataType.STRING(100),
+  })
   email: string;
 
-  @Column({ length: 20, nullable: true, unique: true })
+  @Unique
+  @AllowNull
+  @Column({
+    type: DataType.STRING(20),
+  })
   telefone: string;
 
-  @Column({ length: 255, nullable: true })
+  @AllowNull
+  @Column({
+    type: DataType.STRING(255),
+  })
   endereco: string;
 
-  @Column({ default: true })
+  @Default(true)
+  @Column({
+    type: DataType.BOOLEAN,
+  })
   ativo: boolean;
 
-  @ManyToMany(() => Obra, obra => obra.fornecedores)
-  obras: Obra[];
+  @BelongsToMany(() => Obras, () => ObrasFornecedores)
+  obrasId: Obras[];
 }

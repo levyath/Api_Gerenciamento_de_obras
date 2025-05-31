@@ -1,24 +1,15 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
-import { Fornecedores } from './entities/fornecedores.entity';
-import { Obra } from '../obras/entities/obra.entity';
-import { ObraFornecedor } from '../obra-fornecedor/entities/obra-fornecedor.entity';
-
-import { ObrasModule } from '../obras/obras.module'; 
-
 import { FornecedoresService } from './fornecedores.service';
 import { FornecedoresController } from './fornecedores.controller';
 import { FornecedoresRepository } from './fornecedores.repository';
-import { ObrasRepository } from '../obras/obras.repository';
+import { Fornecedores } from './entities/fornecedores.entity';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { Obras } from '../obras/entities/obras.entity';
+import { ObrasFornecedores } from '../obra-fornecedor/entities/obras-fornecedores.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Fornecedores, Obra, ObraFornecedor]),
-    ObrasModule, 
-  ],
+  imports: [SequelizeModule.forFeature([Fornecedores, Obras, ObrasFornecedores])],
   controllers: [FornecedoresController],
-  providers: [FornecedoresService, FornecedoresRepository, ObrasRepository],
-  exports: [FornecedoresRepository, ObrasRepository],
+  providers: [FornecedoresService, FornecedoresRepository],
 })
 export class FornecedoresModule {}

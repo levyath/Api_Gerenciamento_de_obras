@@ -1,51 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOneOptions } from 'typeorm';
+import { InjectModel } from '@nestjs/sequelize';
 import { Endereco } from './entities/endereco.entity';
-import { Obra } from '../obras/entities/obra.entity';
+import { CreateEnderecoDto } from './dto/create-endereco.dto';
+import { UpdateEnderecoDto } from './dto/update-endereco.dto';
+
 
 @Injectable()
 export class EnderecoRepository {
   constructor(
-    @InjectRepository(Endereco)
-    private readonly enderecoRepository: Repository<Endereco>,
-    @InjectRepository(Obra)
-    private readonly obraRepository: Repository<Obra>,
+    @InjectModel(Endereco)
+    private readonly enderecoModel: typeof Endereco,
   ) {}
 
-  async create(obraId: number, endereco: Endereco): Promise<Endereco | null> {
-  const createdEndereco = await this.enderecoRepository.save(endereco);
-
-  await this.obraRepository.update(obraId, {
-    endereco: { id: createdEndereco.id },
-  });
-
-  return this.findOne(createdEndereco.id);
+  async findAll(): Promise<Endereco[]> {
+    return this.enderecoModel.findAll();
   }
 
-  async findOne(id: number): Promise<Endereco | null> {
-  const obra = await this.obraRepository.findOne({
-    where: { id },
-    relations: ['endereco'],
-  });
-
-  return obra?.endereco ?? null;
-}
-
-  
-  async findOneByOptions(options: FindOneOptions<Endereco>): Promise<Endereco | null> {
-    return this.enderecoRepository.findOne(options);
+  async findById(id: number): Promise<Endereco | null> {
+    return this.enderecoModel.findByPk(id);
   }
 
-  async update(id: number, endereco: Partial<Endereco>): Promise<Endereco | null> {
-  const obra = await this.obraRepository.findOne({ where: { id } });
-
-  if (!obra || !obra.endereco) {
-    return null;
+  async create(data: CreateEnderecoDto): Promise<Endereco> {
+    return this.enderecoModel.create(data as any);
   }
 
-  await this.enderecoRepository.update(obra.endereco.id, endereco);
-  return this.findOne(obra.endereco.id);
-}
+  async update(id: number, data: Partial<UpdateEnderecoDto>): Promise<Endereco | null> {
+    const endereco = await this.enderecoModel.findByPk(id);
+    if (!endereco) return null;
+    return endereco.update(data);
+  }
 
+  async delete(id: number): Promise<boolean> {
+    const deletedCount = await this.enderecoModel.destroy({ where: { id } });
+    return deletedCount > 0;
+  }
 }

@@ -1,35 +1,47 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateEquipamentoDto {
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({ example: 'Furadeira Bosch' })
   nome: string;
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({ example: 'Furadeira' })
   tipo: string;
 
   @IsString()
-  @IsOptional()
+  @IsOptional()  
+  @ApiPropertyOptional({ example: 'Bosch' })
   marca?: string;
 
   @IsString()
   @IsOptional()
+  @ApiPropertyOptional({ example: 'GSR 1000' })
   modelo?: string;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
+  @ApiProperty({ example: 'SN123456789' })
   numeroDeSerie?: string;
 
   @IsNumber()
   @IsNotEmpty()
-  fornecedor?: number;
+  @ApiPropertyOptional({ example: 1, description: 'ID do fornecedor associado' })
+  fornecedorId?: number;
 
   @IsString()
   @IsOptional()
+  @ApiPropertyOptional({ example: 'novo' })
   estado?: string; 
 
-  @IsNumber()
-  @IsNotEmpty()
-  obras?: number[];
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Number)
+  @ApiPropertyOptional({ example: [1, 2], description: 'IDs das obras associadas ao equipamento', type: [Number] })
+  obrasId?: number[];
 }

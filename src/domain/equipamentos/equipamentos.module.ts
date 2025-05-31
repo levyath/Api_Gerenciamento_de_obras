@@ -1,25 +1,16 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { EquipamentosService } from './equipamentos.service';
 import { EquipamentosController } from './equipamentos.controller';
-import { EquipamentosRepository } from './equipamentos.repository';
-
+import { SequelizeModule } from '@nestjs/sequelize';
 import { Equipamentos } from './entities/equipamento.entity';
-import { Obra } from '../obras/entities/obra.entity';
-import { ObraEquipamento } from '../obra-equipamentos/entities/obra-equipamento.entity';
-
-import { ObrasModule } from '../obras/obras.module';
-import { FornecedoresModule } from '../fornecedores/fornecedores.module';
+import { EquipamentosRepository } from './equipamentos.repository';
+import { Obras } from '../obras/entities/obras.entity';
+import { ObrasEquipamentos } from '../obra-equipamento/entities/obras-equipamentos.entity';
+import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Equipamentos, Obra, ObraEquipamento]),
-    ObrasModule,
-    FornecedoresModule,
-  ],
+  imports: [SequelizeModule.forFeature([Equipamentos, Obras, ObrasEquipamentos, Fornecedores])],
   controllers: [EquipamentosController],
   providers: [EquipamentosService, EquipamentosRepository],
-  exports: [EquipamentosRepository],
 })
 export class EquipamentosModule {}

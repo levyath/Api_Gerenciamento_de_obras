@@ -1,53 +1,74 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
+  Table,
   Column,
-  ManyToOne,
-  JoinColumn,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  BelongsToMany,
+  BelongsTo,
+  ForeignKey,
+} from 'sequelize-typescript';
+import { ObrasEquipamentos } from 'src/domain/obra-equipamento/entities/obras-equipamentos.entity';
 import { Fornecedores } from '../../fornecedores/entities/fornecedores.entity';
-import { Obra } from '../../obras/entities/obra.entity';
+import { Obras } from 'src/domain/obras/entities/obras.entity';
 
-@Entity('equipamentos')
-export class Equipamentos {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Table({ tableName: 'equipamentos', timestamps: false })
+export class Equipamentos extends Model<Equipamentos> {
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  declare id: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: false,
+  })
   nome: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: false,
+  })
   tipo: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: true,
+  })
   marca: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: true,
+  })
   modelo: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({
+    type: DataType.STRING(100),
+    allowNull: false,
+    field: 'numeroDeSerie',
+  })
   numeroDeSerie: string;
 
-  @ManyToOne(() => Fornecedores, { nullable: true })
-  @JoinColumn({ name: 'fornecedorId' })
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: true,
+  })
+  estado: string;
+  
+
+  @ForeignKey(() => Fornecedores)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  fornecedorId: number;
+
+  @BelongsTo(() => Fornecedores)
   fornecedor: Fornecedores;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
-  estado: string;
 
-  @ManyToMany(() => Obra, obra => obra.equipamentos)
-  @JoinTable({
-    name: 'obra_equipamentos',
-    joinColumn: {
-      name: 'equipamento_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'obra_id',
-      referencedColumnName: 'id',
-    },
-  })
-  obras: Obra[];
+  @BelongsToMany(() => Obras, () => ObrasEquipamentos)
+    obrasId: Obras[];
 }

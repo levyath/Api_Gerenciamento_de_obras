@@ -1,45 +1,73 @@
-import { Controller, Get, Post, Body, Patch, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { FornecedoresService } from './fornecedores.service';
 import { Fornecedores } from './entities/fornecedores.entity';
-import { CreateFornecedoreDto } from './dto/create-fornecedores.dto';
+import { CreateFornecedoresDto } from './dto/create-fornecedores.dto';
+import { UpdateFornecedoresDto } from './dto/update-fornecedores.dto';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiNotFoundResponse,
+  ApiBody,
+} from '@nestjs/swagger';
 
+@ApiTags('Fornecedores')
 @Controller('fornecedores')
 export class FornecedoresController {
   constructor(private readonly fornecedoresService: FornecedoresService) {}
 
   @Get()
-  findAll(): Promise<Fornecedores[]> {
+  @ApiOperation({ summary: 'Listar todos os fornecedores' })
+  @ApiResponse({ status: 200, description: 'Lista de fornecedores retornada com sucesso.', type: [Fornecedores] })
+  async findAll(): Promise<Fornecedores[]> {
     return this.fornecedoresService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Fornecedores | null> {
-    return this.fornecedoresService.findOne(id);
+  @ApiOperation({ summary: 'Buscar fornecedor por ID' })
+  @ApiResponse({ status: 200, description: 'Fornecedor encontrado.', type: Fornecedores })
+  @ApiNotFoundResponse({ description: 'Fornecedor não encontrado.' })
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Fornecedores> {
+    const fornecedores = await this.fornecedoresService.findOne(id);
+    if (!fornecedores) {
+      throw new NotFoundException(`Fornecedor com id ${id} não encontrado.`);
+    }
+    return fornecedores;
   }
 
   @Post()
-  create(@Body() fornecedores: CreateFornecedoreDto): Promise<Fornecedores | null> {
-    return this.fornecedoresService.create(fornecedores);
+  @ApiOperation({ summary: 'Criar um novo fornecedor' })
+  @ApiResponse({ status: 201, description: 'Fornecedor criado com sucesso.', type: Fornecedores })
+  @ApiBody({ type: CreateFornecedoresDto })
+  async create(@Body() data: CreateFornecedoresDto): Promise<Fornecedores> {
+    return this.fornecedoresService.create(data);
   }
 
   @Put(':id')
-  update(
-    @Param('id') id: number, @Body() fornecedores: CreateFornecedoreDto): Promise<Fornecedores | null> {
-    return this.fornecedoresService.update(id, fornecedores);
-  }
-
-  @Patch(':id')
-  updateActive(@Param('id') id: number, @Body('ativo') ativo: boolean): Promise<Fornecedores | null> {
-    return this.fornecedoresService.updateActive(id, ativo);
+  @ApiOperation({ summary: 'Atualizar fornecedor existente' })
+  @ApiResponse({ status: 200, description: 'Fornecedor atualizado com sucesso.', type: Fornecedores })
+  @ApiNotFoundResponse({ description: 'Fornecedor não encontrado.' })
+  @ApiBody({ type: UpdateFornecedoresDto })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: Partial<UpdateFornecedoresDto>,
+  ): Promise<Fornecedores> {
+    const updated = await this.fornecedoresService.update(id, data);
+    if (!updated) {
+      throw new NotFoundException(`Fornecedor com id ${id} não encontrado.`);
+    }
+    return updated;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<void> {
-    return this.fornecedoresService.remove(id);
-  }
-
-  @Get('obras/:id')
-  async findSuppliersByObra(@Param('id') id: number) {
-    return this.fornecedoresService.findSuppliersByObra(id);
+  @ApiOperation({ summary: 'Remover fornecedor por ID' })
+  @ApiResponse({ status: 200, description: 'Fornecedor removido com sucesso.' })
+  @ApiNotFoundResponse({ description: 'Fornecedor não encontrado.' })
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
+    const deleted = await this.fornecedoresService.remove(id);
+    if (!deleted) {
+      throw new NotFoundException(`Fornecedor com id ${id} não encontrado.`);
+    }
+    return { message: `Fornecedor com id ${id} removido com sucesso.` };
   }
 }

@@ -1,54 +1,18 @@
-import { forwardRef, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
-import { Obra } from './entities/obra.entity';
-import { ObrasController } from './obras.controller';
+import { Module } from '@nestjs/common';
 import { ObrasService } from './obras.service';
+import { ObrasController } from './obras.controller';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { Obras } from './entities/obras.entity';
 import { ObrasRepository } from './obras.repository';
-
-import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
-import { ObraFornecedor } from '../obra-fornecedor/entities/obra-fornecedor.entity';
-import { FornecedoresRepository } from '../fornecedores/fornecedores.repository';
-
-import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
-import { ObraEquipamento } from '../obra-equipamentos/entities/obra-equipamento.entity';
-import { EquipamentosRepository } from '../equipamentos/equipamentos.repository';
-
 import { Endereco } from '../enderecos/entities/endereco.entity';
-import { EnderecoModule } from '../enderecos/endereco.module';
-
-import { Fiscalizacoes } from '../fiscalizacoes/entities/fiscalizacoes.entity';
-import { ObraFiscalizacoes } from '../obra-fiscalizacoes/entities/obra-fiscalizacoes.entity';
-import { FiscalizacoesRepository } from '../fiscalizacoes/fiscalizacoes.repository';
+import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
+import { ObrasFornecedores } from '../obra-fornecedor/entities/obras-fornecedores.entity';
+import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
+import { ObrasEquipamentos } from '../obra-equipamento/entities/obras-equipamentos.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Obra,
-      Fornecedores,
-      ObraFornecedor,
-      Equipamentos,
-      ObraEquipamento,
-      Endereco,
-      Fiscalizacoes,
-      ObraFiscalizacoes,
-    ]),
-    forwardRef(() => EnderecoModule), 
-  ],
+  imports: [SequelizeModule.forFeature([Obras, Endereco, Fornecedores, ObrasFornecedores, Equipamentos, ObrasEquipamentos])],
   controllers: [ObrasController],
-  providers: [
-    ObrasService,
-    ObrasRepository,
-    FornecedoresRepository,
-    EquipamentosRepository,
-    FiscalizacoesRepository,
-  ],
-  exports: [
-    ObrasRepository,
-    FornecedoresRepository,
-    EquipamentosRepository,
-    FiscalizacoesRepository,
-    TypeOrmModule
-  ],
+  providers: [ObrasService, ObrasRepository],
 })
 export class ObrasModule {}

@@ -1,33 +1,83 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+  NotFoundException,
+} from '@nestjs/common';
 import { ObrasService } from './obras.service';
-import { Obra } from './entities/obra.entity';
+import { Obras } from './entities/obras.entity';
 import { CreateObraDto } from './dto/create-obra.dto';
+import { UpdateObraDto } from './dto/update-obra.dto';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiNotFoundResponse,
+  ApiBody,
+} from '@nestjs/swagger';
 
+@ApiTags('Obras')
 @Controller('obras')
 export class ObrasController {
-  constructor(private readonly obraService: ObrasService) {}
+  constructor(private readonly obrasService: ObrasService) {}
+
   @Get()
-  findAll(): any{
-    return this.obraService.findAll();
+  @ApiOperation({ summary: 'Listar todas as obras' })
+  @ApiResponse({ status: 200, description: 'Lista de obras retornada com sucesso.', type: [Obras] })
+  async findAll(): Promise<Obras[]> {
+    return this.obrasService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Obra | null> {
-    return this.obraService.findOne(id);
+  @ApiOperation({ summary: 'Buscar uma obra por ID' })
+  @ApiResponse({ status: 200, description: 'Obra encontrada.', type: Obras })
+  @ApiNotFoundResponse({ description: 'Obra não encontrada.' })
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Obras> {
+    const obra = await this.obrasService.findOne(id);
+    if (!obra) {
+      throw new NotFoundException(`Obra com id ${id} não encontrada.`);
+    }
+    return obra;
   }
 
   @Post()
-  create(@Body() obra: CreateObraDto): Promise<Obra | null> {
-    return this.obraService.create(obra);
+  @ApiOperation({ summary: 'Criar uma nova obra' })
+  @ApiResponse({ status: 201, description: 'Obra criada com sucesso.', type: Obras })
+  @ApiBody({ type: CreateObraDto })
+  async create(@Body() data: CreateObraDto): Promise<Obras> {
+    return this.obrasService.create(data);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() obra: CreateObraDto): Promise<Obra | null> {
-    return this.obraService.update(id, obra);
+  @ApiOperation({ summary: 'Atualizar uma obra existente' })
+  @ApiResponse({ status: 200, description: 'Obra atualizada com sucesso.', type: Obras })
+  @ApiNotFoundResponse({ description: 'Obra não encontrada.' })
+  @ApiBody({ type: UpdateObraDto })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdateObraDto,
+  ): Promise<Obras> {
+    const updated = await this.obrasService.update(id, data);
+    if (!updated) {
+      throw new NotFoundException(`Obra com id ${id} não encontrada.`);
+    }
+    return updated;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<void> {
-    return this.obraService.remove(id);
+  @ApiOperation({ summary: 'Remover uma obra por ID' })
+  @ApiResponse({ status: 200, description: 'Obra removida com sucesso.' })
+  @ApiNotFoundResponse({ description: 'Obra não encontrada.' })
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
+    const deleted = await this.obrasService.remove(id);
+    if (!deleted) {
+      throw new NotFoundException(`Obra com id ${id} não encontrada.`);
+    }
+    return { message: `Obra com id ${id} removida com sucesso.` };
   }
 }

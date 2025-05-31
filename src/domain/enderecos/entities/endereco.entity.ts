@@ -1,35 +1,55 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-} from 'typeorm';
-import { Obra } from '../../obras/entities/obra.entity';
+import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, HasOne } from 'sequelize-typescript';
+import { Obras } from 'src/domain/obras/entities/obras.entity';
 
-@Entity('enderecos')
-export class Endereco {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Table({ tableName: 'enderecos' })
+export class Endereco extends Model<Endereco> {
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  declare id: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   rua: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   numero: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   complemento?: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   bairro: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   cidade: string;
 
-  @Column({ type: 'char', length: 2, nullable: false })
+  @Column({
+    type: DataType.CHAR(2),
+    allowNull: false,
+  })
   estado: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   cep: string;
 
+  @HasOne(() => Obras)
+  obra: Obras;
 }
