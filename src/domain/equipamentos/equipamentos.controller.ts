@@ -7,6 +7,7 @@ import {
   Patch,
   Delete,
   ParseIntPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { EquipamentosService } from './equipamentos.service';
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
@@ -37,7 +38,11 @@ export class EquipamentosController {
   @ApiResponse({ status: 200, description: 'Equipamento encontrado.', type: Equipamentos })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Equipamentos> {
-    return this.equipamentosService.findOne(id);
+    const equipamento = await this.equipamentosService.findOne(id);
+    if (!equipamento) {
+      throw new NotFoundException(`Equipamento com id ${id} não encontrado.`);
+    }
+    return equipamento;
   }
 
   @Post()
@@ -55,8 +60,12 @@ export class EquipamentosController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: Partial<UpdateEquipamentoDto>,
-  ): Promise<Equipamentos>  {
-    return this.equipamentosService.update(id, data);
+  ): Promise<Equipamentos> {
+    const updated = await this.equipamentosService.update(id, data);
+    if (!updated) {
+      throw new NotFoundException(`Equipamento com id ${id} não encontrado.`);
+    }
+    return updated;
   }
 
   @Delete(':id')

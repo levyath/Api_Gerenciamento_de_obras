@@ -53,4 +53,8 @@ export class FornecedoresRepository {
     const deletedCount = await this.fornecedoresModel.destroy({ where: { id } });
     return deletedCount > 0;
   }
+
+  async findOneByOptions(options: any): Promise<Fornecedores | null> {
+  return this.fornecedoresModel.findOne(options);
+  }
 }

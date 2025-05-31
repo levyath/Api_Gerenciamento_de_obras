@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
+import { InjectModel} from '@nestjs/sequelize';
 
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
 import { Equipamentos } from './entities/equipamento.entity';
@@ -7,6 +7,7 @@ import { UpdateEquipamentoDto } from './dto/update-equipamento.dto';
 
 import { Obras } from '../obras/entities/obras.entity';
 import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class EquipamentosRepository {
@@ -55,5 +56,26 @@ export class EquipamentosRepository {
   async delete(id: number): Promise<boolean> {
     const deleted = await this.equipamentosModel.destroy({ where: { id } });
     return deleted > 0;
+  }
+
+  async findEquipamentosEmUso(ids: number[]): Promise<Equipamentos[]> {
+  return this.equipamentosModel.findAll({
+   where: {
+      id: {
+        [Op.in]: ids,
+      },
+    },
+    include: [
+      {
+        association: 'obras', 
+        required: true,      
+        attributes: ['id'],   
+      },
+    ],
+  });
+  }
+
+  async findOneByOptions(options: any): Promise<Equipamentos | null> {
+    return this.equipamentosModel.findOne(options); 
   }
 }
