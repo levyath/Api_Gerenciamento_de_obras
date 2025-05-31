@@ -62,7 +62,7 @@ export class ObrasRepository {
 
     const { fornecedoresId, equipamentosId, ...updateData } = data;
 
-    await obra.update(updateData);
+    await obra.update(updateData as any);
 
     if (fornecedoresId) {
       await obra.$set('fornecedores', fornecedoresId); 
