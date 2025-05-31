@@ -30,7 +30,8 @@ export class CreateEquipamentoDto {
 
   @IsNumber()
   @IsNotEmpty()
-  fornecedor?: number;
+  @ApiPropertyOptional({ example: 1, description: 'ID do fornecedor associado' })
+  fornecedorId?: number;
 
   @IsString()
   @IsOptional()
@@ -41,5 +42,6 @@ export class CreateEquipamentoDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => Number)
+  @ApiPropertyOptional({ example: [1, 2], description: 'IDs das obras associadas ao equipamento', type: [Number] })
   obrasId?: number[];
 }

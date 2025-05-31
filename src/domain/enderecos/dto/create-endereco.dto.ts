@@ -36,5 +36,4 @@ export class CreateEnderecoDto {
   @IsNotEmpty()
   @ApiProperty({ example: '01000-000' })
   cep: string;
-
 }
