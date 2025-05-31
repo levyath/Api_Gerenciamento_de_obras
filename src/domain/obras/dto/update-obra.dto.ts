@@ -1,5 +1,15 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateObraDto } from './create-obra.dto';
-import { IsOptional, IsArray, IsNumber } from 'class-validator';
+// import { IsOptional, IsArray, IsNumber } from 'class-validator';
 
-export class UpdateObraDto extends PartialType(CreateObraDto) {}
+export class UpdateObraDto extends PartialType(CreateObraDto) {
+  // @IsOptional()
+  // @IsArray()
+  // @IsNumber({}, { each: true })
+  // fornecedoresId?: number[];
+
+  // @IsOptional()
+  // @IsArray()
+  // @IsNumber({}, { each: true })
+  // equipamentosId?: number[];
+}

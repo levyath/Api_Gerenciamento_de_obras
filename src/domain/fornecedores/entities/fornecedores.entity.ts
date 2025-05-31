@@ -63,5 +63,5 @@ export class Fornecedores extends Model<Fornecedores> {
   ativo: boolean;
 
   @BelongsToMany(() => Obras, () => ObrasFornecedores)
-  obras: Obras[];
+  obrasId: Obras[];
 }

@@ -67,14 +67,15 @@ export class CreateObraDto {
   @ApiPropertyOptional({ example: [1, 2], description: 'IDs dos fornecedores associados à obra', type: [Number] })
   fornecedoresId?: number[];
 
-  // @IsOptional()
-  // @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => Number)
-  // equipamentos?: number[];
-
   @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Number)
+  @ApiPropertyOptional({ example: [1, 2], description: 'IDs dos equipamentos associados à obra', type: [Number] })
+  equipamentosId?: number[];
+
   @IsNumber()
+  @IsOptional()
   @ApiPropertyOptional({ example: 1, description: 'ID do endereço associado' })
-  endereco_id?: number;
+  enderecoId?: number;
 }

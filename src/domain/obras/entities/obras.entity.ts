@@ -13,7 +13,9 @@ import {
 } from 'sequelize-typescript';
 import { Endereco } from 'src/domain/enderecos/entities/endereco.entity';
 import { Fornecedores } from 'src/domain/fornecedores/entities/fornecedores.entity';
+import { Equipamentos } from 'src/domain/equipamentos/entities/equipamento.entity';
 import { ObrasFornecedores } from 'src/domain/obra-fornecedor/entities/obras-fornecedores.entity';
+import { ObrasEquipamentos } from 'src/domain/obra-equipamento/entities/obras-equipamentos.entity';
 
 @Table({
   tableName: 'obras',
@@ -91,7 +93,7 @@ export class Obras extends Model<Obras> {
   })
   longitude: number;
 
-  @ForeignKey(() => Endereco)
+ @ForeignKey(() => Endereco)
   @Column({ type: DataType.INTEGER, allowNull: true })
   enderecoId: number;
 
@@ -100,4 +102,7 @@ export class Obras extends Model<Obras> {
   
   @BelongsToMany(() => Fornecedores, () => ObrasFornecedores)
   fornecedores: Fornecedores[];
+
+  @BelongsToMany(() => Equipamentos, () => ObrasEquipamentos)
+  equipamentos: Fornecedores[];
 }

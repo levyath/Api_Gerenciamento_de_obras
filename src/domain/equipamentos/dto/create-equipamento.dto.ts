@@ -1,5 +1,6 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateEquipamentoDto {
   @IsString()
@@ -27,16 +28,18 @@ export class CreateEquipamentoDto {
   @ApiProperty({ example: 'SN123456789' })
   numeroDeSerie?: string;
 
-  // @IsNumber()
-  // @IsNotEmpty()
-  // fornecedor?: number;
+  @IsNumber()
+  @IsNotEmpty()
+  fornecedor?: number;
 
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({ example: 'novo' })
   estado?: string; 
 
-  // @IsNumber()
-  // @IsNotEmpty()
-  // obras?: number[];
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Number)
+  obrasId?: number[];
 }

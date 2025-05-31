@@ -5,7 +5,13 @@ import {
   DataType,
   PrimaryKey,
   AutoIncrement,
+  BelongsToMany,
+  BelongsTo,
+  ForeignKey,
 } from 'sequelize-typescript';
+import { ObrasEquipamentos } from 'src/domain/obra-equipamento/entities/obras-equipamentos.entity';
+import { Fornecedores } from '../../fornecedores/entities/fornecedores.entity';
+import { Obras } from 'src/domain/obras/entities/obras.entity';
 
 @Table({ tableName: 'equipamentos', timestamps: false })
 export class Equipamentos extends Model<Equipamentos> {
@@ -50,4 +56,19 @@ export class Equipamentos extends Model<Equipamentos> {
     allowNull: true,
   })
   estado: string;
+  
+
+  @ForeignKey(() => Fornecedores)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  fornecedorId: number;
+
+  @BelongsTo(() => Fornecedores)
+  fornecedor: Fornecedores;
+
+
+  @BelongsToMany(() => Obras, () => ObrasEquipamentos)
+    obrasId: Obras[];
 }

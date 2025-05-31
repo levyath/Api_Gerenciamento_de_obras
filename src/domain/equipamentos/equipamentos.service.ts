@@ -14,7 +14,7 @@ export class EquipamentosService {
   }
 
   async findOne(id: number): Promise<Equipamentos> {
-    const equipamento = await this.equipamentosRepository.findOne(id);
+    const equipamento = await this.equipamentosRepository.findById(id);
     if (!equipamento) {
       throw new NotFoundException(`Equipamento com id ${id} não encontrado`);
     }

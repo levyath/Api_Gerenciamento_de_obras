@@ -5,6 +5,7 @@ import { CreateObraDto } from './dto/create-obra.dto';
 import { UpdateObraDto } from './dto/update-obra.dto';
 import { Endereco } from '../enderecos/entities/endereco.entity';
 import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
+import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
 
 @Injectable()
 export class ObrasRepository {
@@ -14,46 +15,62 @@ export class ObrasRepository {
   ) {}
 
   async findAll(): Promise<Obras[]> {
-    return this.obrasModel.findAll({
+  return this.obrasModel.findAll({
     include: [
       {
         association: 'fornecedores',
         attributes: ['id'],
         through: { attributes: [] }, 
       },
+      {
+        association: 'equipamentos',
+        attributes: ['id'], 
+        through: { attributes: [] }, 
+      },
     ],
   });
-  }
+}
 
   async findById(id: number): Promise<Obras | null> {
-    return this.obrasModel.findByPk(id, { include: [Endereco, Fornecedores] });
+    return this.obrasModel.findByPk(id, { include: [Endereco, Fornecedores, Equipamentos] });
   }
 
   async create(data: CreateObraDto): Promise<Obras> {
-    const { fornecedoresId, ...obraData } = data;
-    const novaObra = await this.obrasModel.create(data as any);
-    if (fornecedoresId && fornecedoresId.length > 0) {
+  const { fornecedoresId, equipamentosId, ...obraData } = data as any;
+
+  const novaObra = await this.obrasModel.create(obraData);
+
+  if (fornecedoresId && fornecedoresId.length > 0) {
     await novaObra.$set('fornecedores', fornecedoresId);
   }
 
-    const obra = await this.findById(novaObra.id);
-    if (!obra) {
-      throw new Error('Obra not found after creation');
-    }
-    return obra;
+  if (equipamentosId && equipamentosId.length > 0) {
+    await novaObra.$set('equipamentos', equipamentosId);
   }
+
+  const obra = await this.findById(novaObra.id);
+  if (!obra) {
+    throw new Error('Obra not found after creation');
+  }
+
+  return obra;
+}
 
   async update(id: number, data: UpdateObraDto): Promise<Obras | null> {
     const obra = await this.obrasModel.findByPk(id);
     if (!obra) return null;
 
-    const { fornecedoresId, ...updateData } = data;
+    const { fornecedoresId, equipamentosId, ...updateData } = data;
 
     await obra.update(updateData);
 
     if (fornecedoresId) {
-      await obra.$set('fornecedores', fornecedoresId); // atualiza os relacionamentos N:N
+      await obra.$set('fornecedores', fornecedoresId); 
     }
+
+    if (equipamentosId && equipamentosId.length > 0) {
+    await obra.$set('equipamentos', equipamentosId);
+  }
 
     return this.findById(id);
   }
