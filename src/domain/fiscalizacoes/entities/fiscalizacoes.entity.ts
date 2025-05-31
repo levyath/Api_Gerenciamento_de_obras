@@ -1,18 +1,15 @@
-import { Table, Column, Model, DataType, BelongsToMany, CreatedAt, UpdatedAt, PrimaryKey } from 'sequelize-typescript';
-import { Obra } from '../../obras/entities/obra.entity';
-import { ObraFiscalizacoes } from '../../obra-fiscalizacoes/entities/obra-fiscalizacoes.entity';
-import { InferAttributes, InferCreationAttributes } from 'sequelize';
+import { Table, Column, Model, DataType, BelongsToMany, CreatedAt, UpdatedAt, PrimaryKey, AutoIncrement, HasMany } from 'sequelize-typescript';
+import { Obras } from '../../obras/entities/obras.entity';
+import { ObrasFiscalizacoes } from 'src/domain/obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
 //import { Relatorio } from 'src/domain/relatorios/entities/relatorio.entity'; todo
 //import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel.entity'; pendente Levy
 
-@Table({ timestamps: false, tableName: 'fiscalizacoes' })
-export class Fiscalizacoes extends Model<
-    InferAttributes<Fiscalizacoes>,
-    InferCreationAttributes<Fiscalizacoes>
-> {
+@Table({ tableName: 'fiscalizacoes', timestamps: false })
+export class Fiscalizacoes extends Model<Fiscalizacoes> {
     @PrimaryKey
-    @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
-    declare id?: number;
+    @AutoIncrement
+    @Column
+    declare id: number;
 
     @Column({ type: DataType.STRING(50), allowNull: false })
     titulo: string;
@@ -23,8 +20,11 @@ export class Fiscalizacoes extends Model<
     @Column({ type: DataType.DATE, allowNull: false })
     data: Date;
 
-    @BelongsToMany(() => Obra, () => ObraFiscalizacoes)
-    obras: Obra[];
+    @Column({ type: DataType.STRING(20), allowNull: false})
+    status: string;
+
+    @BelongsToMany(() => Obras, () => ObrasFiscalizacoes)
+    obras: Obras[];
 
     //pendente Levy
     //@ManyToOne(() => ResponsavelTecnico, { nullable: true })

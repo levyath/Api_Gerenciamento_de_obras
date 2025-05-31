@@ -1,24 +1,17 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-
-//fiscalizacoes imports
 import { FiscalizacoesService } from './fiscalizacoes.service';
 import { FiscalizacoesController } from './fiscalizacoes.controller';
 import { FiscalizacoesRepository } from './fiscalizacoes.repository';
-
-//import entities
 import { Obra } from '../obras/entities/obra.entity';
 import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
-import { ObraFiscalizacoes } from '../obra-fiscalizacoes/entities/obra-fiscalizacoes.entity';
-
-//import modules
 import { ObrasModule } from '../obras/obras.module';
 //import { RelatorioModule } from '../relatorio/relatorio.module'; to-do
 //import { ResponsavelTecnicoModule } from '../responsaveis-tecnicos/responsaveis-tecnicos.module'; pendente Levy
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Obra, Fiscalizacoes, ObraFiscalizacoes]),
+    SequelizeModule.forFeature([Obra, Fiscalizacoes]),
     ObrasModule,
     //RelatorioModule,
     //ResponsavelTecnicoModule,

@@ -1,15 +1,15 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, DataType } from 'sequelize-typescript';
-import { Obra } from '../../obras/entities/obra.entity';
+import { Obras } from '../../obras/entities/obras.entity';
 import { Fiscalizacoes } from '../../fiscalizacoes/entities/fiscalizacoes.entity';
 
-@Table({ tableName: 'obra_fiscalizacoes' })
-export class ObraFiscalizacoes extends Model {
-    @ForeignKey(() => Obra)
+@Table({ tableName: 'obras_fiscalizacoes' })
+export class ObrasFiscalizacoes extends Model {
+    @ForeignKey(() => Obras)
     @Column({ type: DataType.INTEGER, allowNull: false })
     obraId: number;
 
-    @BelongsTo(() => Obra)
-    obra: Obra;
+    @BelongsTo(() => Obras)
+    obra: Obras;
 
     @ForeignKey(() => Fiscalizacoes)
     @Column({ type: DataType.INTEGER, allowNull: false })

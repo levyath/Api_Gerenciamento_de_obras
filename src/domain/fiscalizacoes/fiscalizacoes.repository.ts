@@ -1,111 +1,78 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Fiscalizacoes } from "./entities/fiscalizacoes.entity";
-import { ObraFiscalizacoes } from "../obra-fiscalizacoes/entities/obra-fiscalizacoes.entity";
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
-import { Obra } from "../obras/entities/obra.entity";
-import { Sequelize } from "sequelize";
+import { Obras } from "../obras/entities/obras.entity";
 
 @Injectable()
 export class FiscalizacoesRepository {
     constructor(
-        @Inject('SEQUELIZE') private sequelize: Sequelize,
-
         @InjectModel(Fiscalizacoes)
         private readonly fiscalizacoesModel: typeof Fiscalizacoes,
-        
-        @InjectModel(ObraFiscalizacoes)
-        private readonly obraFiscalizacoesModel: typeof ObraFiscalizacoes
     ) {}
 
+    //get /fiscalizacoes
     async findAll(): Promise<Fiscalizacoes[]> {
-        return this.fiscalizacoesModel.findAll({
-            include: [{ model: Obra }],
-        });
+        return this.fiscalizacoesModel.findAll();
     }
 
+    //get /fiscalizacoes/:id
+    async findOne(id: number): Promise<Fiscalizacoes | null> {
+        return await this.fiscalizacoesModel.findOne({
+            where: { id },
+            include: [Obras],
+        })
+    }
+
+    //get /obras/:id/fiscalizacoes
     async findByObraId(obraId: number): Promise<Fiscalizacoes[]> {
-        const obraFiscalizacoes = await this.obraFiscalizacoesModel.findAll({
-            where: { obraId },
-            include: [{ model: Fiscalizacoes }],
+        return await this.fiscalizacoesModel.findAll({
+            include: [{
+                where: { id: obraId },
+                include: [Obras],
+               // model: Obras,
+            }],
         });
-        return obraFiscalizacoes.map(of => of.fiscalizacao);
     }
 
-    async findOneById(id: number): Promise<Fiscalizacoes> {
-        const fiscalizacao = await this.fiscalizacoesModel.findByPk(id, {
-            include: [{ model: Obra }],
-        });
-        if (!fiscalizacao) {
-            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
+    //post /obras/:id/fiscalizacoes
+    async create(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
+        const { titulo, descricao, data, obra_ids } = dto;
+        const fiscalizacao = await this.fiscalizacoesModel.create(dto as any);
+        
+        const obra = await Obras.findByPk(obraId);
+        if (!obra) {
+            throw new NotFoundException(`Obra com ID ${obraId} não encontrada`);
         }
+    
+        await obra.$add('fiscalizacoes', fiscalizacao);
         return fiscalizacao;
     }
-
-    async createForObra(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        const transaction = await this.sequelize.transaction();
-        try {
-            const obras = await Obra.findAll({
-                where: {
-                    id: dto.obra_ids
-                }
-            });
-            const novaFiscalizacao = await this.fiscalizacoesModel.create(
-                {
-                    titulo: dto.titulo,
-                    descricao: dto.descricao,
-                    data: new Date(dto.data),
-                    obras: obras,
-                },
-                { transaction }
-            );
-
-            await this.obraFiscalizacoesModel.create(
-                {
-                    obraId,
-                    fiscalizacaoId: novaFiscalizacao.id,
-                },
-                { transaction }
-            );
-
-            await transaction.commit();
-            return novaFiscalizacao;
-        } catch (error) {
-            await transaction.rollback();
-            throw new BadRequestException('Erro ao criar fiscalização!');
-        }
-    }   
-
+    
+    //put /fiscalizacao/:id
     async update(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        const transaction = await this.sequelize.transaction();
-        try {
-            const fiscalizacao = await this.findOneById(id);
-
-            // Atualizar os campos da fiscalização
-            await fiscalizacao.update(
-                {
-                    titulo: dto.titulo,
-                    descricao: dto.descricao,
-                    data: dto.data ? new Date(dto.data) : fiscalizacao.data,
-                },
-                { transaction }
-            );
-
-            await transaction.commit();
-            return fiscalizacao;
-        } catch (error) {
-            await transaction.rollback();
-            throw new BadRequestException('Erro ao atualizar fiscalização!');
+        const fiscalizacao = await this.fiscalizacoesModel.findByPk(id);
+        if (!fiscalizacao) {
+            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada`);
         }
+    
+        await fiscalizacao.update(dto as any);
+        return fiscalizacao;
     }
-
-    async patch(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
+    
+    //patch /fiscalizacao/:id
+    async patch(id: number, dto: Partial<UpdateFiscalizacoesDto>): Promise<Fiscalizacoes> {
         return this.update(id, dto);
     }
-
-    async remove(id: number): Promise<void> {
-        const fiscalizacao = await this.findOneById(id);
+    
+    //delete /fiscalizacao/:id
+    async delete(id: number): Promise<void> {
+        const fiscalizacao = await this.fiscalizacoesModel.findByPk(id);
+        if (!fiscalizacao) {
+            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada`);
+        }
+    
         await fiscalizacao.destroy();
     }
 }

@@ -1,27 +1,4 @@
-import { IsString, IsOptional, IsDateString, IsInt, IsArray, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateFiscalizacoesDto } from './create-fiscalizacoes.dto';
 
-export class UpdateFiscalizacoesDto {
-    @IsOptional()
-    @IsString()
-    titulo?: string;
-
-    @IsOptional()
-    @IsString()
-    descricao?: string;
-
-    @IsOptional()
-    @IsDateString()
-    data?: string;
-
-    // // pendente levy
-    // @IsOptional()
-    // @IsInt()
-    // responsavel_id?: number;
-
-    // // pendente eu
-    // @IsArray()
-    // @ValidateNested({ each: true })
-    // @Type(() => Number)
-    // relatorio_ids?: number[];
-}
+export class UpdateFiscalizacoesDto extends PartialType(CreateFiscalizacoesDto) {}
