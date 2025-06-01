@@ -10,6 +10,7 @@ import {
   ApiBody,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
+import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dto';
 
 @ApiTags('Responsaveis Tecnicos')
 @Controller('responsaveis-tecnicos')
@@ -35,5 +36,16 @@ export class ResponsaveisTecnicosController
   async findOne(@Param('id') id: number): Promise<ResponsavelTecnico> 
   {
     return await this.responsavelTecnicoService.findOne(id);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Criar um novo responsável técnico' })
+  @ApiResponse({ status: 201, description: 'Responsável técnico criado com sucesso.', type: ResponsavelTecnico })
+  @ApiBadRequestResponse({ description: 'Dados obrigatórios ausentes ou CPF inválido.' })
+  @ApiConflictResponse({ description: 'CPF já cadastrado no sistema.' })
+  @ApiBody({ type: CreateResponsavelTecnicoDto, description: 'Dados do responsável técnico a ser criado' })
+  async create(@Body() dto: CreateResponsavelTecnicoDto): Promise<ResponsavelTecnico> 
+  {
+    return await this.responsavelTecnicoService.create(dto);
   }
 }
