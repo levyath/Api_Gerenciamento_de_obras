@@ -79,4 +79,9 @@ export class ResponsaveisTecnicosRepository {
 
         return this.findById(id);
     }
+
+    async delete(id: number): Promise<boolean> {
+        const deletedCount = await this.responsavelTecnicoModel.destroy({ where: { id } });
+        return deletedCount > 0 ? true : false;
+    }
 }

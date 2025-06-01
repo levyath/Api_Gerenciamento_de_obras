@@ -4,12 +4,14 @@ import { ResponsaveisTecnicosRepository } from './responsaveis-tecnicos.reposito
 import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dto';
 import { CpfValidatorService } from '../cpf-validator.service';
 import { UpdateResponsavelTecnicoDto } from './dto/update-responsavel-tecnico.dto';
+import { ObraResponsavelTecnicoRepository } from '../obra-responsavel-tecnico/obra-responsavel-tecnico.repository';
 
 @Injectable()
 export class ResponsaveisTecnicosService 
 {
     constructor(
         private readonly responsaveisTecnicosRepository: ResponsaveisTecnicosRepository,
+        private readonly obrasResponsavelTecnicoRepository: ObraResponsavelTecnicoRepository,
         private readonly cpfValidator: CpfValidatorService 
     ) {}
 
@@ -49,6 +51,15 @@ export class ResponsaveisTecnicosService
         return this.responsaveisTecnicosRepository.update(id, input);
     }
 
+    async remove(id: number): Promise<boolean> 
+    {
+        this.validarId(id);
+        await this.obterResponsavelPorId(id); // Verifica se existe
+        await this.verificarVinculosAtivos(id);
+        
+        return await this.responsaveisTecnicosRepository.delete(id);
+    }
+
     // ============ MÉTODOS AUXILIARES PRIVADOS ============
 
     private validarId(id: number): void {
@@ -78,6 +89,7 @@ export class ResponsaveisTecnicosService
             );
         }
     }
+    
     private validarFormatoCPF(cpf: string): void {
         if (!this.cpfValidator.validarRegex(cpf)) {
             throw new BadRequestException('CPF inválido. Formato esperado: xxx.xxx.xxx-xx');
@@ -95,6 +107,20 @@ export class ResponsaveisTecnicosService
         
         if (responsavelExistente && responsavelExistente.id !== idExcluir) {
             throw new ConflictException('Já existe um responsável técnico cadastrado com este CPF.');
+        }
+    }
+
+    private async verificarVinculosAtivos(idResponsavel: number): Promise<void> {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        
+        const vinculos = await this.obrasResponsavelTecnicoRepository.buscarVinculosPorResponsavel(idResponsavel);
+        const vinculosAtivos = vinculos.filter(vinculo => 
+            !vinculo.data_fim || new Date(vinculo.data_fim) >= hoje
+        );
+        
+        if (vinculosAtivos.length > 0) {
+            throw new ConflictException('Não é possível remover um responsável com vínculos ativos.');
         }
     }
 }

@@ -62,4 +62,16 @@ export class ResponsaveisTecnicosController
   {
     await this.responsavelTecnicoService.update(id, dto);
   }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Remove um responsável técnico' })
+  @HttpCode(204)
+  @ApiResponse({ status: 204, description: 'Responsável técnico removido com sucesso - sem conteúdo retornado' })
+  @ApiBadRequestResponse({ description: 'Requisição inválida.' })
+  @ApiNotFoundResponse({ description: 'Responsável técnico não encontrado.' })
+  @ApiConflictResponse({ description: 'Não é possível remover um responsável com vínculos ativos.' })
+  async remove(@Param('id') id: number): Promise<void> 
+  {
+    await this.responsavelTecnicoService.remove(id);
+  }
 }
