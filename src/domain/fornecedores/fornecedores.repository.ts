@@ -4,6 +4,8 @@ import { Fornecedores } from './entities/fornecedores.entity';
 import { CreateFornecedoresDto } from './dto/create-fornecedores.dto';
 import { UpdateFornecedoresDto } from './dto/update-fornecedores.dto';
 import { Obras } from '../obras/entities/obras.entity';
+import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
+import { ObrasFornecedores } from '../obra-fornecedor/entities/obras-fornecedores.entity';
 
 
 @Injectable()
@@ -13,6 +15,10 @@ export class FornecedoresRepository {
     private readonly fornecedoresModel: typeof Fornecedores,
     @InjectModel(Obras)
     private readonly obrasModel: typeof Obras,
+    @InjectModel(Equipamentos)
+    private readonly equipamentosModel: typeof Equipamentos, 
+    @InjectModel(ObrasFornecedores)
+    private readonly obraFornecedorModel: typeof ObrasFornecedores,
   ) {}
 
   async findAll(): Promise<Fornecedores[]> {
@@ -76,16 +82,25 @@ async updateActive(id: number, ativo: boolean): Promise<Fornecedores | null> {
 }
 
   async delete(id: number): Promise<boolean> {
-    const deletedCount = await this.fornecedoresModel.destroy({ where: { id } });
-    return deletedCount > 0;
-  }
+  await this.obraFornecedorModel.destroy({
+    where: { fornecedorId: id }
+  });
+
+  await this.equipamentosModel.update(
+    { fornecedorId: null as unknown as number },
+    { where: { fornecedorId: id } }
+  );
+
+  const deletedCount = await this.fornecedoresModel.destroy({ where: { id } });
+  return deletedCount > 0;
+}
 
   async findSuppliersByObra(obraId: number): Promise<Fornecedores[] | null> {
   const obra = await this.obrasModel.findByPk(obraId, {
     include: [
       {
         model: this.fornecedoresModel,
-        through: { attributes: [] }, // ignora dados da tabela pivot
+        through: { attributes: [] },
       },
     ],
   });

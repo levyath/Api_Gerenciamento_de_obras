@@ -77,6 +77,22 @@ export class EquipamentosController {
     }
   }
 
+  @Patch(':id')
+  @ApiOperation({ summary: 'Atualizar as obras associadas a um equipamento' })
+  @ApiResponse({ status: 200, description: 'Obras do equipamento atualizadas com sucesso.', type: Equipamentos })
+  @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
+  @ApiBody({ schema: { type: 'object', properties: { obras: { type: 'array', items: { type: 'number' } } } } })
+  async updateObras(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('obras') obras: number[]
+  ): Promise<Equipamentos | null> {
+    try {
+      return await this.equipamentosService.updateObras(id, obras);
+    } catch (error) {
+      throw new BadRequestException('Erro ao atualizar obras do equipamento: ' + error.message);
+    }
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Remover equipamento por ID' })
   @ApiResponse({ status: 200, description: 'Equipamento removido com sucesso.' })
@@ -87,6 +103,23 @@ export class EquipamentosController {
       return { message: 'Equipamento removido com sucesso.' };
     } catch (error) {
       throw new BadRequestException('Erro ao remover equipamento: ' + error.message);
+    }
+  }
+}
+
+@ApiTags('Equipamentos')
+@Controller('obras')
+export class ObrasEquipamentoController {
+  constructor(private readonly equipamentosService: EquipamentosService) {}
+
+  @Get(':id/equipamentos')
+  @ApiOperation({ summary: 'Listar equipamentos de uma obra pelo ID da obra' })
+  @ApiResponse({ status: 200, description: 'Equipamentos da obra retornados com sucesso.', type: [Equipamentos] })
+  async findEquipamentosByObra(@Param('id', ParseIntPipe) id: number) {
+    try {
+      return this.equipamentosService.getEquipamentosByObraId(id);
+    } catch (error) {
+      throw new BadRequestException('Erro ao visualizar equipamentos da obra: ' + error.message);
     }
   }
 }

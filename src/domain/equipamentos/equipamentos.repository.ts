@@ -7,7 +7,6 @@ import { UpdateEquipamentoDto } from './dto/update-equipamento.dto';
 
 import { Obras } from '../obras/entities/obras.entity';
 import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
-import { Op } from 'sequelize';
 
 @Injectable()
 export class EquipamentosRepository {
@@ -83,24 +82,32 @@ export class EquipamentosRepository {
     return this.findById(id);
   }
 
+    async updateObras(equipamento: Equipamentos, obras: Obras[]): Promise<Equipamentos | null> {
+      await equipamento.$set('obras', obras);
+
+      return this.equipamentosModel.findByPk(equipamento.id, {
+        include: ['obras'], 
+      });
+  }
+
   async remove(id: number): Promise<boolean> {
   const deletedCount = await this.equipamentosModel.destroy({ where: { id } });
   return deletedCount > 0;
 }
 
-  async findEquipamentosEmUso(ids: number[]): Promise<Equipamentos[]> {
+  async findByObraId(obraId: number): Promise<Equipamentos[]> {
     return this.equipamentosModel.findAll({
-      where: {
-        id: {
-          [Op.in]: ids,
-        },
-      },
       include: [
         {
           model: Obras,
-          required: true,
-          attributes: ['id'],
-          through: { attributes: [] },
+          as: 'obras',
+          where: { id: obraId },
+          attributes: [],  
+          required: true,  
+        },
+        {
+          model: Fornecedores,
+          as: 'fornecedor',
         },
       ],
     });

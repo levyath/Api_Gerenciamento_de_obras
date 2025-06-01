@@ -67,8 +67,12 @@ export class EquipamentosService {
       });
 
       if (obrasExistentes.length !== obraIds.length) {
+        const idsIncorretos = obraIds.filter(
+          (id) => !obrasExistentes.some((obra) => obra.id === id)
+        );
+
         throw new HttpException(
-          'Uma ou mais obras informadas não existem.',
+          `As obras a seguir não existem: ${idsIncorretos.join(', ')}`,
           HttpStatus.NOT_FOUND,
         );
       }
@@ -120,8 +124,12 @@ export class EquipamentosService {
       });
 
       if (obrasExistentes.length !== obraIds.length) {
+        const idsIncorretos = obraIds.filter(
+          (id) => !obrasExistentes.some((obra) => obra.id === id)
+        );
+
         throw new HttpException(
-          'Uma ou mais obras informadas não existem.',
+          `As obras a seguir não existem: ${idsIncorretos.join(', ')}`,
           HttpStatus.NOT_FOUND,
         );
       }
@@ -132,6 +140,33 @@ export class EquipamentosService {
     return this.equipamentosRepository.update(id, data);
   }
 
+
+    async updateObras(id: number, obrasIds: number[]) {
+    const equipamento = await this.equipamentosRepository.findById(id);
+
+    if (!equipamento) {
+      throw new NotFoundException('O equipamento buscado não existe!');
+    }
+
+    const obras = await this.obrasRepository.findAll({
+      where: { id: obrasIds },
+    });
+
+    if (obras.length !== obrasIds.length) {
+      const idsIncorretos = obrasIds.filter(
+        (id) => !obras.some((obra) => obra.id === id)
+      );
+
+      throw new HttpException(
+        `As obras a seguir não existem: ${idsIncorretos.join(', ')}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return await this.equipamentosRepository.updateObras(equipamento, obras);
+  }
+
+
   async delete(id: number): Promise<boolean> {
     const existeEquipamento = await this.equipamentosRepository.findById(id);
     if (!existeEquipamento) {
@@ -139,6 +174,16 @@ export class EquipamentosService {
     }
 
     return this.equipamentosRepository.remove(id);
+  }
+
+  async getEquipamentosByObraId(obraId: number){
+    const equipamentos = await this.obrasRepository.findByPk(obraId);
+
+    if (!equipamentos) {
+      throw new NotFoundException('A obra buscada não existe!');
+    }
+
+    return this.equipamentosRepository.findByObraId(obraId);;
   }
 }
 

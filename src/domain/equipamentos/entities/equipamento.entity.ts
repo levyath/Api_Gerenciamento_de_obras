@@ -61,9 +61,9 @@ export class Equipamentos extends Model<Equipamentos> {
   @ForeignKey(() => Fornecedores)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
   })
-  fornecedorId: number;
+  fornecedorId?: number;
 
   @BelongsTo(() => Fornecedores)
   fornecedor: Fornecedores;

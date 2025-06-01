@@ -11,7 +11,9 @@ import { ObrasEquipamentos } from '../obra-equipamento/entities/obras-equipament
 import { Fornecedores } from '../fornecedores/entities/fornecedores.entity';
 
 import { FornecedoresModule } from '../fornecedores/fornecedores.module';
-import { ObrasModule } from '../obras/obras.module'; // importa o módulo de obras
+import { ObrasModule } from '../obras/obras.module';
+
+import { ObrasEquipamentoController } from './equipamentos.controller';
 
 @Module({
   imports: [
@@ -22,10 +24,10 @@ import { ObrasModule } from '../obras/obras.module'; // importa o módulo de obr
       Fornecedores,
     ]),
     forwardRef(() => FornecedoresModule),
-    forwardRef(() => ObrasModule), // adiciona para evitar erro circular
+    forwardRef(() => ObrasModule),
   ],
-  controllers: [EquipamentosController],
+  controllers: [EquipamentosController, ObrasEquipamentoController], 
   providers: [EquipamentosService, EquipamentosRepository],
-  exports: [EquipamentosRepository, EquipamentosService], // opcionalmente exporta service
+  exports: [EquipamentosRepository, EquipamentosService],
 })
 export class EquipamentosModule {}

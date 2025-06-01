@@ -36,7 +36,6 @@ export class ObrasService {
     const todosFornecedores = (await this.fornecedoresRepository.findAll())
       .filter(fornecedor => fornecedoresIds.includes(fornecedor.id));
 
-    // Verifica se todos os fornecedores existem
     if (todosFornecedores.length !== fornecedoresIds.length) {
       const idsIncorretos = fornecedoresIds.filter(id => !todosFornecedores.some(f => f.id === id));
       throw new HttpException(
@@ -67,15 +66,6 @@ export class ObrasService {
       throw new HttpException(
         `Os equipamentos a seguir não existem: ${idsIncorretos.join(', ')}`,
         HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const equipamentosEmUso = await this.equipamentosRepository.findEquipamentosEmUso(equipamentosIds);
-
-    if (equipamentosEmUso.length > 0) {
-      throw new HttpException(
-        `Os equipamentos a seguir já estão em uso por outra obra: ${equipamentosEmUso.map(e => e.id).join(', ')}`,
-        HttpStatus.CONFLICT,
       );
     }
 
@@ -99,7 +89,6 @@ export class ObrasService {
     const todosFornecedores = (await this.fornecedoresRepository.findAll())
       .filter(fornecedor => fornecedoresIds.includes(fornecedor.id));
 
-    // Verifica se todos os fornecedores existem
     if (todosFornecedores.length !== fornecedoresIds.length) {
       const idsIncorretos = fornecedoresIds.filter(id => !todosFornecedores.some(f => f.id === id));
       throw new HttpException(
@@ -130,15 +119,6 @@ export class ObrasService {
       throw new HttpException(
         `Os equipamentos a seguir não existem: ${idsIncorretos.join(', ')}`,
         HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const equipamentosEmUso = await this.equipamentosRepository.findEquipamentosEmUso(equipamentosIds);
-
-    if (equipamentosEmUso.length > 0) {
-      throw new HttpException(
-        `Os equipamentos a seguir já estão em uso por outra obra: ${equipamentosEmUso.map(e => e.id).join(', ')}`,
-        HttpStatus.CONFLICT,
       );
     }
 

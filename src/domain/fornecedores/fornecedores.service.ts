@@ -60,7 +60,13 @@ export class FornecedoresService {
     const obrasExistentes = todasObras.filter((obra) => data.obrasId!.includes(obra.id));
 
     if (obrasExistentes.length !== data.obrasId.length) {
-      throw new HttpException('Uma ou mais obras informadas não existem.', HttpStatus.NOT_FOUND);
+      const idsIncorretos = data.obrasId.filter(
+        (id) => !obrasExistentes.some((obra) => obra.id === id)
+      );
+      throw new HttpException(
+        `As obras a seguir não existem: ${idsIncorretos.join(', ')}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     data.obrasId = obrasExistentes.map((obra) => obra.id);
@@ -109,7 +115,13 @@ export class FornecedoresService {
       const obrasExistentes = todasObras.filter((obra) => data.obrasId!.includes(obra.id));
 
       if (obrasExistentes.length !== data.obrasId.length) {
-        throw new HttpException('Uma ou mais obras informadas não existem.', HttpStatus.NOT_FOUND);
+        const idsIncorretos = data.obrasId.filter(
+          (id) => !obrasExistentes.some((obra) => obra.id === id)
+        );
+        throw new HttpException(
+          `As obras a seguir não existem: ${idsIncorretos.join(', ')}`,
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       data.obrasId = obrasExistentes.map((obra) => obra.id);
