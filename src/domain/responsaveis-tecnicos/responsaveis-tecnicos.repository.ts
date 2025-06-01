@@ -21,5 +21,15 @@ export class ResponsaveisTecnicosRepository {
         });
     }
     
-    
+    async findById(id: number): Promise<ResponsavelTecnico | null> {
+        return this.responsavelTecnicoModel.findByPk(id, {
+        include: [
+            {
+            association: 'obras',
+            attributes: ['id', 'nome', 'status'],
+            through: { attributes: [] },
+            },
+        ],
+        });
+    }
 }
