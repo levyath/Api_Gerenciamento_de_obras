@@ -30,6 +30,6 @@ import { EquipamentosModule } from '../equipamentos/equipamentos.module';
   ],
   controllers: [ObrasController],
   providers: [ObrasService, ObrasRepository],
-  exports: [ObrasRepository, ObrasService], 
+  exports: [ObrasRepository, ObrasService], // Exporta para outros módulos usarem
 })
 export class ObrasModule {}
