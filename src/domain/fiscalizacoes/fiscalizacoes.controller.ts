@@ -3,11 +3,15 @@ import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
 import { FiscalizacoesService } from './fiscalizacoes.service';
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Fiscalizações')
 @Controller('fiscalizacoes')
 export class FiscalizacoesController {
     constructor(private readonly fiscalizacoesService: FiscalizacoesService) {}
 
+    @ApiOperation({ summary: 'Lista todas as fiscalizações' })
+    @ApiResponse({ status: 200, description: 'Lista retornada com sucesso' })
     @Get()
     async findAll(): Promise<Fiscalizacoes[]> {
         try {
@@ -17,6 +21,9 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Busca uma fiscalização pelo ID' })
+    @ApiResponse({ status: 200, description: 'Fiscalização encontrada' })
+    @ApiResponse({ status: 404, description: 'Fiscalização não encontrada' })
     @Get(':id')
     async findOne(@Param('id') id: number): Promise<Fiscalizacoes> {
         try {
@@ -30,6 +37,7 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Busca fiscalizações por status' })
     @Get('/status/:status')
     async findByStatus(@Param('status') status: string): Promise<Fiscalizacoes[]> {
         try {
@@ -39,6 +47,7 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Lista as 10 fiscalizações mais recentes' })
     @Get('/recentes')
     async findRecentes(): Promise<Fiscalizacoes[]> {
         try {
@@ -48,6 +57,7 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Busca uma fiscalização, e suas relações com obras, responsável técnico, e relatórios' })
     @Get(':id/detalhes')
     async findDetalhes(@Param('id') id: number): Promise<Fiscalizacoes | null> {
         try {
@@ -57,6 +67,7 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Busca todas as fiscalizações associadas a uma obra' })
     @Get('/obras/:id/fiscalizacoes')
     async findByObraId(@Param('id') obraId: number): Promise<Fiscalizacoes[]> {
         try {
@@ -66,6 +77,9 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Cria uma fiscalização para uma obra' })
+    @ApiResponse({ status: 201, description: 'Fiscalização criada com sucesso' })
+    @ApiResponse({ status: 400, description: 'Erro na criação da fiscalização' })
     @Post('/obras/:id/fiscalizacoes')
     async create(@Param('id') obraId: number, @Body() dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
         try {
@@ -78,6 +92,7 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Atualiza por completo uma fiscalização pelo ID' })
     @Put(':id')
     async update(@Param('id') id: number, @Body() dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
         try {
@@ -87,8 +102,9 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Atualiza parcialmente uma fiscalização pelo ID' })
     @Patch(':id')
-    async partialUpdate(@Param('id') id: number, @Body() dto: Partial<UpdateFiscalizacoesDto>): Promise<Fiscalizacoes> {
+    async patch(@Param('id') id: number, @Body() dto: Partial<UpdateFiscalizacoesDto>): Promise<Fiscalizacoes> {
         try {
             return await this.fiscalizacoesService.patch(id, dto);
         } catch (error) {
@@ -96,6 +112,7 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Exclui uma fiscalização' })
     @Delete(':id')
     async delete(@Param('id') id: number): Promise<void> {
         try {
@@ -105,6 +122,7 @@ export class FiscalizacoesController {
         }
     }
 
+    @ApiOperation({ summary: 'Exclui todas as fiscalizações associadas a uma obra' })
     @Delete('/obras/:id/fiscalizacoes')
     async deleteAllByObraId(@Param('id') obraId: number): Promise<void> {
         try {
