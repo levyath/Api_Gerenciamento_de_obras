@@ -36,5 +36,28 @@ export class MaterialRepository {
         });
     }
 
-    
+    // async countVinculos(id: number): Promise<number> {
+    //     const result = await this.materialModel.findByPk(id, {
+    //         include: [{
+    //             association: 'obras',
+    //             attributes: [],
+    //             required: false,
+    //             through: { attributes: [] }
+    //         }],
+    //         attributes: [
+    //             [Sequelize.fn('COUNT', Sequelize.col('obras.id')), 'vinculosCount']
+    //         ],
+    //         group: ['Material.id'],
+    //         raw: true,
+    //         plain: true
+    //     }) as unknown as { vinculosCount: number }; // Type assertion for raw query result
+
+    //     return result?.vinculosCount || 0;
+    // }
+
+    async delete(id: number): Promise<number> {
+        return this.materialModel.destroy({
+        where: { id },
+        });
+    }
 }

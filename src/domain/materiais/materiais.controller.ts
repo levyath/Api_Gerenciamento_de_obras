@@ -47,4 +47,15 @@ export class MateriaisController {
   {
     await this.materiaisService.update(id, dto);
   }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Remover um material' })
+  @HttpCode(204)
+  @ApiResponse({ status: 204, description: 'Material removido com sucesso.' })
+  @ApiNotFoundResponse({ description: 'Material não encontrado.' })
+  @ApiConflictResponse({ description: 'Material está vinculado a obras e não pode ser removido.' })
+  async remove(@Param('id') id: number): Promise<void> 
+  {
+    await this.materiaisService.remove(id);
+  }
 }

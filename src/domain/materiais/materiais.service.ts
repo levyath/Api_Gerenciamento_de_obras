@@ -35,7 +35,7 @@ export class MateriaisService {
     if (!material) {
       throw new NotFoundException(`Material com ID ${id} não encontrado`);
     }
-    
+
     return material;
   }
 
@@ -116,6 +116,24 @@ export class MateriaisService {
         return this.findOne(id); // Retorna o material atualizado
     } catch (error) {
         throw new InternalServerErrorException('Falha ao atualizar material');
+    }
+  }
+
+  async remove(id: number): Promise<void> {
+    // const countVinculos = await this.materialRepository.countVinculos(id);
+    // if (countVinculos > 0) {
+    //   throw new ConflictException(
+    //     `Material está vinculado a ${countVinculos} obra(s)`
+    //   );
+    // }
+
+    try {
+      const deleted = await this.materialRepository.delete(id);
+      if (deleted === 0) {
+        throw new NotFoundException('Material não encontrado para exclusão');
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('Falha ao remover material');
     }
   }
 
