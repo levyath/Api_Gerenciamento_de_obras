@@ -25,4 +25,8 @@ export class MaterialRepository {
         order: [['nome', 'ASC']],
         });
     }
+
+    async findById(id: number): Promise<Material | null> {
+        return this.materialModel.findByPk(id);
+    }
 }

@@ -27,5 +27,13 @@ export class MateriaisService {
     return this.materialRepository.findAll();
   }
 
+  async findOne(id: number): Promise<Material> {
+    const material = await this.materialRepository.findById(id);
+    if (!material) {
+      throw new NotFoundException(`Material com ID ${id} não encontrado`);
+    }
+    return material;
+  }
+
   
 }

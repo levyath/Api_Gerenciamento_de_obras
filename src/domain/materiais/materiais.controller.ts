@@ -25,4 +25,13 @@ export class MateriaisController {
   {
     return this.materiaisService.findAll();
   }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Obter um material por ID' })
+  @ApiResponse({ status: 200, description: 'Material encontrado com sucesso.' })
+  @ApiNotFoundResponse({ description: 'Material não encontrado.' })
+  async findOne(@Param('id') id: number) 
+  {
+    return this.materiaisService.findOne(id);
+  }
 }
