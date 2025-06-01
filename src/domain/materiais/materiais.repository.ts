@@ -1,0 +1,22 @@
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { Material } from './entities/material.entity';
+import { Op, Sequelize } from 'sequelize';
+
+@Injectable()
+export class MaterialRepository {
+    constructor(
+        @InjectModel(Material)
+        private readonly materialModel: typeof Material,
+    ) {}
+
+    async findByCodigo(codigo: string): Promise<Material | null> {
+        return this.materialModel.findOne({
+        where: { codigo },
+        });
+    }
+
+    async create(dto: any): Promise<Material> {
+        return this.materialModel.create(dto);
+    }
+}
