@@ -16,6 +16,8 @@ import { Fornecedores } from 'src/domain/fornecedores/entities/fornecedores.enti
 import { Equipamentos } from 'src/domain/equipamentos/entities/equipamento.entity';
 import { ObrasFornecedores } from 'src/domain/obra-fornecedor/entities/obras-fornecedores.entity';
 import { ObrasEquipamentos } from 'src/domain/obra-equipamento/entities/obras-equipamentos.entity';
+import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel-tecnico.entity';
+import { ObraResponsavelTecnico } from 'src/domain/obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
 
 @Table({
   tableName: 'obras',
@@ -105,4 +107,7 @@ export class Obras extends Model<Obras> {
 
   @BelongsToMany(() => Equipamentos, () => ObrasEquipamentos)
   declare equipamentos: Equipamentos[];
+
+  @BelongsToMany(() => ResponsavelTecnico, () => ObraResponsavelTecnico)
+  responsaveisTecnicos: ResponsavelTecnico[];
 }
