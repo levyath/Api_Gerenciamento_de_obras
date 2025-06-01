@@ -80,7 +80,7 @@ export class FiscalizacoesController {
     @ApiOperation({ summary: 'Cria uma fiscalização para uma obra' })
     @ApiResponse({ status: 201, description: 'Fiscalização criada com sucesso' })
     @ApiResponse({ status: 400, description: 'Erro na criação da fiscalização' })
-    @Post('/obras/:id/fiscalizacoes')
+    @Post('/obras/:id/fiscalizacao')
     async create(@Param('id') obraId: number, @Body() dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
         try {
             return await this.fiscalizacoesService.create(obraId, dto);
