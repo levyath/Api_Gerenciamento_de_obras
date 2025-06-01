@@ -6,17 +6,21 @@ import { ResponsaveisTecnicosRepository } from './responsaveis-tecnicos.reposito
 
 import { ResponsavelTecnico } from './entities/responsavel-tecnico.entity';
 import { CpfValidatorService } from '../cpf-validator.service';
+import { ObraResponsavelTecnico } from '../obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
+import { ObraResponsavelTecnicoRepository } from '../obra-responsavel-tecnico/obra-responsavel-tecnico.repository';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([
       ResponsavelTecnico,
+      ObraResponsavelTecnico
     ])
   ],
   controllers: [ResponsaveisTecnicosController],
   providers: [
     ResponsaveisTecnicosService,
     ResponsaveisTecnicosRepository,
+    ObraResponsavelTecnicoRepository,
     CpfValidatorService
   ],
   exports: [ResponsaveisTecnicosService]
