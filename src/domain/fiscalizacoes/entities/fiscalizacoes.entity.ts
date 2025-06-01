@@ -1,7 +1,7 @@
-import { Table, Column, Model, DataType, BelongsToMany, CreatedAt, UpdatedAt, PrimaryKey, AutoIncrement, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, BelongsToMany, PrimaryKey, AutoIncrement, HasMany, AllowNull } from 'sequelize-typescript';
 import { Obras } from '../../obras/entities/obras.entity';
 import { ObrasFiscalizacoes } from 'src/domain/obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
-//import { Relatorio } from 'src/domain/relatorios/entities/relatorio.entity'; todo
+import { Relatorios } from 'src/domain/relatorios/entities/relatorios.entity';
 //import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel.entity'; pendente Levy
 
 @Table({ tableName: 'fiscalizacoes', timestamps: false })
@@ -18,7 +18,11 @@ export class Fiscalizacoes extends Model<Fiscalizacoes> {
     descricao: string;
 
     @Column({ type: DataType.DATE, allowNull: false })
-    data: Date;
+    data_inicio: Date;
+
+    @AllowNull
+    @Column({ type: DataType.DATE })
+    data_fim: Date;
 
     @Column({ type: DataType.STRING(20), allowNull: false})
     status: string;
@@ -26,11 +30,11 @@ export class Fiscalizacoes extends Model<Fiscalizacoes> {
     @BelongsToMany(() => Obras, () => ObrasFiscalizacoes)
     obras: Obras[];
 
+    @HasMany(() => Relatorios)
+    relatorios: Relatorios[];
+
     //pendente Levy
     //@ManyToOne(() => ResponsavelTecnico, { nullable: true })
     //responsavel: ResponsavelTecnico;
 
-    //pendente Eu
-    //@OneToMany(() => Relatorio, relatorio => relatorio.fiscalizacao, { cascade: true })
-    //relatorios: Relatorio[];
 }

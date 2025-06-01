@@ -4,6 +4,7 @@ import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
 import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
 import { Obras } from 'src/domain/obras/entities/obras.entity';
+import { InitializeOnPreviewAllowlist } from '@nestjs/core';
 
 @Injectable()
 export class FiscalizacoesService {
@@ -36,15 +37,18 @@ export class FiscalizacoesService {
     }
 
     async create(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        const { data, titulo } = dto;
+        const { data_inicio, data_fim, titulo } = dto;
         const hoje = new Date();
-        const dataFiscalizacao = new Date(data);
+        const dataInicio = new Date(data_inicio);
+        const dataFim = data_fim ? new Date(data_fim) : null;
         const fiscalizacoesExistentes = await this.findByObraId(obraId);
         const tituloDuplicado = fiscalizacoesExistentes.some(f => f.titulo === titulo);
         const obra = await Obras.findByPk(obraId);
 
-        if (dataFiscalizacao > hoje)
+        if (dataInicio > hoje)
             throw new BadRequestException('A fiscalização não pode ter uma data futura.');
+        if (dataFim && dataFim < dataInicio)
+            throw new BadRequestException('A data de fim não pode ser anterior ao início da fiscalização.')
         if (tituloDuplicado)
             throw new BadRequestException(`A obra já possui uma fiscalização com o título "${titulo}".`);
         if (!obra)

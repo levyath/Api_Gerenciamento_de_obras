@@ -58,7 +58,6 @@ export class FiscalizacoesRepository {
 
     //post /obras/:id/fiscalizacoes
     async create(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        const { titulo, descricao, data, obra_ids } = dto;
         const fiscalizacao = await this.fiscalizacoesModel.create(dto as any);
         
         const obra = await Obras.findByPk(obraId);
