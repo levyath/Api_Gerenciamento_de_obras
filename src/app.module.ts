@@ -3,18 +3,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize'; // Importa SequelizeModule
 
-import 'dotenv/config'; 
+import 'dotenv/config';
 import { EnderecosModule } from './domain/enderecos/enderecos.module';
 import { EquipamentosModule } from './domain/equipamentos/equipamentos.module';
 import { FornecedoresModule } from './domain/fornecedores/fornecedores.module';
 import { ObrasModule } from './domain/obras/obras.module';
-const {
-  DB_HOST,
-  DB_PORT,
-  DB_DATABASE,
-  DB_USER,
-  DB_PASSWORD,
-} = process.env;
+import { EtapasDaObraModule } from './domain/etapas-da-obra/etapas-da-obra.module';
+import { ResponsaveisTecnicosModule } from './domain/responsaveis-tecnicos/responsaveis-tecnicos.module';
+import { DiarioDeObraModule } from './domain/diario-de-obra/diario-de-obra.module';
+import { MateriaisModule } from './domain/materiais/materiais.module';
+const { DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = process.env;
 
 @Module({
   imports: [
@@ -34,7 +32,9 @@ const {
           );
         }
 
-        console.log(`Conectando ao banco de dados: postgres://${DB_USER}@${DB_HOST}:${port}/${DB_DATABASE}`);
+        console.log(
+          `Conectando ao banco de dados: postgres://${DB_USER}@${DB_HOST}:${port}/${DB_DATABASE}`,
+        );
 
         return {
           dialect: 'postgres',
@@ -61,7 +61,11 @@ const {
     EnderecosModule,
     EquipamentosModule,
     FornecedoresModule,
-    ObrasModule
+    ObrasModule,
+    EtapasDaObraModule,
+    ResponsaveisTecnicosModule,
+    DiarioDeObraModule,
+    MateriaisModule
   ],
   controllers: [AppController],
   providers: [AppService],

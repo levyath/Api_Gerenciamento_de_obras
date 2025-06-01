@@ -29,7 +29,7 @@ export class CreateEquipamentoDto {
   numeroDeSerie?: string;
 
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   @ApiPropertyOptional({ example: 1, description: 'ID do fornecedor associado' })
   fornecedorId?: number;
 

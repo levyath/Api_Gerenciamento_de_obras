@@ -1,8 +1,21 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, ParseIntPipe, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+  BadRequestException,
+} from '@nestjs/common';
+
 import { FornecedoresService } from './fornecedores.service';
 import { Fornecedores } from './entities/fornecedores.entity';
 import { CreateFornecedoresDto } from './dto/create-fornecedores.dto';
 import { UpdateFornecedoresDto } from './dto/update-fornecedores.dto';
+
 import {
   ApiTags,
   ApiOperation,
@@ -10,6 +23,10 @@ import {
   ApiNotFoundResponse,
   ApiBody,
 } from '@nestjs/swagger';
+
+const ParseIntPipeCustom = new ParseIntPipe({
+  exceptionFactory: () => new BadRequestException('O parâmetro id deve ser um número válido'),
+});
 
 @ApiTags('Fornecedores')
 @Controller('fornecedores')
@@ -20,19 +37,23 @@ export class FornecedoresController {
   @ApiOperation({ summary: 'Listar todos os fornecedores' })
   @ApiResponse({ status: 200, description: 'Lista de fornecedores retornada com sucesso.', type: [Fornecedores] })
   async findAll(): Promise<Fornecedores[]> {
-    return this.fornecedoresService.findAll();
+    try {
+      return await this.fornecedoresService.findAll();
+    } catch (error) {
+      throw new BadRequestException('Erro ao listar fornecedores: ' + error.message);
+    }
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar fornecedor por ID' })
   @ApiResponse({ status: 200, description: 'Fornecedor encontrado.', type: Fornecedores })
   @ApiNotFoundResponse({ description: 'Fornecedor não encontrado.' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Fornecedores> {
-    const fornecedores = await this.fornecedoresService.findOne(id);
-    if (!fornecedores) {
-      throw new NotFoundException(`Fornecedor com id ${id} não encontrado.`);
+  async findOne(@Param('id', ParseIntPipeCustom) id: number): Promise<Fornecedores | null> {
+    try {
+      return await this.fornecedoresService.findOne(id);
+    } catch (error) {
+      throw new BadRequestException('Erro ao buscar fornecedor: ' + error.message);
     }
-    return fornecedores;
   }
 
   @Post()
@@ -40,7 +61,11 @@ export class FornecedoresController {
   @ApiResponse({ status: 201, description: 'Fornecedor criado com sucesso.', type: Fornecedores })
   @ApiBody({ type: CreateFornecedoresDto })
   async create(@Body() data: CreateFornecedoresDto): Promise<Fornecedores> {
-    return this.fornecedoresService.create(data);
+    try {
+      return await this.fornecedoresService.create(data);
+    } catch (error) {
+      throw new BadRequestException('Erro ao criar fornecedor: ' + error.message);
+    }
   }
 
   @Put(':id')
@@ -49,25 +74,58 @@ export class FornecedoresController {
   @ApiNotFoundResponse({ description: 'Fornecedor não encontrado.' })
   @ApiBody({ type: UpdateFornecedoresDto })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipeCustom) id: number,
     @Body() data: Partial<UpdateFornecedoresDto>,
-  ): Promise<Fornecedores> {
-    const updated = await this.fornecedoresService.update(id, data);
-    if (!updated) {
-      throw new NotFoundException(`Fornecedor com id ${id} não encontrado.`);
+  ): Promise<Fornecedores | null> {
+    try {
+      return await this.fornecedoresService.update(id, data);
+    } catch (error) {
+      throw new BadRequestException('Erro ao atualizar fornecedor: ' + error.message);
     }
-    return updated;
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Atualizar parcialmente o campo ativo do fornecedor' })
+  @ApiResponse({ status: 200, description: 'Campo ativo atualizado com sucesso.', type: Fornecedores })
+  async updateActive(
+    @Param('id', ParseIntPipeCustom) id: number,
+    @Body('ativo') ativo: boolean,
+  ): Promise<Fornecedores | null> {
+    try {
+      return await this.fornecedoresService.updateActive(id, ativo);
+    } catch (error) {
+      throw new BadRequestException('Erro ao atualizar o campo ativo do fornecedor: ' + error.message);
+    }
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remover fornecedor por ID' })
   @ApiResponse({ status: 200, description: 'Fornecedor removido com sucesso.' })
   @ApiNotFoundResponse({ description: 'Fornecedor não encontrado.' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
-    const deleted = await this.fornecedoresService.remove(id);
-    if (!deleted) {
-      throw new NotFoundException(`Fornecedor com id ${id} não encontrado.`);
+  async remove(@Param('id', ParseIntPipeCustom) id: number): Promise<{ message: string }> {
+    try {
+      await this.fornecedoresService.remove(id);
+      return { message: `Fornecedor com id ${id} removido com sucesso.` };
+    } catch (error) {
+      throw new BadRequestException('Erro ao remover fornecedor: ' + error.message);
     }
-    return { message: `Fornecedor com id ${id} removido com sucesso.` };
   }
+}
+
+@ApiTags('Fornecedores')
+@Controller('obras')
+export class ObrasController {
+  constructor(private readonly fornecedoresService: FornecedoresService) {}
+
+  @Get(':id/fornecedores')
+  @ApiOperation({ summary: 'Listar fornecedores vinculados a uma obra pelo ID' })
+  @ApiResponse({ status: 200, description: 'Fornecedores listados com sucesso.' })
+  async findSuppliersByObra(@Param('id', ParseIntPipeCustom) id: number) {
+    try {
+      return await this.fornecedoresService.findSuppliersByObra(id);
+    } catch (error) {
+      throw new BadRequestException('Erro ao visualizar fornecedores da obra: ' + error.message);
+    }
+  }
+
 }

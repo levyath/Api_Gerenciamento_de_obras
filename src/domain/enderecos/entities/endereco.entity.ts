@@ -1,7 +1,7 @@
 import { Table, Column, Model, DataType, PrimaryKey, AutoIncrement, HasOne } from 'sequelize-typescript';
 import { Obras } from 'src/domain/obras/entities/obras.entity';
 
-@Table({ tableName: 'enderecos' })
+@Table({ tableName: 'enderecos', timestamps: false })
 export class Endereco extends Model<Endereco> {
   @PrimaryKey
   @AutoIncrement

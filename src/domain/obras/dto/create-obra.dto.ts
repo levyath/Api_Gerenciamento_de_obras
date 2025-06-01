@@ -74,8 +74,4 @@ export class CreateObraDto {
   @ApiPropertyOptional({ example: [1, 2], description: 'IDs dos equipamentos associados à obra', type: [Number] })
   equipamentosId?: number[];
 
-  @IsNumber()
-  @IsOptional()
-  @ApiPropertyOptional({ example: 1, description: 'ID do endereço associado' })
-  enderecoId?: number;
 }

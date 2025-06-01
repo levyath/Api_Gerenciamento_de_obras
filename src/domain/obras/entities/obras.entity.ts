@@ -18,6 +18,8 @@ import { ObrasFornecedores } from 'src/domain/obra-fornecedor/entities/obras-for
 import { ObrasEquipamentos } from 'src/domain/obra-equipamento/entities/obras-equipamentos.entity';
 import { Fiscalizacoes } from 'src/domain/fiscalizacoes/entities/fiscalizacoes.entity';
 import { ObrasFiscalizacoes } from 'src/domain/obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
+import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel-tecnico.entity';
+import { ObraResponsavelTecnico } from 'src/domain/obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
 
 @Table({
   tableName: 'obras',
@@ -33,80 +35,83 @@ export class Obras extends Model<Obras> {
     type: DataType.STRING(255),
     allowNull: false,
   })
-  nome: string;
+  declare nome: string;
 
   @Column({
     type: DataType.TEXT,
     allowNull: false,
   })
-  descricao: string;
+  declare descricao: string;
 
   @Default('Planejada')
   @Column({
     type: DataType.ENUM('Planejada', 'Em andamento', 'Concluída', 'Paralisada'),
   })
-  status: string;
+  declare status: string;
 
   @Column({
     type: DataType.DATEONLY,
     allowNull: false,
   })
-  data_inicio: Date;
+  declare data_inicio: Date;
 
   @AllowNull
   @Column({
     type: DataType.DATEONLY,
   })
-  data_conclusao: Date;
+  declare data_conclusao: Date;
 
   @Column({
     type: DataType.STRING(255),
     allowNull: false,
   })
-  responsavel: string;
+  declare responsavel: string;
 
   @Column({
     type: DataType.DECIMAL(10, 2),
     allowNull: false,
   })
-  orcamento_total: number;
+  declare orcamento_total: number;
 
   @Default(0)
   @Column({
     type: DataType.DECIMAL(10, 2),
   })
-  gastos_atualizados: number;
+  declare gastos_atualizados: number;
 
   @Default(0)
   @Column({
     type: DataType.FLOAT,
   })
-  percentual_concluido: number;
+  declare percentual_concluido: number;
 
   @AllowNull
   @Column({
     type: DataType.DECIMAL(10, 6),
   })
-  latitude: number;
+  declare latitude: number;
 
   @AllowNull
   @Column({
     type: DataType.DECIMAL(10, 6),
   })
-  longitude: number;
+  declare longitude: number;
 
- @ForeignKey(() => Endereco)
+  @ForeignKey(() => Endereco)
   @Column({ type: DataType.INTEGER, allowNull: true })
-  enderecoId: number;
+  declare enderecoId: number | null;
 
   @BelongsTo(() => Endereco)
-  endereco: Endereco;
+  declare endereco: Endereco;
   
   @BelongsToMany(() => Fornecedores, () => ObrasFornecedores)
-  fornecedores: Fornecedores[];
+  declare fornecedores: Fornecedores[];
 
   @BelongsToMany(() => Equipamentos, () => ObrasEquipamentos)
-  equipamentos: Equipamentos[];
+  declare equipamentos: Equipamentos[];
+
+  @BelongsToMany(() => ResponsavelTecnico, () => ObraResponsavelTecnico)
+  responsaveisTecnicos: ResponsavelTecnico[];
 
   @BelongsToMany(() => Fiscalizacoes, () => ObrasFiscalizacoes)
   fiscalizacoes: Fiscalizacoes[];
