@@ -19,6 +19,18 @@ export class FiscalizacoesService {
         return this.fiscalizacoesRepository.findOne(id);
     }
 
+    async findDetalhes(id: number): Promise<Fiscalizacoes | null> {
+        return await this.fiscalizacoesRepository.findDetalhes(id);
+    }
+
+    async findAllByStatus(status: string) {
+        return await this.fiscalizacoesRepository.findAllByStatus(status);
+    }
+
+    async findRecentes() {
+        return await this.fiscalizacoesRepository.findRecentes();
+    }
+
     async findByObraId(obraId: number): Promise<Fiscalizacoes[]> {
         return this.fiscalizacoesRepository.findByObraId(obraId);
     }
@@ -53,5 +65,9 @@ export class FiscalizacoesService {
 
     async delete(id: number): Promise<void> {
         return this.fiscalizacoesRepository.delete(id);
+    }
+
+    async deleteAllByObraId(obraId: number) {
+        return await this.fiscalizacoesRepository.deleteAllByObraId(obraId);
     }
 }

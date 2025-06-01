@@ -30,6 +30,33 @@ export class FiscalizacoesController {
         }
     }
 
+    @Get('/status/:status')
+    async findByStatus(@Param('status') status: string): Promise<Fiscalizacoes[]> {
+        try {
+            return await this.fiscalizacoesService.findAllByStatus(status);
+        } catch (error) {
+            throw new BadRequestException(`Erro ao listar as fiscalizações com status "${status}".`);
+        }
+    }
+
+    @Get('/recentes')
+    async findRecentes(): Promise<Fiscalizacoes[]> {
+        try {
+            return await this.fiscalizacoesService.findRecentes();
+        } catch (error) {
+            throw new BadRequestException('Erro ao listar fiscalizações recentes.');
+        }
+    }
+
+    @Get(':id/detalhes')
+    async findDetalhes(@Param('id') id: number): Promise<Fiscalizacoes | null> {
+        try {
+            return await this.fiscalizacoesService.findDetalhes(id);
+        } catch (error) {
+            throw new BadRequestException('Erro ao listar fiscalizações detalhadas.');
+        }
+    }
+
     @Get('/obras/:id/fiscalizacoes')
     async findByObraId(@Param('id') obraId: number): Promise<Fiscalizacoes[]> {
         try {

@@ -21,8 +21,28 @@ export class FiscalizacoesRepository {
     async findOne(id: number): Promise<Fiscalizacoes | null> {
         return await this.fiscalizacoesModel.findOne({
             where: { id },
+        })
+    }
+
+    //get /fiscalizacoes/:id/detalhes
+    async findDetalhes(id: number): Promise<Fiscalizacoes | null>{
+        return await this.fiscalizacoesModel.findOne({
+            where: { id },
             include: [Obras],
         })
+    }
+
+    //get /fiscalizacoes/status/:status
+    async findAllByStatus(status: string): Promise<Fiscalizacoes[]>{
+        return await this.fiscalizacoesModel.findAll({ where: { status } });
+    }
+
+    //get /fiscalizacoes/recentes
+    async findRecentes(): Promise<Fiscalizacoes[]>{
+        return await this.fiscalizacoesModel.findAll({
+            order: [['data', 'DESC']],
+            limit: 10,
+        });
     }
 
     //get /obras/:id/fiscalizacoes
@@ -42,9 +62,8 @@ export class FiscalizacoesRepository {
         const fiscalizacao = await this.fiscalizacoesModel.create(dto as any);
         
         const obra = await Obras.findByPk(obraId);
-        if (!obra) {
+        if (!obra)
             throw new NotFoundException(`Obra com ID ${obraId} não encontrada`);
-        }
     
         await obra.$add('fiscalizacoes', fiscalizacao);
         return fiscalizacao;
@@ -53,9 +72,8 @@ export class FiscalizacoesRepository {
     //put /fiscalizacao/:id
     async update(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
         const fiscalizacao = await this.fiscalizacoesModel.findByPk(id);
-        if (!fiscalizacao) {
+        if (!fiscalizacao)
             throw new NotFoundException(`Fiscalização com ID ${id} não encontrada`);
-        }
     
         await fiscalizacao.update(dto as any);
         return fiscalizacao;
@@ -72,7 +90,19 @@ export class FiscalizacoesRepository {
         if (!fiscalizacao) {
             throw new NotFoundException(`Fiscalização com ID ${id} não encontrada`);
         }
-    
+
         await fiscalizacao.destroy();
+    }
+
+    //delete /obras/:id/fiscalizacoes
+    async deleteAllByObraId(obraId: number): Promise<void>{
+        const obra = await Obras.findByPk(obraId, {
+            include: [Fiscalizacoes],
+        });
+
+        if (!obra)
+            throw new NotFoundException(`Obra com ID ${obraId} não encontrada.`);
+        if (obra.fiscalizacoes.length > 0)
+            await obra.$remove('fiscalizacoes', obra.fiscalizacoes);
     }
 }
