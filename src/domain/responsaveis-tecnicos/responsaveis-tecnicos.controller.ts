@@ -11,6 +11,7 @@ import {
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dto';
+import { UpdateResponsavelTecnicoDto } from './dto/update-responsavel-tecnico.dto';
 
 @ApiTags('Responsaveis Tecnicos')
 @Controller('responsaveis-tecnicos')
@@ -47,5 +48,18 @@ export class ResponsaveisTecnicosController
   async create(@Body() dto: CreateResponsavelTecnicoDto): Promise<ResponsavelTecnico> 
   {
     return await this.responsavelTecnicoService.create(dto);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Atualizar um responsável técnico existente' })
+  @HttpCode(204)
+  @ApiResponse({ status: 204, description: 'Responsável técnico atualizado com sucesso.' })
+  @ApiBadRequestResponse({ description: 'ID inválido ou CPF com formato incorreto.' })
+  @ApiNotFoundResponse({ description: 'Responsável técnico não encontrado.' })
+  @ApiConflictResponse({ description: 'Já existe um responsável técnico com este CPF.' })
+  @ApiBody({ type: UpdateResponsavelTecnicoDto, description: 'Dados atualizados do responsável técnico' })
+  async update(@Param('id') id: number, @Body() dto: UpdateResponsavelTecnicoDto ): Promise<void> 
+  {
+    await this.responsavelTecnicoService.update(id, dto);
   }
 }

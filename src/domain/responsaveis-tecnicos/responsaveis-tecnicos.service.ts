@@ -3,6 +3,7 @@ import { ResponsavelTecnico } from './entities/responsavel-tecnico.entity';
 import { ResponsaveisTecnicosRepository } from './responsaveis-tecnicos.repository';
 import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dto';
 import { CpfValidatorService } from '../cpf-validator.service';
+import { UpdateResponsavelTecnicoDto } from './dto/update-responsavel-tecnico.dto';
 
 @Injectable()
 export class ResponsaveisTecnicosService 
@@ -32,6 +33,20 @@ export class ResponsaveisTecnicosService
         await this.verificarCPFUnico(input.cpf);
         
         return this.responsaveisTecnicosRepository.create(input);
+    }
+
+    async update(id: number, input: UpdateResponsavelTecnicoDto): Promise<ResponsavelTecnico | null> 
+    {
+        this.validarId(id);
+        await this.obterResponsavelPorId(id); // Verifica se existe
+        
+        if (input.cpf) {
+            this.validarFormatoCPF(input.cpf);
+            this.validarCPF(input.cpf);
+            await this.verificarCPFUnico(input.cpf, id);
+        }
+
+        return this.responsaveisTecnicosRepository.update(id, input);
     }
 
     // ============ MÉTODOS AUXILIARES PRIVADOS ============

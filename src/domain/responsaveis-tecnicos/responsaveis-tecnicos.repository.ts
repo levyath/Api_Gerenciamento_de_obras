@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ResponsavelTecnico } from "./entities/responsavel-tecnico.entity";
 import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dto';
+import { UpdateResponsavelTecnicoDto } from './dto/update-responsavel-tecnico.dto';
 
 @Injectable()
 export class ResponsaveisTecnicosRepository {
@@ -62,5 +63,20 @@ export class ResponsaveisTecnicosRepository {
         }
 
         return responsavel;
+    }
+
+    async update(id: number, data: UpdateResponsavelTecnicoDto & { obrasIds?: number[] }): Promise<ResponsavelTecnico | null> {
+        const responsavel = await this.responsavelTecnicoModel.findByPk(id);
+        if (!responsavel) return null;
+
+        const { obrasIds, ...updateData } = data;
+
+        await responsavel.update(updateData);
+
+        if (obrasIds) {
+        await responsavel.$set('obras', obrasIds);
+        }
+
+        return this.findById(id);
     }
 }
