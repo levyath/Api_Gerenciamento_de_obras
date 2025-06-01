@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { Fiscalizacoes } from "./entities/fiscalizacoes.entity";
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
@@ -56,7 +56,7 @@ export class FiscalizacoesRepository {
         });
     }
 
-    //post /obras/:id/fiscalizacoes
+    //post /obras/:id/fiscalizacao
     async create(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
         const fiscalizacao = await this.fiscalizacoesModel.create(dto as any);
         
