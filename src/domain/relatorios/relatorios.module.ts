@@ -13,5 +13,6 @@ import { FiscalizacoesModule } from '../fiscalizacoes/fiscalizacoes.module';
     ],
     controllers: [RelatoriosController],
     providers: [RelatoriosService, RelatoriosRepository],
+    exports: [RelatoriosService, RelatoriosRepository],
 })
 export class RelatoriosModule {}
