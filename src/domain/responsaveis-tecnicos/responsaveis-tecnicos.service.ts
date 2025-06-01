@@ -170,6 +170,22 @@ export class ResponsaveisTecnicosService
         return vinculo;
     }
 
+    async deleteVinculoObra(responsavelId: number, obraId: number ): Promise<void>
+    {
+        this.validarId(responsavelId);
+        this.validarId(obraId);
+        await this.obterResponsavelPorId(responsavelId);
+        await this.verificarExistenciaObra(obraId);
+
+        await this.obterVinculoExistente(responsavelId, obraId);
+
+        try {
+            await this.obrasResponsavelTecnicoRepository.removerVinculo(responsavelId, obraId);
+        } catch (error) {
+            throw new InternalServerErrorException('Erro ao remover o vínculo. Por favor, tente novamente.');
+        }
+    }
+
     // ============ MÉTODOS AUXILIARES PRIVADOS ============
 
     private validarId(id: number): void {

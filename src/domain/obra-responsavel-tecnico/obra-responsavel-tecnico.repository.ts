@@ -61,4 +61,11 @@ export class ObraResponsavelTecnicoRepository {
     await vinculo.save();
     return vinculo;
   }
+
+  async removerVinculo(responsavelTecnicoId: number, obraId: number ): Promise<void> 
+  {
+    await this.obraRespTecnicoModel.destroy({
+      where: { responsavelTecnicoId, obraId },
+    });
+  }
 }

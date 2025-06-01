@@ -118,4 +118,13 @@ export class ResponsaveisTecnicosController
   {
     return await this.responsavelTecnicoService.findVinculoObra(responsavelId, obraId);
   }
+
+  @Delete(':id/obras/:obraId')
+  @ApiOperation({ summary: 'Remover vínculo entre responsável técnico e obra' })
+  @HttpCode(204)
+  @ApiResponse({ status: 204, description: 'Vínculo removido com sucesso - sem conteúdo retornado' })
+  async deleteVinculoObra(@Param('id') responsavelId: number, @Param('obraId') obraId: number ): Promise<void>
+  {
+    await this.responsavelTecnicoService.deleteVinculoObra(responsavelId, obraId);
+  }
 }
