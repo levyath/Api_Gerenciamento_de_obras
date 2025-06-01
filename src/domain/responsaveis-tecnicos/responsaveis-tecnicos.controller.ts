@@ -102,4 +102,12 @@ export class ResponsaveisTecnicosController
   {
     await this.responsavelTecnicoService.updateVinculoObra(responsavelId, obraId, dto);
   }
+
+  @Get(':id/obras')
+  @ApiOperation({ summary: 'Listar todos os vínculos de obras de um responsável técnico' })
+  @ApiResponse({ status: 200, description: 'Lista de vínculos retornada com sucesso.', type: [ObraResponsavelTecnico] })
+  async findAllVinculoObras(@Param('id') id: number): Promise<ObraResponsavelTecnico[]> 
+  {
+    return await this.responsavelTecnicoService.findAllVinculosObra(id);
+  }
 }

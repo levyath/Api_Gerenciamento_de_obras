@@ -137,6 +137,24 @@ export class ResponsaveisTecnicosService
         );
     }
 
+    async findAllVinculosObra(responsavelId: number ): Promise<ObraResponsavelTecnico[]> 
+    {
+        // Validação do ID do responsável
+        this.validarId(responsavelId);
+
+        // Verifica se o responsável existe
+        await this.obterResponsavelPorId(responsavelId);
+
+        // Busca todos os vínculos usando o método específico do repositório
+        const vinculos = await this.obrasResponsavelTecnicoRepository.buscarVinculosPorResponsavel(responsavelId);
+        
+        if (!vinculos || vinculos.length === 0) {
+            throw new NotFoundException(`Nenhum vínculo encontrado para o responsável técnico com ID ${responsavelId}.`);
+        }
+
+        return vinculos;
+    }
+
     // ============ MÉTODOS AUXILIARES PRIVADOS ============
 
     private validarId(id: number): void {
