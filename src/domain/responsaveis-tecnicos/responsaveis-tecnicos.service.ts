@@ -155,6 +155,21 @@ export class ResponsaveisTecnicosService
         return vinculos;
     }
 
+    async findVinculoObra(responsavelId: number, obraId: number ): Promise<ObraResponsavelTecnico> 
+    {
+        this.validarId(responsavelId);
+        this.validarId(obraId);
+        await this.obterResponsavelPorId(responsavelId);
+        await this.verificarExistenciaObra(obraId);
+
+        const vinculo = await this.obrasResponsavelTecnicoRepository.buscarVinculo(responsavelId, obraId);
+        if (!vinculo) {
+            throw new NotFoundException(`Vínculo entre responsável ${responsavelId} e obra ${obraId} não encontrado.`);
+        }
+
+        return vinculo;
+    }
+
     // ============ MÉTODOS AUXILIARES PRIVADOS ============
 
     private validarId(id: number): void {
