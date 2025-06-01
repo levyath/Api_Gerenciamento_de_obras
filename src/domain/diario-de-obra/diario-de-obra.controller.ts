@@ -13,16 +13,28 @@ import {
 import { CreateDiarioDeObraDto } from './dto/create-diario-de-obra.dto';
 import { DiarioDeObraService } from './diario-de-obra.service';
 import { UpdateDiarioDeObraDto } from './dto/update-diario-de-obra.dto';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiNotFoundResponse,
+  ApiBody,
+  ApiBadRequestResponse
+} from '@nestjs/swagger';
+import { DiarioDeObra } from './entities/diario-de-obra.entity';
 
+@ApiTags('Diarios de Obra')
 @Controller('obras/:idObra/diarios')
 export class DiarioDeObraController {
   constructor(private readonly diarioDeObraService: DiarioDeObraService) {}
 
   @Post()
-  async create(
-    @Param('idObra', ParseIntPipe) idObra: number,
-    @Body() dto: CreateDiarioDeObraDto,
-  ) {
+  @ApiOperation({ summary: 'Criar novo diário de obra', description: 'Registra um novo diário de obra para a obra especificada' })
+  @ApiResponse({ status: 201, description: 'Diário de obra criado com sucesso', type: DiarioDeObra })
+  @ApiBadRequestResponse({ description: 'Dados inválidos ou erro na criação' })
+  @ApiNotFoundResponse({ description: 'Obra não encontrada' })
+  async create(@Param('idObra', ParseIntPipe) idObra: number, @Body() dto: CreateDiarioDeObraDto )
+  {
     try {
       return await this.diarioDeObraService.create({ ...dto, obraId: idObra });
     } catch (error) {
@@ -33,7 +45,11 @@ export class DiarioDeObraController {
   }
 
   @Get()
-  async findAll(@Param('idObra', ParseIntPipe) idObra: number) {
+  @ApiOperation({ summary: 'Listar diários de obra', description: 'Retorna todos os diários de obra associados à obra especificada' })
+  @ApiResponse({ status: 200, description: 'Lista de diários de obra retornada com sucesso', type: [DiarioDeObra] })
+  @ApiBadRequestResponse({ description: 'Erro ao buscar diários' })
+  async findAll(@Param('idObra', ParseIntPipe) idObra: number) 
+  {
     try {
       return await this.diarioDeObraService.findAllByObra(idObra);
     } catch (error) {
@@ -44,10 +60,11 @@ export class DiarioDeObraController {
   }
 
   @Get(':diarioId')
-  async findOne(
-    @Param('idObra', ParseIntPipe) idObra: number,
-    @Param('diarioId', ParseIntPipe) diarioId: number,
-  ) {
+  @ApiOperation({ summary: 'Obter diário específico', description: 'Retorna um diário de obra específico pelo seu ID' })
+  @ApiResponse({ status: 200, description: 'Diário de obra retornado com sucesso', type: DiarioDeObra })
+  @ApiNotFoundResponse({ description: 'Diário não encontrado' })
+  async findOne(@Param('idObra', ParseIntPipe) idObra: number, @Param('diarioId', ParseIntPipe) diarioId: number )
+  {
     try {
       return await this.diarioDeObraService.findById(diarioId);
     } catch (error) {
@@ -58,6 +75,10 @@ export class DiarioDeObraController {
   }
 
   @Put(':diarioId')
+  @ApiOperation({ summary: 'Atualizar diário de obra', description: 'Atualiza os dados de um diário de obra existente' })
+  @ApiResponse({ status: 204, description: 'Diário atualizado com sucesso', type: DiarioDeObra })
+  @ApiBadRequestResponse({ description: 'Dados inválidos ou erro na atualização' })
+  @ApiNotFoundResponse({ description: 'Diário não encontrado' })
   async update(
     @Param('idObra', ParseIntPipe) idObra: number,
     @Param('diarioId', ParseIntPipe) diarioId: number,
@@ -73,10 +94,10 @@ export class DiarioDeObraController {
   }
 
   @Delete(':diarioId')
-  async remove(
-    @Param('idObra', ParseIntPipe) idObra: number,
-    @Param('diarioId', ParseIntPipe) diarioId: number,
-  ) {
+  @ApiOperation({ summary: 'Remover diário de obra', description: 'Remove permanentemente um diário de obra' })
+  @ApiResponse({ status: 204, description: 'Diário removido com sucesso' })
+  @ApiNotFoundResponse({ description: 'Diário não encontrado' })
+  async remove(@Param('idObra', ParseIntPipe) idObra: number, @Param('diarioId', ParseIntPipe) diarioId: number ) {
     try {
       return await this.diarioDeObraService.remove(diarioId);
     } catch (error) {
