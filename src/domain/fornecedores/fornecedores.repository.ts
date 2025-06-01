@@ -11,6 +11,8 @@ export class FornecedoresRepository {
   constructor(
     @InjectModel(Fornecedores)
     private readonly fornecedoresModel: typeof Fornecedores,
+    @InjectModel(Obras)
+    private readonly obrasModel: typeof Obras,
   ) {}
 
   async findAll(): Promise<Fornecedores[]> {
@@ -65,10 +67,31 @@ export class FornecedoresRepository {
   return this.findById(id);
 }
 
+async updateActive(id: number, ativo: boolean): Promise<Fornecedores | null> {
+  await this.fornecedoresModel.update(
+    { ativo },            
+    { where: { id } }    
+  );
+  return this.findById(id);
+}
+
   async delete(id: number): Promise<boolean> {
     const deletedCount = await this.fornecedoresModel.destroy({ where: { id } });
     return deletedCount > 0;
   }
+
+  async findSuppliersByObra(obraId: number): Promise<Fornecedores[] | null> {
+  const obra = await this.obrasModel.findByPk(obraId, {
+    include: [
+      {
+        model: this.fornecedoresModel,
+        through: { attributes: [] }, // ignora dados da tabela pivot
+      },
+    ],
+  });
+
+  return obra ? (obra.fornecedores ?? []) : null; 
+}
 
   async findOneByOptions(options: any): Promise<Fornecedores | null> {
   return this.fornecedoresModel.findOne(options);

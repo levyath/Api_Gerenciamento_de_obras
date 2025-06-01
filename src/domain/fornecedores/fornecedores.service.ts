@@ -118,6 +118,16 @@ export class FornecedoresService {
     return this.fornecedoresRepo.update(id, data);
   }
 
+   async updateActive(id: number, ativo: boolean) {
+    const existeFornecedor = await this.fornecedoresRepo.findById(id);
+
+    if (!existeFornecedor) {
+      throw new NotFoundException(`O fornecedor buscado não existe!`);
+    }
+
+    return this.fornecedoresRepo.updateActive(id, ativo);
+  }
+
   async remove(id: number): Promise<boolean> {
     const existeFornecedor = await this.fornecedoresRepo.findById(id);
     
@@ -127,4 +137,14 @@ export class FornecedoresService {
 
     return this.fornecedoresRepo.delete(id);
   }
+
+  async findSuppliersByObra(obraId: number) {
+  const existeObra = await this.obrasRepository.findById(obraId);
+
+  if (!existeObra) {
+    throw new NotFoundException(`A obra buscada não existe!`);
+  }
+
+  return this.fornecedoresRepo.findSuppliersByObra(obraId);
+}
 }

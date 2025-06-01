@@ -77,6 +77,7 @@ export class ObrasController {
     }
   }
 
+
   @Delete(':id')
   @ApiOperation({ summary: 'Remover uma obra por ID' })
   @ApiResponse({ status: 200, description: 'Obra removida com sucesso.' })

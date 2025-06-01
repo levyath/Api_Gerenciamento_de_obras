@@ -19,9 +19,8 @@ import {
   ApiBody,
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
-import { Obras } from '../obras/entities/obras.entity';
 
-@ApiTags('Endereços')
+@ApiTags('Enderecos')
 @Controller('enderecos')
 export class EnderecosGlobalController {
   constructor(private readonly enderecosService: EnderecosService) {}
@@ -46,7 +45,7 @@ export class EnderecosGlobalController {
   }
 }
 
-@ApiTags('Obras com Endereços')
+@ApiTags('Enderecos')
 @Controller('obras')
 export class ObrasEnderecosController {
   constructor(private readonly enderecosService: EnderecosService) {}
