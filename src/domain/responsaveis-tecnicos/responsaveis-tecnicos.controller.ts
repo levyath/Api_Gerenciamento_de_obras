@@ -12,6 +12,8 @@ import {
 } from '@nestjs/swagger';
 import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dto';
 import { UpdateResponsavelTecnicoDto } from './dto/update-responsavel-tecnico.dto';
+import { CreateVinculoObraDto } from '../obra-responsavel-tecnico/dto/create-obra-responsavel-tecnico.dto';
+import { ObraResponsavelTecnico } from '../obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
 
 @ApiTags('Responsaveis Tecnicos')
 @Controller('responsaveis-tecnicos')
@@ -73,5 +75,17 @@ export class ResponsaveisTecnicosController
   async remove(@Param('id') id: number): Promise<void> 
   {
     await this.responsavelTecnicoService.remove(id);
+  }
+
+  @Post(':id/obras')
+  @ApiOperation({ summary: 'Adicionar vínculos de obras ao responsável técnico' })
+  @ApiResponse({ status: 201, description: 'Vínculos adicionados com sucesso.', type: [ObraResponsavelTecnico] })
+  @ApiBadRequestResponse({ description: 'ID inválido ou dados dos vínculos incorretos.' })
+  @ApiNotFoundResponse({ description: 'Responsável técnico não encontrado.' })
+  @ApiConflictResponse({ description: 'Vínculo já existente ou conflito ao adicionar vínculo.' })
+  @ApiBody({ type: CreateVinculoObraDto, isArray: true, description: 'Array de vínculos de obra para adicionar' })
+  async addObras(@Param('id') id: number, @Body() vinculosDto: CreateVinculoObraDto[] ): Promise<ObraResponsavelTecnico[]> 
+  {
+    return await this.responsavelTecnicoService.createVinculosObra(id, vinculosDto);
   }
 }
