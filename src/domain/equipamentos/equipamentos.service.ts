@@ -176,14 +176,20 @@ export class EquipamentosService {
     return this.equipamentosRepository.remove(id);
   }
 
-  async getEquipamentosByObraId(obraId: number){
-    const equipamentos = await this.obrasRepository.findByPk(obraId);
+  async getEquipamentosByObraId(obraId: number) {
+  const obra = await this.obrasRepository.findByPk(obraId);
 
-    if (!equipamentos) {
-      throw new NotFoundException('A obra buscada não existe!');
-    }
-
-    return this.equipamentosRepository.findByObraId(obraId);;
+  if (!obra) {
+    throw new NotFoundException('A obra buscada não existe!');
   }
+
+  const equipamentos = await this.equipamentosRepository.findByObraId(obraId);
+
+  if (!equipamentos || equipamentos.length === 0) {
+    throw new NotFoundException(`Nenhum equipamento encontrado para a obra de ID ${obraId}.`);
+  }
+
+  return equipamentos;
+}
 }
 

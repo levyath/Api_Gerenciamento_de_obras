@@ -32,6 +32,10 @@ export class EnderecosService {
       throw new NotFoundException('A obra informada não existe!');
     }
 
+    if (obra.enderecoId === null || obra.enderecoId === undefined) {
+    throw new BadRequestException('Esta obra não possui endereço!');
+  }
+
     return this.enderecoRepository.findEnderecoByObraId(id);
   }
 

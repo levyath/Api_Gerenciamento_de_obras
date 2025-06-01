@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, NotFoundException, BadRequestException } from '@nestjs/common';
 import { FornecedoresRepository } from './fornecedores.repository';
 import { Fornecedores } from './entities/fornecedores.entity';
 import { CreateFornecedoresDto } from './dto/create-fornecedores.dto';
@@ -53,6 +53,10 @@ export class FornecedoresService {
     if (existeCnpj) {
       throw new HttpException('Já existe um fornecedor com o mesmo CNPJ.', HttpStatus.CONFLICT);
     }
+  }
+
+  if(!data.ativo){
+    throw new HttpException('Não é possível criar um fornecedor inativo!', HttpStatus.CONFLICT);
   }
 
   if (data.obrasId?.length) {
@@ -131,14 +135,18 @@ export class FornecedoresService {
   }
 
    async updateActive(id: number, ativo: boolean) {
-    const existeFornecedor = await this.fornecedoresRepo.findById(id);
+  const existeFornecedor = await this.fornecedoresRepo.findById(id);
 
-    if (!existeFornecedor) {
-      throw new NotFoundException(`O fornecedor buscado não existe!`);
-    }
-
-    return this.fornecedoresRepo.updateActive(id, ativo);
+  if (!existeFornecedor) {
+    throw new NotFoundException(`O fornecedor buscado não existe!`);
   }
+
+  if (existeFornecedor.ativo === ativo) {
+    throw new BadRequestException(`O campo 'ativo' já está definido como ${ativo}. Nenhuma atualização necessária.`);
+  }
+
+  return this.fornecedoresRepo.updateActive(id, ativo);
+}
 
   async remove(id: number): Promise<boolean> {
     const existeFornecedor = await this.fornecedoresRepo.findById(id);
@@ -157,6 +165,12 @@ export class FornecedoresService {
     throw new NotFoundException(`A obra buscada não existe!`);
   }
 
-  return this.fornecedoresRepo.findSuppliersByObra(obraId);
+  const fornecedores = await this.fornecedoresRepo.findSuppliersByObra(obraId);
+
+  if (!fornecedores || fornecedores.length === 0) {
+    throw new NotFoundException(`Nenhum fornecedor encontrado para a obra de ID ${obraId}.`);
+  }
+
+  return fornecedores;
 }
 }

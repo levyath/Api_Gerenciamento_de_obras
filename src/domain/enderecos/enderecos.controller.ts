@@ -38,7 +38,7 @@ export class EnderecosGlobalController {
   })
   async findAll(): Promise<Endereco[]> {
     try {
-      return this.enderecosService.findAll();
+      return await this.enderecosService.findAll();
     } catch (error) {
       throw new BadRequestException('Erro ao listar endereços: ' + error.message);
     }

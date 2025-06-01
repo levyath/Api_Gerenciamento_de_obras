@@ -71,7 +71,7 @@ export class EquipamentosController {
     @Body() data: Partial<UpdateEquipamentoDto>,
   ): Promise<Equipamentos | null> {
     try {
-      return this.equipamentosService.update(id, data);
+      return await this.equipamentosService.update(id, data);
     } catch (error) {
       throw new BadRequestException('Erro ao atualizar equipamento: ' + error.message);
     }
@@ -117,7 +117,7 @@ export class ObrasEquipamentoController {
   @ApiResponse({ status: 200, description: 'Equipamentos da obra retornados com sucesso.', type: [Equipamentos] })
   async findEquipamentosByObra(@Param('id', ParseIntPipe) id: number) {
     try {
-      return this.equipamentosService.getEquipamentosByObraId(id);
+      return await this.equipamentosService.getEquipamentosByObraId(id);
     } catch (error) {
       throw new BadRequestException('Erro ao visualizar equipamentos da obra: ' + error.message);
     }

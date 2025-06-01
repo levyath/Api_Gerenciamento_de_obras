@@ -3,12 +3,15 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Obras } from './entities/obras.entity';
 import { CreateObraDto } from './dto/create-obra.dto';
 import { UpdateObraDto } from './dto/update-obra.dto';
+import { Endereco } from '../enderecos/entities/endereco.entity';
 
 @Injectable()
 export class ObrasRepository {
   constructor(
     @InjectModel(Obras)
     private readonly obrasModel: typeof Obras,
+    @InjectModel(Endereco)
+    private readonly enderecoModel: typeof Endereco,
   ) {}
 
   async findAll(): Promise<Obras[]> {
@@ -95,8 +98,22 @@ export class ObrasRepository {
   }
 
   async delete(id: number): Promise<boolean> {
-    const deletedCount = await this.obrasModel.destroy({ where: { id } });
-    return deletedCount > 0;
+  const obra = await this.obrasModel.findByPk(id);
+
+  if (!obra) {
+    return false;
   }
+
+  const enderecoId = obra.enderecoId;
+
+  const deletedCount = await this.obrasModel.destroy({ where: { id } });
+
+  if (deletedCount > 0 && enderecoId) {
+    await this.enderecoModel.destroy({ where: { id: enderecoId } });
+    return true;
+  }
+
+  return false;
+}
   
 }
