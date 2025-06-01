@@ -17,4 +17,12 @@ export class MateriaisController {
   {
     return this.materiaisService.create(dto);
   }
+
+  @Get()
+  @ApiOperation({ summary: 'Listar todos os materiais' })
+  @ApiResponse({ status: 200, description: 'Lista de materiais retornada com sucesso.' })
+  async findAll() 
+  {
+    return this.materiaisService.findAll();
+  }
 }

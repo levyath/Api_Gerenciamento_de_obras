@@ -19,4 +19,10 @@ export class MaterialRepository {
     async create(dto: any): Promise<Material> {
         return this.materialModel.create(dto);
     }
+
+    async findAll(): Promise<Material[]> {
+        return this.materialModel.findAll({
+        order: [['nome', 'ASC']],
+        });
+    }
 }
