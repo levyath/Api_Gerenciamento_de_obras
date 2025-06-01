@@ -23,11 +23,11 @@ export class FiscalizacoesService {
         return await this.fiscalizacoesRepository.findDetalhes(id);
     }
 
-    async findAllByStatus(status: string) {
+    async findAllByStatus(status: string): Promise<Fiscalizacoes[]> {
         return await this.fiscalizacoesRepository.findAllByStatus(status);
     }
 
-    async findRecentes() {
+    async findRecentes(): Promise<Fiscalizacoes[]> {
         return await this.fiscalizacoesRepository.findRecentes();
     }
 
@@ -67,7 +67,7 @@ export class FiscalizacoesService {
         return this.fiscalizacoesRepository.delete(id);
     }
 
-    async deleteAllByObraId(obraId: number) {
+    async deleteAllByObraId(obraId: number): Promise<void> {
         return await this.fiscalizacoesRepository.deleteAllByObraId(obraId);
     }
 }

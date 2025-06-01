@@ -67,7 +67,7 @@ export class FiscalizacoesController {
     }
 
     @Post('/obras/:id/fiscalizacoes')
-    async create(@Param('id') obraId: number, @Body() dto: CreateFiscalizacoesDto) {
+    async create(@Param('id') obraId: number, @Body() dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
         try {
             return await this.fiscalizacoesService.create(obraId, dto);
         } catch (error) {
@@ -101,7 +101,16 @@ export class FiscalizacoesController {
         try {
             await this.fiscalizacoesService.delete(id);
         } catch (error) {
-            throw new BadRequestException(`Erro ao excluir fiscalização ID ${id}.`);
+            throw new BadRequestException(`Erro ao excluir fiscalização com ID ${id}.`);
+        }
+    }
+
+    @Delete('/obras/:id/fiscalizacoes')
+    async deleteAllByObraId(@Param('id') obraId: number): Promise<void> {
+        try {
+            await this.fiscalizacoesService.deleteAllByObraId(obraId);
+        } catch (error) {
+            throw new BadRequestException(`Erro ao excluir fiscalizações da obra com ID ${obraId}.`);
         }
     }
 }
