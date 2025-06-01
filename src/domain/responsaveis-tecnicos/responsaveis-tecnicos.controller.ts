@@ -57,10 +57,10 @@ export class ResponsaveisTecnicosController
   @ApiOperation({ summary: 'Atualizar um responsável técnico existente' })
   @HttpCode(204)
   @ApiResponse({ status: 204, description: 'Responsável técnico atualizado com sucesso.' })
-  @ApiBadRequestResponse({ description: 'ID inválido ou CPF com formato incorreto.' })
+  @ApiBadRequestResponse({ description: 'ID inválido, dados incorretos (formato CPF, campos vazios), nenhum dado fornecido, tentativa de atualização sem alterações ou propriedades inválidas.' })
   @ApiNotFoundResponse({ description: 'Responsável técnico não encontrado.' })
-  @ApiConflictResponse({ description: 'Já existe um responsável técnico com este CPF.' })
-  @ApiBody({ type: UpdateResponsavelTecnicoDto, description: 'Dados atualizados do responsável técnico' })
+  @ApiConflictResponse({ description: 'Conflito de dados: Já existe um responsável técnico com este CPF ou registro profissional.' })
+  @ApiBody({ type: UpdateResponsavelTecnicoDto, description: 'Dados atualizados do responsável técnico (campos permitidos: nome, cpf, registro_profissional, especialidade, ativo)' })
   async update(@Param('id') id: number, @Body() dto: UpdateResponsavelTecnicoDto ): Promise<void> 
   {
     await this.responsavelTecnicoService.update(id, dto);

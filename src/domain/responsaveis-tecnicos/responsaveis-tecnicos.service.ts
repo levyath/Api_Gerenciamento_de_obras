@@ -43,15 +43,80 @@ export class ResponsaveisTecnicosService
         return this.responsaveisTecnicosRepository.create(input);
     }
 
-    async update(id: number, input: UpdateResponsavelTecnicoDto): Promise<ResponsavelTecnico | null> 
-    {
+    async update(id: number, input: UpdateResponsavelTecnicoDto): Promise<ResponsavelTecnico | null> {
+        // Validação básica do ID
         this.validarId(id);
-        await this.obterResponsavelPorId(id); // Verifica se existe
         
-        if (input.cpf) {
+        // Verifica se há dados para atualizar
+        if (Object.keys(input).length === 0) {
+            throw new BadRequestException('Nenhum dado fornecido para atualização');
+        }
+
+        // Valida propriedades permitidas
+        const allowedProperties = ['nome', 'cpf', 'registro_profissional', 'especialidade', 'ativo'];
+        const invalidProperties = Object.keys(input).filter(
+            prop => !allowedProperties.includes(prop)
+        );
+
+        if (invalidProperties.length > 0) {
+            throw new BadRequestException(
+                `Propriedades inválidas para atualização: ${invalidProperties.join(', ')}. ` +
+                `Apenas estas propriedades podem ser atualizadas: ${allowedProperties.join(', ')}`
+            );
+        }
+
+        // Obtém o responsável existente
+        const responsavelExistente = await this.obterResponsavelPorId(id);
+        if (!responsavelExistente) {
+            throw new NotFoundException('Responsável técnico não encontrado');
+        }
+
+        // Verifica alterações válidas
+        const hasChanges = Object.keys(input).some(key => {
+            const inputValue = input[key];
+            const currentValue = responsavelExistente[key];
+            return inputValue !== undefined && inputValue !== currentValue;
+        });
+
+        if (!hasChanges) {
+            throw new BadRequestException('Nenhuma alteração fornecida em relação aos dados atuais');
+        }
+
+        // Validações específicas para cada campo
+        if (input.nome !== undefined) {
+            if (input.nome === responsavelExistente.nome) {
+                throw new BadRequestException('O nome fornecido é igual ao atual');
+            }
+            if (!input.nome.trim()) {
+                throw new BadRequestException('Nome não pode ser vazio');
+            }
+        }
+
+        if (input.cpf !== undefined) {
+            if (input.cpf === responsavelExistente.cpf) {
+                throw new BadRequestException('O CPF fornecido é igual ao atual');
+            }
             this.validarFormatoCPF(input.cpf);
             this.validarCPF(input.cpf);
             await this.verificarCPFUnico(input.cpf, id);
+        }
+
+        if (input.registro_profissional !== undefined) {
+            if (input.registro_profissional === responsavelExistente.registro_profissional) {
+                throw new BadRequestException('O registro profissional fornecido é igual ao atual');
+            }
+            if (!input.registro_profissional.trim()) {
+                throw new BadRequestException('Registro profissional não pode ser vazio');
+            }
+        }
+
+        if (input.especialidade !== undefined) {
+            if (input.especialidade === responsavelExistente.especialidade) {
+                throw new BadRequestException('A especialidade fornecida é igual à atual');
+            }
+            if (!input.especialidade.trim()) {
+                throw new BadRequestException('Especialidade não pode ser vazia');
+            }
         }
 
         return this.responsaveisTecnicosRepository.update(id, input);
@@ -69,7 +134,7 @@ export class ResponsaveisTecnicosService
     async createVinculosObra(responsavelId: number, vinculosDto: CreateVinculoObraDto[] ): Promise<ObraResponsavelTecnico[]> 
     {
         this.validarId(responsavelId);
-        await this.obterResponsavelPorId(responsavelId);
+        const responsavelExistente = await this.obterResponsavelPorId(responsavelId);
 
         const vinculosAtuais = await this.obrasResponsavelTecnicoRepository.buscarVinculosPorResponsavel(responsavelId);
 
@@ -91,6 +156,11 @@ export class ResponsaveisTecnicosService
             const vinculo = await this.processarCriacaoVinculo(responsavelId, dto, vinculosAtuais);
             resultados.push(vinculo);
         }
+        
+        // Update responsavelTecnico to active if not already
+        if (!responsavelExistente.ativo) {
+            await this.responsaveisTecnicosRepository.update(responsavelId, { ativo: true });
+        }
 
         return resultados;
     }
@@ -103,8 +173,37 @@ export class ResponsaveisTecnicosService
         await this.obterResponsavelPorId(responsavelId);
         await this.verificarExistenciaObra(obraId);
 
+        // Verifica se há dados para atualização
+        if (Object.keys(updateDto).length === 0) {
+            throw new BadRequestException('Nenhum dado fornecido para atualização');
+        }
+
+        // Valida propriedades permitidas
+        const allowedProperties = ['dataInicio', 'dataFim', 'tipoVinculo'];
+        const invalidProperties = Object.keys(updateDto).filter(
+            prop => !allowedProperties.includes(prop)
+        );
+
+        if (invalidProperties.length > 0) {
+            throw new BadRequestException(
+                `Propriedades inválidas para atualização: ${invalidProperties.join(', ')}. ` +
+                `Apenas estas propriedades podem ser atualizadas: ${allowedProperties.join(', ')}`
+            );
+        }
+
         // Obtém e valida vínculo existente
         const vinculoExistente = await this.obterVinculoExistente(responsavelId, obraId);
+
+        // Verifica se há alterações nos valores
+        const hasChanges = Object.keys(updateDto).some(key => {
+            const dtoValue = updateDto[key];
+            const existingValue = vinculoExistente[key === 'tipoVinculo' ? 'tipo_vinculo' : key];
+            return dtoValue !== undefined && dtoValue !== existingValue;
+        });
+
+        if (!hasChanges) {
+            throw new BadRequestException('Nenhuma alteração fornecida em relação aos dados atuais');
+        }
 
         // Processa atualização
         const { novaDataInicio, novaDataFim } = this.processarDatasAtualizacao(
@@ -181,6 +280,14 @@ export class ResponsaveisTecnicosService
 
         try {
             await this.obrasResponsavelTecnicoRepository.removerVinculo(responsavelId, obraId);
+
+            // Check remaining links
+            const vinculosRestantes = await this.obrasResponsavelTecnicoRepository.buscarVinculosPorResponsavel(responsavelId);
+        
+            // If no links left, set responsavel to inactive
+            if (vinculosRestantes.length === 0) {
+                await this.responsaveisTecnicosRepository.update(responsavelId, { ativo: false });
+            }
         } catch (error) {
             throw new InternalServerErrorException('Erro ao remover o vínculo. Por favor, tente novamente.');
         }
