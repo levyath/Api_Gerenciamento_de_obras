@@ -29,4 +29,12 @@ export class MaterialRepository {
     async findById(id: number): Promise<Material | null> {
         return this.materialModel.findByPk(id);
     }
+
+    async update(id: number, dto: any): Promise<[number]> {
+        return this.materialModel.update(dto, {
+        where: { id },
+        });
+    }
+
+    
 }
