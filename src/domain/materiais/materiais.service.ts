@@ -22,4 +22,10 @@ export class MateriaisService {
       throw new InternalServerErrorException('Falha ao criar material');
     }
   }
+  
+  async findAll(): Promise<Material[]> {
+    return this.materialRepository.findAll();
+  }
+
+  
 }
