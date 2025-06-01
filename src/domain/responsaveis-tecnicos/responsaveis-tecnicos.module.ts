@@ -5,6 +5,7 @@ import { ResponsaveisTecnicosService } from './responsaveis-tecnicos.service';
 import { ResponsaveisTecnicosRepository } from './responsaveis-tecnicos.repository';
 
 import { ResponsavelTecnico } from './entities/responsavel-tecnico.entity';
+import { CpfValidatorService } from '../cpf-validator.service';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ResponsavelTecnico } from './entities/responsavel-tecnico.entity';
   providers: [
     ResponsaveisTecnicosService,
     ResponsaveisTecnicosRepository,
+    CpfValidatorService
   ],
   exports: [ResponsaveisTecnicosService]
 })
