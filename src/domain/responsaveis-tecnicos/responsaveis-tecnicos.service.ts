@@ -9,6 +9,7 @@ import { CreateVinculoObraDto } from '../obra-responsavel-tecnico/dto/create-obr
 import { ObrasRepository } from '../obras/obras.repository';
 import { ObraResponsavelTecnico } from '../obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
 import { TipoVinculoObra } from '../obra-responsavel-tecnico/enums/tipo-vinculo-obra.enum';
+import { UpdateVinculoObraDto } from '../obra-responsavel-tecnico/dto/update-obra-responsavel-tecnico.dto';
 
 @Injectable()
 export class ResponsaveisTecnicosService 
@@ -92,6 +93,48 @@ export class ResponsaveisTecnicosService
         }
 
         return resultados;
+    }
+
+    async updateVinculoObra(responsavelId: number, obraId: number, updateDto: UpdateVinculoObraDto ): Promise<ObraResponsavelTecnico> 
+    {
+        // Validações básicas
+        this.validarId(responsavelId);
+        this.validarId(obraId);
+        await this.obterResponsavelPorId(responsavelId);
+        await this.verificarExistenciaObra(obraId);
+
+        // Obtém e valida vínculo existente
+        const vinculoExistente = await this.obterVinculoExistente(responsavelId, obraId);
+
+        // Processa atualização
+        const { novaDataInicio, novaDataFim } = this.processarDatasAtualizacao(
+            updateDto.dataInicio,
+            updateDto.dataFim,
+            vinculoExistente
+        );
+
+        const tipoVinculoFinal = this.validarTipoVinculo(
+            updateDto.tipoVinculo ?? vinculoExistente.tipo_vinculo
+        );
+
+        // Verifica conflitos
+        await this.verificarConflitosAtualizacao(
+            responsavelId,
+            obraId,
+            novaDataInicio,
+            novaDataFim,
+            tipoVinculoFinal,
+            vinculoExistente.id
+        );
+
+        // Executa atualização
+        return this.executarAtualizacao(
+            responsavelId,
+            obraId,
+            novaDataInicio,
+            novaDataFim,
+            tipoVinculoFinal
+        );
     }
 
     // ============ MÉTODOS AUXILIARES PRIVADOS ============
@@ -283,4 +326,83 @@ export class ResponsaveisTecnicosService
         
         return this.obrasResponsavelTecnicoRepository.criarVinculo(responsavelId, dadosCriacao);
     }
+
+    private processarDatasAtualizacao(dataInicioDto: string | undefined, dataFimDto: string | null | undefined, vinculoExistente: ObraResponsavelTecnico): { novaDataInicio: Date; novaDataFim: Date | null } 
+    {
+        const dataInicioStr = dataInicioDto ?? vinculoExistente.data_inicio;
+        if (!dataInicioStr) {
+            throw new BadRequestException('Data de início é obrigatória.');
+        }
+
+        const novaDataInicio = new Date(dataInicioStr);
+        if (isNaN(novaDataInicio.getTime())) {
+            throw new BadRequestException('Data de início inválida.');
+        }
+
+        let novaDataFim: Date | null = null;
+        if (dataFimDto !== undefined) {
+            novaDataFim = dataFimDto ? new Date(dataFimDto) : null;
+        } else if (vinculoExistente.data_fim) {
+            novaDataFim = new Date(vinculoExistente.data_fim);
+        }
+
+        if (novaDataFim && isNaN(novaDataFim.getTime())) {
+            throw new BadRequestException('Data de fim inválida.');
+        }
+
+        if (novaDataFim && novaDataInicio > novaDataFim) {
+            throw new BadRequestException('Data fim não pode ser anterior à data início.');
+        }
+
+        return { novaDataInicio, novaDataFim };
+    }    
+
+    private async obterVinculoExistente(responsavelId: number, obraId: number ): Promise<ObraResponsavelTecnico> 
+    {
+        const vinculo = await this.obrasResponsavelTecnicoRepository.buscarVinculo(responsavelId, obraId);
+        if (!vinculo) {
+            throw new NotFoundException(`Vínculo entre responsável ${responsavelId} e obra ${obraId} não encontrado.`);
+        }
+        return vinculo; 
+    }
+
+    private async verificarConflitosAtualizacao(responsavelId: number, obraId: number, novaDataInicio: Date, novaDataFim: Date | null, tipoVinculo: TipoVinculoObra, vinculoIdAtual: number ): Promise<void> 
+    {
+        const vinculosAtuais = await this.obrasResponsavelTecnicoRepository.buscarVinculosPorResponsavel(responsavelId);
+
+        const conflito = vinculosAtuais.some(v => {
+            if (v.id === vinculoIdAtual) return false;
+            
+            const inicioExistente = v.data_inicio ? new Date(v.data_inicio) : null;
+            const fimExistente = v.data_fim ? new Date(v.data_fim) : null;
+
+            return (
+            v.obra.id === obraId &&
+            v.tipo_vinculo === tipoVinculo &&
+            this.datasSobrepostas(novaDataInicio, novaDataFim, inicioExistente, fimExistente)
+            );
+        });
+
+        if (conflito) {
+            throw new BadRequestException('Existe sobreposição de datas com outro vínculo do mesmo tipo para esta obra.');
+        }
+    }
+
+    private async executarAtualizacao(responsavelId: number, obraId: number, dataInicio: Date, dataFim: Date | null, tipoVinculo: TipoVinculoObra ): Promise<ObraResponsavelTecnico> 
+    {
+        const dadosAtualizacao: UpdateVinculoObraDto = {
+            dataInicio: dataInicio.toISOString().split('T')[0],
+            dataFim: dataFim ? dataFim.toISOString().split('T')[0] : undefined,
+            tipoVinculo: tipoVinculo
+        };
+
+        const resultado = await this.obrasResponsavelTecnicoRepository.atualizarVinculo(responsavelId, obraId, dadosAtualizacao);
+
+        if (!resultado) {
+            throw new Error('Falha ao atualizar vínculo');
+        }
+
+        return resultado;
+    }
+    
 }

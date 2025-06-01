@@ -14,6 +14,7 @@ import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dt
 import { UpdateResponsavelTecnicoDto } from './dto/update-responsavel-tecnico.dto';
 import { CreateVinculoObraDto } from '../obra-responsavel-tecnico/dto/create-obra-responsavel-tecnico.dto';
 import { ObraResponsavelTecnico } from '../obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
+import { UpdateVinculoObraDto } from '../obra-responsavel-tecnico/dto/update-obra-responsavel-tecnico.dto';
 
 @ApiTags('Responsaveis Tecnicos')
 @Controller('responsaveis-tecnicos')
@@ -77,8 +78,11 @@ export class ResponsaveisTecnicosController
     await this.responsavelTecnicoService.remove(id);
   }
 
+  // --- Gerenciamento de vínculos com obras ---
+
   @Post(':id/obras')
   @ApiOperation({ summary: 'Adicionar vínculos de obras ao responsável técnico' })
+  @HttpCode(201)
   @ApiResponse({ status: 201, description: 'Vínculos adicionados com sucesso.', type: [ObraResponsavelTecnico] })
   @ApiBadRequestResponse({ description: 'ID inválido ou dados dos vínculos incorretos.' })
   @ApiNotFoundResponse({ description: 'Responsável técnico não encontrado.' })
@@ -87,5 +91,15 @@ export class ResponsaveisTecnicosController
   async addObras(@Param('id') id: number, @Body() vinculosDto: CreateVinculoObraDto[] ): Promise<ObraResponsavelTecnico[]> 
   {
     return await this.responsavelTecnicoService.createVinculosObra(id, vinculosDto);
+  }
+
+  @Put(':id/obras/:obraId')
+  @ApiOperation({ summary: 'Atualizar vínculo específico entre responsável técnico e obra' })
+  @HttpCode(204)
+  @ApiResponse({ status: 204, description: 'Vínculo atualizado com sucesso - sem conteúdo retornado.' })
+  @ApiBody({ type: UpdateVinculoObraDto, description: 'Dados atualizados do vínculo' })
+  async updateVinculoObra(@Param('id') responsavelId: number, @Param('obraId') obraId: number, @Body() dto: UpdateVinculoObraDto ): Promise<void> 
+  {
+    await this.responsavelTecnicoService.updateVinculoObra(responsavelId, obraId, dto);
   }
 }
