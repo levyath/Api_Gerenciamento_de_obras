@@ -16,6 +16,7 @@ import { FornecedoresModule } from '../fornecedores/fornecedores.module';
 import { EquipamentosModule } from '../equipamentos/equipamentos.module';
 import { ResponsavelTecnico } from '../responsaveis-tecnicos/entities/responsavel-tecnico.entity';
 import { ObraResponsavelTecnico } from '../obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
+import { EnderecosModule } from '../enderecos/enderecos.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ObraResponsavelTecnico } from '../obra-responsavel-tecnico/entities/obr
     ]),
     forwardRef(() => FornecedoresModule),
     forwardRef(() => EquipamentosModule),
+    forwardRef(() => EnderecosModule),
   ],
   controllers: [ObrasController],
   providers: [ObrasService, ObrasRepository],
