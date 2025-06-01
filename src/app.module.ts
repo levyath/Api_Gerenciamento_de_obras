@@ -9,6 +9,7 @@ import { EquipamentosModule } from './domain/equipamentos/equipamentos.module';
 import { FornecedoresModule } from './domain/fornecedores/fornecedores.module';
 import { ObrasModule } from './domain/obras/obras.module';
 import { EtapasDaObraModule } from './domain/etapas-da-obra/etapas-da-obra.module';
+import { ResponsaveisTecnicosModule } from './domain/responsaveis-tecnicos/responsaveis-tecnicos.module';
 const { DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = process.env;
 
 @Module({
@@ -60,6 +61,7 @@ const { DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = process.env;
     FornecedoresModule,
     ObrasModule,
     EtapasDaObraModule,
+    ResponsaveisTecnicosModule
   ],
   controllers: [AppController],
   providers: [AppService],
