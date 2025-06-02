@@ -62,12 +62,6 @@ export class Obras extends Model<Obras> {
   declare data_conclusao: Date;
 
   @Column({
-    type: DataType.STRING(255),
-    allowNull: false,
-  })
-  declare responsavel: string;
-
-  @Column({
     type: DataType.DECIMAL(10, 2),
     allowNull: false,
   })
