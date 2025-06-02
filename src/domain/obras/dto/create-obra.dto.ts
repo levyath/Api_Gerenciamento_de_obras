@@ -32,10 +32,6 @@ export class CreateObraDto {
   @ApiPropertyOptional({ example: '2024-12-31' })
   data_conclusao?: Date;
 
-  @IsString()
-  @ApiProperty({ example: 'Eng. João Silva' })
-  responsavel: string;
-
   @IsNumber()
   @ApiProperty({ example: 500000.0 })
   orcamento_total: number;

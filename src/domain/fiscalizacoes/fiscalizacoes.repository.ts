@@ -4,6 +4,7 @@ import { Fiscalizacoes } from "./entities/fiscalizacoes.entity";
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
 import { Obras } from "../obras/entities/obras.entity";
+import { ResponsavelTecnico } from "../responsaveis-tecnicos/entities/responsavel-tecnico.entity";
 
 @Injectable()
 export class FiscalizacoesRepository {
@@ -21,6 +22,7 @@ export class FiscalizacoesRepository {
     async findOne(id: number): Promise<Fiscalizacoes | null> {
         return await this.fiscalizacoesModel.findOne({
             where: { id },
+            //include: [Obras, ResponsavelTecnico],
         })
     }
 
@@ -28,7 +30,7 @@ export class FiscalizacoesRepository {
     async findDetalhes(id: number): Promise<Fiscalizacoes | null>{
         return await this.fiscalizacoesModel.findOne({
             where: { id },
-            include: [Obras],
+            include: [Obras, ResponsavelTecnico],
         })
     }
 

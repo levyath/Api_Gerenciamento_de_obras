@@ -8,14 +8,14 @@ import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
 import { ObrasModule } from '../obras/obras.module';
 import { Relatorios } from '../relatorios/entities/relatorios.entity';
 import { RelatoriosModule } from '../relatorios/relatorios.module';
-//import { ResponsavelTecnicoModule } from '../responsaveis-tecnicos/responsaveis-tecnicos.module'; pendente Levy
+import { ResponsaveisTecnicosModule } from '../responsaveis-tecnicos/responsaveis-tecnicos.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([Obras, Fiscalizacoes, Relatorios]),
     ObrasModule,
     RelatoriosModule,
-    //ResponsavelTecnicoModule,
+    ResponsaveisTecnicosModule,
   ],
   controllers: [FiscalizacoesController],
   providers: [FiscalizacoesService, FiscalizacoesRepository],
