@@ -4,7 +4,7 @@ import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
 import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
 import { Obras } from 'src/domain/obras/entities/obras.entity';
-import { InitializeOnPreviewAllowlist } from '@nestjs/core';
+import { ResponsavelTecnico } from '../responsaveis-tecnicos/entities/responsavel-tecnico.entity';
 
 @Injectable()
 export class FiscalizacoesService {
@@ -37,14 +37,17 @@ export class FiscalizacoesService {
     }
 
     async create(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        const { data_inicio, data_fim, titulo } = dto;
+        const { data_inicio, data_fim, titulo, responsavelTecnicoId } = dto;
         const hoje = new Date();
         const dataInicio = new Date(data_inicio);
         const dataFim = data_fim ? new Date(data_fim) : null;
         const fiscalizacoesExistentes = await this.findByObraId(obraId);
         const tituloDuplicado = fiscalizacoesExistentes.some(f => f.titulo === titulo);
         const obra = await Obras.findByPk(obraId);
-
+        const responsavel = await ResponsavelTecnico.findByPk(responsavelTecnicoId);
+        
+        if (!responsavel || !responsavel.ativo)
+            throw new BadRequestException(`Responsável técnico ID ${responsavelTecnicoId} inválido ou inativo.`);
         if (dataInicio > hoje)
             throw new BadRequestException('A fiscalização não pode ter uma data futura.');
         if (dataFim && dataFim < dataInicio)
@@ -60,6 +63,11 @@ export class FiscalizacoesService {
     }
 
     async update(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
+        if (dto.responsavelTecnicoId) {
+            const responsavel = await ResponsavelTecnico.findByPk(dto.responsavelTecnicoId);
+            if (!responsavel || !responsavel.ativo)
+                throw new BadRequestException(`Responsável técnico ID ${dto.responsavelTecnicoId} inválido ou inativo.`);
+        }
         return this.fiscalizacoesRepository.update(id, dto);
     }
 

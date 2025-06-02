@@ -30,8 +30,7 @@ export class CreateFiscalizacoesDto {
     @Type(() => Number)
     obra_ids: number[];
 
-    // // pendente levy
-    // @IsInt()
-    // responsavel_id?: number;
-
+    @ApiProperty({ description: 'ID do responsável técnico', example: 1 })
+    @IsInt()
+    responsavelTecnicoId: number;
 }
