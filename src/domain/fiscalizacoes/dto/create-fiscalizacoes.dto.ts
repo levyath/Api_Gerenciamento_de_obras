@@ -24,12 +24,6 @@ export class CreateFiscalizacoesDto {
     @IsString()
     status: string;
 
-    @ApiProperty({ description: 'IDs das obras associadas', example: '[1, 2, 3, 4]' })
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => Number)
-    obra_ids: number[];
-
     @ApiProperty({ description: 'ID do responsável técnico', example: 1 })
     @IsInt()
     responsavelTecnicoId: number;
