@@ -95,7 +95,7 @@ export class SeedService implements OnModuleInit {
   }
 
   async seedDevelopment() {
-    console.log('🔁 Gerando seed de desenvolvimento...');
+    console.log('Gerando seed de desenvolvimento...');
     await this.clearAll();
     await this.resetSequences();
     await this.seedData(false);
@@ -104,10 +104,10 @@ export class SeedService implements OnModuleInit {
   async seedProduction() {
     const count = await this.obrasModel.count();
     if (count > 0) {
-      console.log('✅ Seed já existente em produção. Nenhuma ação realizada.');
+      console.log('Seed já existente em produção. Nenhuma ação realizada.');
       return;
     }
-    console.log('🚀 Gerando seed fixa para produção...');
+    console.log('Gerando seed fixa para produção...');
     await this.seedData(true);
   }
 
@@ -290,6 +290,6 @@ export class SeedService implements OnModuleInit {
       }
     }
 
-    console.log(`✅ Seed ${isProd ? 'fixa (produção)' : 'aleatória (desenvolvimento)'} gerada com sucesso.`);
+    console.log(`Seed ${isProd ? 'fixa (produção)' : 'aleatória (desenvolvimento)'} gerada com sucesso.`);
   }
 }

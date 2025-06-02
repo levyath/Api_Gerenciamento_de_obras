@@ -80,15 +80,15 @@ export class FiscalizacoesController {
     @ApiOperation({ summary: 'Cria uma fiscalização para uma obra' })
     @ApiResponse({ status: 201, description: 'Fiscalização criada com sucesso' })
     @ApiResponse({ status: 400, description: 'Erro na criação da fiscalização' })
-    @Post('/obras/:id/fiscalizacao')
-    async create(@Param('id') obraId: number, @Body() dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
+    @Post('/obras/fiscalizacao')
+    async create(@Body() dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
         try {
-            return await this.fiscalizacoesService.create(obraId, dto);
+            return await this.fiscalizacoesService.create(dto);
         } catch (error) {
             if (error instanceof BadRequestException || error instanceof NotFoundException) {
                 throw error;
             }
-            throw new BadRequestException(`Erro ao criar fiscalização para a obra ${obraId}.`);
+            throw new BadRequestException(`Erro ao criar fiscalização.`);
         }
     }
 

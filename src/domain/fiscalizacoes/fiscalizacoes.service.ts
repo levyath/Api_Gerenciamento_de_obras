@@ -25,7 +25,10 @@ export class FiscalizacoesService {
     }
 
     async findAllByStatus(status: string): Promise<Fiscalizacoes[]> {
-        return await this.fiscalizacoesRepository.findAllByStatus(status);
+        const fiscalizacoes = this.fiscalizacoesRepository.findAllByStatus(status);
+        if ((await fiscalizacoes).length === 0)
+            throw new NotFoundException(`Não há fiscalizações com o status ${status}`);
+        return fiscalizacoes;
     }
 
     async findRecentes(): Promise<Fiscalizacoes[]> {
@@ -36,14 +39,11 @@ export class FiscalizacoesService {
         return this.fiscalizacoesRepository.findByObraId(obraId);
     }
 
-    async create(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        const { data_inicio, data_fim, titulo, responsavelTecnicoId } = dto;
+    async create(dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
+        const { data_inicio, data_fim, responsavelTecnicoId, obraIds } = dto;
         const hoje = new Date();
         const dataInicio = new Date(data_inicio);
         const dataFim = data_fim ? new Date(data_fim) : null;
-        const fiscalizacoesExistentes = await this.findByObraId(obraId);
-        const tituloDuplicado = fiscalizacoesExistentes.some(f => f.titulo === titulo);
-        const obra = await Obras.findByPk(obraId);
         const responsavel = await ResponsavelTecnico.findByPk(responsavelTecnicoId);
         
         if (!responsavel || !responsavel.ativo)
@@ -52,14 +52,16 @@ export class FiscalizacoesService {
             throw new BadRequestException('A fiscalização não pode ter uma data futura.');
         if (dataFim && dataFim < dataInicio)
             throw new BadRequestException('A data de fim não pode ser anterior ao início da fiscalização.')
-        if (tituloDuplicado)
-            throw new BadRequestException(`A obra já possui uma fiscalização com o título "${titulo}".`);
-        if (!obra)
-            throw new NotFoundException(`Obra com ID ${obraId} não encontrada.`);
-        if (obra.status === 'Concluída')
-            throw new BadRequestException('Não é possível adicionar fiscalização a uma obra concluída.');
 
-        return this.fiscalizacoesRepository.create(obraId, dto);
+        for (const obraId of obraIds) {
+            const obra = await Obras.findByPk(obraId);
+            if (!obra)
+                throw new NotFoundException(`Obra com ID ${obraId} não encontrada.`);
+            if (obra.status === 'Concluída')
+                throw new BadRequestException('Não é possível adicionar fiscalização a uma obra concluída.');
+        }
+
+        return this.fiscalizacoesRepository.create(dto);
     }
 
     async update(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
