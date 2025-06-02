@@ -9,7 +9,6 @@ import { FiscalizacoesModule } from '../fiscalizacoes/fiscalizacoes.module';
 @Module({
     imports: [
         SequelizeModule.forFeature([Relatorios]),
-        FiscalizacoesModule,
     ],
     controllers: [RelatoriosController],
     providers: [RelatoriosService, RelatoriosRepository],

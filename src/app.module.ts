@@ -24,6 +24,11 @@ import { ObrasEquipamentos } from './domain/obra-equipamento/entities/obras-equi
 import { ObrasFornecedores } from './domain/obra-fornecedor/entities/obras-fornecedores.entity';
 import { EtapasDaObra } from './domain/etapas-da-obra/entities/etapas-da-obra.entity';
 import { DiarioDeObra } from './domain/diario-de-obra/entities/diario-de-obra.entity';
+import { Fiscalizacoes } from './domain/fiscalizacoes/entities/fiscalizacoes.entity';
+import { ObrasFiscalizacoes } from './domain/obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
+import { Relatorios } from './domain/relatorios/entities/relatorios.entity';
+import { FiscalizacoesModule } from './domain/fiscalizacoes/fiscalizacoes.module';
+import { RelatoriosModule } from './domain/relatorios/relatorios.module';
 
 const { NODE_ENV, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = process.env;
 
@@ -72,6 +77,9 @@ const { NODE_ENV, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = proces
       ObrasFornecedores,
       EtapasDaObra,
       DiarioDeObra,
+      Fiscalizacoes,
+      ObrasFiscalizacoes,
+      Relatorios,
     ]),
     EnderecosModule,
     EquipamentosModule,
@@ -82,6 +90,8 @@ const { NODE_ENV, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = proces
     DiarioDeObraModule,
     MateriaisModule,
     SeedModule,
+    FiscalizacoesModule,
+    RelatoriosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
