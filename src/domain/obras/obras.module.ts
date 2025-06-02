@@ -17,6 +17,9 @@ import { EquipamentosModule } from '../equipamentos/equipamentos.module';
 import { ResponsavelTecnico } from '../responsaveis-tecnicos/entities/responsavel-tecnico.entity';
 import { ObraResponsavelTecnico } from '../obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
 import { EnderecosModule } from '../enderecos/enderecos.module';
+import { ObrasFiscalizacoes } from '../obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
+import { Fiscalizacoes } from '../fiscalizacoes/entities/fiscalizacoes.entity';
+import { Relatorios } from '../relatorios/entities/relatorios.entity';
 
 @Module({
   imports: [
@@ -28,7 +31,10 @@ import { EnderecosModule } from '../enderecos/enderecos.module';
       Equipamentos,
       ObrasEquipamentos,
       ResponsavelTecnico,
-      ObraResponsavelTecnico
+      ObraResponsavelTecnico,
+      ObrasFiscalizacoes,
+      Fiscalizacoes,
+      Relatorios
     ]),
     forwardRef(() => FornecedoresModule),
     forwardRef(() => EquipamentosModule),
