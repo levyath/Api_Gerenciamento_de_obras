@@ -3,16 +3,25 @@ import { InjectModel } from '@nestjs/sequelize';
 import { DiarioDeObra } from './entities/diario-de-obra.entity';
 import { CreateDiarioDeObraDto } from './dto/create-diario-de-obra.dto';
 import { UpdateDiarioDeObraDto } from './dto/update-diario-de-obra.dto';
+import { Obras } from '../obras/entities/obras.entity';
 
 @Injectable()
 export class DiarioDeObraRepository {
   constructor(
     @InjectModel(DiarioDeObra)
     private readonly diarioDeObraModel: typeof DiarioDeObra,
+    
+  @InjectModel(Obras)
+  private readonly obraModel: typeof Obras,
   ) {}
 
   async create(data: CreateDiarioDeObraDto): Promise<DiarioDeObra> {
     return this.diarioDeObraModel.create(data as any);
+  }
+
+  async checkObraExists(obraId: number): Promise<boolean> {
+    const count = await this.obraModel.count({ where: { id: obraId } });
+    return count > 0;
   }
 
   async findAllByObra(obraId: number): Promise<DiarioDeObra[]> {

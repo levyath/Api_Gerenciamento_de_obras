@@ -85,7 +85,7 @@ export class DiarioDeObraController {
     @Body() dto: UpdateDiarioDeObraDto,
   ) {
     try {
-      return await this.diarioDeObraService.update(diarioId, dto);
+      return await this.diarioDeObraService.update(diarioId, dto, idObra);
     } catch (error) {
       throw new BadRequestException(
         `Erro ao atualizar diário de obra: ${error.message}`,

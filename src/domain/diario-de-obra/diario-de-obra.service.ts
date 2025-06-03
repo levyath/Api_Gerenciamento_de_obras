@@ -12,6 +12,12 @@ export class DiarioDeObraService {
   ) {}
 
   async create(dto: CreateDiarioDeObraDto): Promise<DiarioDeObra> {
+    const obraExists = await this.diarioDeObraRepository.checkObraExists(
+      dto.obraId
+    );
+    if (!obraExists) {
+      throw new NotFoundException(`Obra com ID ${dto.obraId} não encontrada`);
+    }
     return this.diarioDeObraRepository.create(dto);
   }
 
@@ -27,7 +33,11 @@ export class DiarioDeObraService {
     return diario;
   }
 
-  async update(id: number, dto: UpdateDiarioDeObraDto): Promise<DiarioDeObra> {
+  async update(id: number, dto: UpdateDiarioDeObraDto, idObra: number): Promise<DiarioDeObra> {
+    const obraExists = await this.diarioDeObraRepository.checkObraExists(idObra);
+    if (!obraExists) {
+      throw new NotFoundException(`Obra com ID ${idObra} não encontrada`);
+    }
     const [count, [updated]] = await this.diarioDeObraRepository.update(
       id,
       dto,
