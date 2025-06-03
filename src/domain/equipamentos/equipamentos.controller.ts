@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   BadRequestException,
   Put,
+  HttpCode,
 } from '@nestjs/common';
 import { EquipamentosService } from './equipamentos.service';
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
@@ -63,21 +64,23 @@ export class EquipamentosController {
   }
 
   @Put(':id')
+  @HttpCode(204)
   @ApiOperation({ summary: 'Atualizar um equipamento existente' })
   @ApiResponse({ status: 200, description: 'Equipamento atualizado com sucesso.', type: Equipamentos })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: Partial<UpdateEquipamentoDto>,
-  ): Promise<Equipamentos | null> {
+  ): Promise<void> {
     try {
-      return await this.equipamentosService.update(id, data);
+      await this.equipamentosService.update(id, data);
     } catch (error) {
       throw new BadRequestException('Erro ao atualizar equipamento: ' + error.message);
     }
   }
 
   @Patch(':id')
+  @HttpCode(204)
   @ApiOperation({ summary: 'Atualizar as obras associadas a um equipamento' })
   @ApiResponse({ status: 200, description: 'Obras do equipamento atualizadas com sucesso.', type: Equipamentos })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
@@ -85,15 +88,16 @@ export class EquipamentosController {
   async updateObras(
     @Param('id', ParseIntPipe) id: number,
     @Body('obras') obras: number[]
-  ): Promise<Equipamentos | null> {
+  ): Promise<void> {
     try {
-      return await this.equipamentosService.updateObras(id, obras);
+      await this.equipamentosService.updateObras(id, obras);
     } catch (error) {
       throw new BadRequestException('Erro ao atualizar obras do equipamento: ' + error.message);
     }
   }
 
   @Delete(':id')
+  @HttpCode(204)
   @ApiOperation({ summary: 'Remover equipamento por ID' })
   @ApiResponse({ status: 200, description: 'Equipamento removido com sucesso.' })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })

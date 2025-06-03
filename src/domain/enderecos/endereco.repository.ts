@@ -61,7 +61,5 @@ export class EnderecoRepository {
     await this.enderecoModel.update(enderecoData, {
       where: { id: obra.enderecoId },
     });
-
-    this.findById(obra.enderecoId);
   }
 }
