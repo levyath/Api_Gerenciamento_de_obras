@@ -22,10 +22,18 @@ export class DiarioDeObraService {
   }
 
   async findAllByObra(obraId: number): Promise<DiarioDeObra[]> {
+    const exists = await this.diarioDeObraRepository.checkObraExists(obraId);
+    if (!exists) {
+      throw new NotFoundException(`Obra com ID ${obraId} não encontrada`);
+    }
     return this.diarioDeObraRepository.findAllByObra(obraId);
   }
 
-  async findById(id: number): Promise<DiarioDeObra> {
+  async findById(id: number, idObra: number): Promise<DiarioDeObra> {
+    const obraExists = await this.diarioDeObraRepository.checkObraExists(idObra);
+    if (!obraExists) {
+      throw new NotFoundException(`Obra com ID ${idObra} não encontrada`);
+    }
     const diario = await this.diarioDeObraRepository.findById(id);
     if (!diario) {
       throw new NotFoundException(`Diário de obra com ID ${id} não encontrado`);
@@ -33,19 +41,18 @@ export class DiarioDeObraService {
     return diario;
   }
 
-  async update(id: number, dto: UpdateDiarioDeObraDto, idObra: number): Promise<DiarioDeObra> {
+  async update(id: number, dto: UpdateDiarioDeObraDto, idObra: number): Promise<void> {
     const obraExists = await this.diarioDeObraRepository.checkObraExists(idObra);
     if (!obraExists) {
       throw new NotFoundException(`Obra com ID ${idObra} não encontrada`);
     }
-    const [count, [updated]] = await this.diarioDeObraRepository.update(
+    const [count] = await this.diarioDeObraRepository.update(
       id,
       dto,
     );
     if (count === 0) {
       throw new NotFoundException(`Diário de obra com ID ${id} não encontrado`);
     }
-    return updated;
   }
 
   async remove(id: number, idObra: number): Promise<void> {

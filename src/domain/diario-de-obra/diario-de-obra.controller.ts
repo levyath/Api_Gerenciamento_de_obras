@@ -9,6 +9,7 @@ import {
   Delete,
   ParseIntPipe,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateDiarioDeObraDto } from './dto/create-diario-de-obra.dto';
 import { DiarioDeObraService } from './diario-de-obra.service';
@@ -53,7 +54,7 @@ export class DiarioDeObraController {
     try {
       return await this.diarioDeObraService.findAllByObra(idObra);
     } catch (error) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Erro ao buscar diários de obra: ${error.message}`,
       );
     }
@@ -66,7 +67,7 @@ export class DiarioDeObraController {
   async findOne(@Param('idObra', ParseIntPipe) idObra: number, @Param('diarioId', ParseIntPipe) diarioId: number )
   {
     try {
-      return await this.diarioDeObraService.findById(diarioId);
+      return await this.diarioDeObraService.findById(diarioId, idObra);
     } catch (error) {
       throw new BadRequestException(
         `Erro ao buscar diário de obra: ${error.message}`,
@@ -85,13 +86,13 @@ export class DiarioDeObraController {
     @Body() dto: UpdateDiarioDeObraDto,
   ) {
     try {
-      return await this.diarioDeObraService.update(diarioId, dto, idObra);
-    } catch (error) {
-      throw new BadRequestException(
+      await this.diarioDeObraService.update(diarioId, dto, idObra);
+    } catch (error: any) {
+      throw new NotFoundException(
         `Erro ao atualizar diário de obra: ${error.message}`,
       );
     }
-  }
+  } 
 
   @Delete(':diarioId')
   @ApiOperation({ summary: 'Remover diário de obra', description: 'Remove permanentemente um diário de obra' })
