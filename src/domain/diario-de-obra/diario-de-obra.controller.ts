@@ -8,8 +8,8 @@ import {
   Put,
   Delete,
   ParseIntPipe,
-  BadRequestException,
   NotFoundException,
+  HttpCode,
 } from '@nestjs/common';
 import { CreateDiarioDeObraDto } from './dto/create-diario-de-obra.dto';
 import { DiarioDeObraService } from './diario-de-obra.service';
@@ -39,7 +39,7 @@ export class DiarioDeObraController {
     try {
       return await this.diarioDeObraService.create({ ...dto, obraId: idObra });
     } catch (error) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Erro ao criar diário de obra: ${error.message}`,
       );
     }
@@ -69,13 +69,14 @@ export class DiarioDeObraController {
     try {
       return await this.diarioDeObraService.findById(diarioId, idObra);
     } catch (error) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Erro ao buscar diário de obra: ${error.message}`,
       );
     }
   }
 
   @Put(':diarioId')
+  @HttpCode(204)
   @ApiOperation({ summary: 'Atualizar diário de obra', description: 'Atualiza os dados de um diário de obra existente' })
   @ApiResponse({ status: 204, description: 'Diário atualizado com sucesso', type: DiarioDeObra })
   @ApiBadRequestResponse({ description: 'Dados inválidos ou erro na atualização' })
@@ -95,6 +96,7 @@ export class DiarioDeObraController {
   } 
 
   @Delete(':diarioId')
+  @HttpCode(204)
   @ApiOperation({ summary: 'Remover diário de obra', description: 'Remove permanentemente um diário de obra' })
   @ApiResponse({ status: 204, description: 'Diário removido com sucesso' })
   @ApiNotFoundResponse({ description: 'Diário não encontrado' })
@@ -102,7 +104,7 @@ export class DiarioDeObraController {
     try {
       return await this.diarioDeObraService.remove(diarioId, idObra);
     } catch (error) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Erro ao remover diário de obra: ${error.message}`,
       );
     }

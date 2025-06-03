@@ -20,10 +20,18 @@ export class EtapasDaObraService {
   }
 
   async findAllByObra(obraId: number): Promise<EtapasDaObra[]> {
+    const exists = await this.etapaObraRepository.checkObraExists(obraId);
+    if (!exists) {
+      throw new NotFoundException(`Obra com ID ${obraId} não encontrada`);
+    }
     return this.etapaObraRepository.findAllByObra(obraId);
   }
 
-  async findById(id: number): Promise<EtapasDaObra> {
+  async findById(id: number, obraId: number): Promise<EtapasDaObra> {
+        const exists = await this.etapaObraRepository.checkObraExists(obraId);
+    if (!exists) {
+      throw new NotFoundException(`Obra com ID ${obraId} não encontrada`);
+    }
     const etapa = await this.etapaObraRepository.findById(id);
     if (!etapa) {
       throw new NotFoundException(`Etapa com ID ${id} não encontrada`);
