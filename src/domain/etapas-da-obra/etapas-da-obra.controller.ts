@@ -64,7 +64,7 @@ export class EtapasDaObraController {
     @Body() dto: UpdateEtapasDaObraDto,
   ) {
     try {
-      return await this.etapaObraService.update(etapaId, dto);
+      return await this.etapaObraService.update(etapaId, dto, idObra);
     } catch (error) {
       throw new BadRequestException(
         `Erro ao atualizar etapa da obra: ${error.message}`,
@@ -78,7 +78,7 @@ export class EtapasDaObraController {
     @Param('etapaId', ParseIntPipe) etapaId: number,
   ) {
     try {
-      return await this.etapaObraService.remove(etapaId);
+      return await this.etapaObraService.remove(etapaId, idObra);
     } catch (error) {
       throw new BadRequestException(
         `Erro ao remover etapa da obra: ${error.message}`,
