@@ -99,7 +99,7 @@ export class DiarioDeObraController {
   @ApiNotFoundResponse({ description: 'Diário não encontrado' })
   async remove(@Param('idObra', ParseIntPipe) idObra: number, @Param('diarioId', ParseIntPipe) diarioId: number ) {
     try {
-      return await this.diarioDeObraService.remove(diarioId);
+      return await this.diarioDeObraService.remove(diarioId, idObra);
     } catch (error) {
       throw new BadRequestException(
         `Erro ao remover diário de obra: ${error.message}`,

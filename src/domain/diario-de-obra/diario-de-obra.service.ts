@@ -48,7 +48,11 @@ export class DiarioDeObraService {
     return updated;
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number, idObra: number): Promise<void> {
+    const obraExists = await this.diarioDeObraRepository.checkObraExists(idObra);
+    if (!obraExists) {
+      throw new NotFoundException(`Obra com ID ${idObra} não encontrada`);
+    }
     const deleted = await this.diarioDeObraRepository.remove(id);
     if (deleted === 0) {
       throw new NotFoundException(`Diário de obra com ID ${id} não encontrado`);
