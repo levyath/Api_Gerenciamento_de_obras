@@ -50,7 +50,7 @@ export class EnderecosService {
     throw new BadRequestException('Esta obra não possui endereço cadastrado para atualizar!');
   }
 
-  return this.enderecoRepository.update(id, enderecoInput);
+  this.enderecoRepository.update(id, enderecoInput);
 }
 
 async findAll() {
