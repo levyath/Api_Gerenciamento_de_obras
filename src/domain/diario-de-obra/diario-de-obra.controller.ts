@@ -27,15 +27,16 @@ import {
 import { DiarioDeObra } from './entities/diario-de-obra.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Diarios de Obra')
 @Controller('obras/:idObra/diarios')
 export class DiarioDeObraController {
   constructor(private readonly diarioDeObraService: DiarioDeObraService) {}
 
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Criar novo diário de obra', description: 'Registra um novo diário de obra para a obra especificada' })
+  @HttpCode(201)
   @ApiResponse({ status: 201, description: 'Diário de obra criado com sucesso', type: DiarioDeObra })
   @ApiBadRequestResponse({ description: 'Dados inválidos ou erro na criação' })
   @ApiNotFoundResponse({ description: 'Obra não encontrada' })
@@ -50,10 +51,9 @@ export class DiarioDeObraController {
     }
   }
 
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Listar diários de obra', description: 'Retorna todos os diários de obra associados à obra especificada' })
+  @HttpCode(200)
   @ApiResponse({ status: 200, description: 'Lista de diários de obra retornada com sucesso', type: [DiarioDeObra] })
   @ApiBadRequestResponse({ description: 'Erro ao buscar diários' })
   async findAll(@Param('idObra', ParseIntPipe) idObra: number) 
@@ -67,10 +67,9 @@ export class DiarioDeObraController {
     }
   }
 
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
   @Get(':diarioId')
   @ApiOperation({ summary: 'Obter diário específico', description: 'Retorna um diário de obra específico pelo seu ID' })
+  @HttpCode(200)
   @ApiResponse({ status: 200, description: 'Diário de obra retornado com sucesso', type: DiarioDeObra })
   @ApiNotFoundResponse({ description: 'Diário não encontrado' })
   async findOne(@Param('idObra', ParseIntPipe) idObra: number, @Param('diarioId', ParseIntPipe) diarioId: number )
@@ -84,8 +83,6 @@ export class DiarioDeObraController {
     }
   }
 
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
   @Put(':diarioId')
   @HttpCode(204)
   @ApiOperation({ summary: 'Atualizar diário de obra', description: 'Atualiza os dados de um diário de obra existente' })
@@ -106,8 +103,6 @@ export class DiarioDeObraController {
     }
   } 
 
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
   @Delete(':diarioId')
   @HttpCode(204)
   @ApiOperation({ summary: 'Remover diário de obra', description: 'Remove permanentemente um diário de obra' })

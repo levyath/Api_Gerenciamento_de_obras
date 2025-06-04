@@ -24,13 +24,13 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Enderecos')
 @Controller('enderecos')
 export class EnderecosGlobalController {
   constructor(private readonly enderecosService: EnderecosService) {}
 
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Listar todos os endereços cadastrados' })
   @ApiResponse({ status: 200, description: 'Lista de endereços retornada com sucesso.', type: [Endereco] })
@@ -44,13 +44,13 @@ export class EnderecosGlobalController {
   }
 }
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Enderecos')
 @Controller('obras')
 export class ObrasEnderecosController {
   constructor(private readonly enderecosService: EnderecosService) {}
 
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
   @Post(':id/endereco')
   @ApiOperation({ summary: 'Criar um novo endereço para uma obra' })
   @ApiResponse({ status: 201, description: 'Endereço criado com sucesso.', type: Endereco })
@@ -66,8 +66,6 @@ export class ObrasEnderecosController {
     }
   }
 
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
   @Get(':id/endereco')
   @ApiOperation({ summary: 'Buscar o endereço de uma obra' })
   @ApiResponse({ status: 200, description: 'Endereço encontrado.', type: Endereco })
@@ -80,8 +78,6 @@ export class ObrasEnderecosController {
     }
   }
 
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
   @Put(':id/endereco')
   @HttpCode(204)
   @ApiOperation({ summary: 'Atualizar o endereço de uma obra' })
