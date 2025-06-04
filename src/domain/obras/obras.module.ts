@@ -20,6 +20,7 @@ import { EnderecosModule } from '../enderecos/enderecos.module';
 import { ObrasFiscalizacoes } from '../obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
 import { Fiscalizacoes } from '../fiscalizacoes/entities/fiscalizacoes.entity';
 import { Relatorios } from '../relatorios/entities/relatorios.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { Relatorios } from '../relatorios/entities/relatorios.entity';
       Fiscalizacoes,
       Relatorios
     ]),
+    AuthModule,
     forwardRef(() => FornecedoresModule),
     forwardRef(() => EquipamentosModule),
     forwardRef(() => EnderecosModule),
