@@ -43,7 +43,7 @@ export class FiscalizacoesRepository {
     //get /fiscalizacoes/recentes
     async findRecentes(): Promise<Fiscalizacoes[]>{
         return await this.fiscalizacoesModel.findAll({
-            order: [['data', 'DESC']],
+            order: [['data_inicio', 'DESC']],
             limit: 10,
         });
     }
@@ -65,9 +65,8 @@ export class FiscalizacoesRepository {
     
         for (const obraId of obraIds) {
             const obra = await Obras.findByPk(obraId);
-            if (!obra) {
+            if (!obra)
                 throw new NotFoundException(`Obra com ID ${obraId} não encontrada.`);
-            }
             await obra.$add('fiscalizacoes', fiscalizacao);
         }
 
@@ -80,25 +79,29 @@ export class FiscalizacoesRepository {
         if (!fiscalizacao)
             throw new NotFoundException(`Fiscalização com ID ${id} não encontrada`);
     
-        await fiscalizacao.update(dto as any);
+        await fiscalizacao.update(dto);
         return fiscalizacao;
     }
     
-    //patch /fiscalizacao/:id
     async patch(id: number, dto: Partial<UpdateFiscalizacoesDto>): Promise<Fiscalizacoes> {
-        return this.update(id, dto);
+        const fiscalizacao = await this.fiscalizacoesModel.findByPk(id);
+        if (!fiscalizacao)
+            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
+
+        await fiscalizacao.update(dto);
+        return fiscalizacao;
     }
     
     //delete /fiscalizacao/:id
     async delete(id: number): Promise<void> {
         const fiscalizacao = await this.fiscalizacoesModel.findByPk(id);
-        if (!fiscalizacao) {
+        if (!fiscalizacao)
             throw new NotFoundException(`Fiscalização com ID ${id} não encontrada`);
-        }
 
         await fiscalizacao.destroy();
     }
 
+    //delete /obras/:id/fiscalizacoes
     async deleteAllByObraId(obraId: number): Promise<void> {
         const fiscalizacoes = await this.fiscalizacoesModel.findAll({
             include: [{ model: Obras, where: { id: obraId } }]

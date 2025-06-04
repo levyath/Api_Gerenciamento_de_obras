@@ -4,6 +4,7 @@ import { FiscalizacoesService } from './fiscalizacoes.service';
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UpdateFiscalizacaoStatusDto } from './dto/update-fiscalizacoes-status.dto';
 
 @ApiTags('Fiscalizações')
 @Controller('fiscalizacoes')
@@ -18,6 +19,16 @@ export class FiscalizacoesController {
             return await this.fiscalizacoesService.findAll();
         } catch (error) {
             throw new BadRequestException('Erro ao listar fiscalizações...');
+        }
+    }
+
+    @ApiOperation({ summary: 'Lista as 10 fiscalizações mais recentes' })
+    @Get('/recentes')
+    async findRecentes(): Promise<Fiscalizacoes[]> {
+        try {
+            return await this.fiscalizacoesService.findRecentes();
+        } catch (error) {
+            throw new BadRequestException('Erro ao listar fiscalizações recentes.');
         }
     }
 
@@ -44,16 +55,6 @@ export class FiscalizacoesController {
             return await this.fiscalizacoesService.findAllByStatus(status);
         } catch (error) {
             throw new BadRequestException(`Erro ao listar as fiscalizações com status "${status}".`);
-        }
-    }
-
-    @ApiOperation({ summary: 'Lista as 10 fiscalizações mais recentes' })
-    @Get('/recentes')
-    async findRecentes(): Promise<Fiscalizacoes[]> {
-        try {
-            return await this.fiscalizacoesService.findRecentes();
-        } catch (error) {
-            throw new BadRequestException('Erro ao listar fiscalizações recentes.');
         }
     }
 
@@ -102,13 +103,17 @@ export class FiscalizacoesController {
         }
     }
 
-    @ApiOperation({ summary: 'Atualiza parcialmente uma fiscalização pelo ID' })
+    @ApiOperation({ summary: 'Atualiza o status de uma fiscalização pelo ID' })
+    @ApiResponse({ status: 200, description: 'Status da fiscalização atualizado com sucesso.', type: Fiscalizacoes })
+    @ApiResponse({ status: 400, description: 'Requisição inválida ou status inválido.' })
+    @ApiResponse({ status: 404, description: 'Fiscalização não encontrada.' })
     @Patch(':id')
-    async patch(@Param('id') id: number, @Body() dto: Partial<UpdateFiscalizacoesDto>): Promise<Fiscalizacoes> {
+    async patchStatus(@Param('id') id: number, @Body() updateStatusDto: UpdateFiscalizacaoStatusDto): Promise<Fiscalizacoes> {
         try {
-            return await this.fiscalizacoesService.patch(id, dto);
+            return await this.fiscalizacoesService.patchStatus(id, updateStatusDto.status);
         } catch (error) {
-            throw new BadRequestException(`Erro ao atualizar parcialmente a fiscalização ${id}.`);
+            if (error instanceof NotFoundException) throw error;
+            throw new BadRequestException(`Erro ao atualizar o status da fiscalização ${id}. Detalhes: ${error.message}`);
         }
     }
 

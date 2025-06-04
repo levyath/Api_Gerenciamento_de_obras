@@ -5,6 +5,7 @@ import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
 import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
 import { Obras } from 'src/domain/obras/entities/obras.entity';
 import { ResponsavelTecnico } from '../responsaveis-tecnicos/entities/responsavel-tecnico.entity';
+import { FiscalizacaoStatus } from './enums/fiscalizacoes-status.enum';
 
 @Injectable()
 export class FiscalizacoesService {
@@ -70,11 +71,46 @@ export class FiscalizacoesService {
             if (!responsavel || !responsavel.ativo)
                 throw new BadRequestException(`Responsável técnico ID ${dto.responsavelTecnicoId} inválido ou inativo.`);
         }
+
+        const fiscalizacaoExistente = await this.fiscalizacoesRepository.findOne(id);
+        if (!fiscalizacaoExistente)
+             throw new NotFoundException(`Fiscalização com ID ${id} não encontrada para atualização.`);
+
+        const dataInicioValidate = dto.data_inicio || fiscalizacaoExistente.data_inicio;
+        const dataFimValidate = dto.data_fim || fiscalizacaoExistente.data_fim;
+
+        if (dataInicioValidate && dataFimValidate && dataFimValidate < dataInicioValidate)
+            throw new BadRequestException('A data de fim não pode ser menor que a data de início.');
+
+        if (dto.obraIds && dto.obraIds.length > 0) {
+            const obrasExistentes = await Obras.findAll({ where: { id: dto.obraIds } });
+
+            if (obrasExistentes.length !== dto.obraIds.length) {
+                const foundIds = new Set(obrasExistentes.map(obra => obra.id));
+                const missingIds = dto.obraIds.filter(id => !foundIds.has(id));
+                throw new BadRequestException(`As seguintes Obras com IDs não foram encontradas: ${missingIds.join(', ')}.`);
+            }
+
+            const fiscalizacaoAtualizada = await this.fiscalizacoesRepository.update(id, dto);
+            await fiscalizacaoAtualizada.$set('obras', obrasExistentes);
+            return fiscalizacaoAtualizada;
+
+        } else if (dto.obraIds && dto.obraIds.length === 0) {
+            const fiscalizacaoAtualizada = await this.fiscalizacoesRepository.update(id, dto);
+            await fiscalizacaoAtualizada.$set('obras', []);
+            return fiscalizacaoAtualizada;
+        }
+
         return this.fiscalizacoesRepository.update(id, dto);
     }
 
-    async patch(id: number, dto: UpdateFiscalizacoesDto): Promise<Fiscalizacoes> {
-        return this.fiscalizacoesRepository.patch(id, dto);
+    async patchStatus(id: number, status: FiscalizacaoStatus): Promise<Fiscalizacoes> {
+        const fiscalizacao = await this.fiscalizacoesRepository.findOne(id);
+        if (!fiscalizacao)
+            throw new NotFoundException(`Fiscalização com ID ${id} não encontrada.`);
+        
+        const updateStatus: Partial<Fiscalizacoes> = { status: status };
+        return this.fiscalizacoesRepository.patch(id, updateStatus);
     }
 
     async delete(id: number): Promise<void> {
