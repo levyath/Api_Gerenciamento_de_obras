@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, NotFoundException, UseGuards } from '@nestjs/common';
 import { ResponsaveisTecnicosService } from './responsaveis-tecnicos.service';
 import { ResponsavelTecnico } from './entities/responsavel-tecnico.entity';
 import {
@@ -9,13 +9,17 @@ import {
   ApiNotFoundResponse,
   ApiBody,
   ApiBadRequestResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dto';
 import { UpdateResponsavelTecnicoDto } from './dto/update-responsavel-tecnico.dto';
 import { CreateVinculoObraDto } from '../obra-responsavel-tecnico/dto/create-obra-responsavel-tecnico.dto';
 import { ObraResponsavelTecnico } from '../obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
 import { UpdateVinculoObraDto } from '../obra-responsavel-tecnico/dto/update-obra-responsavel-tecnico.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Responsaveis Tecnicos')
 @Controller('responsaveis-tecnicos')
 export class ResponsaveisTecnicosController 
@@ -105,6 +109,7 @@ export class ResponsaveisTecnicosController
 
   @Get(':id/obras')
   @ApiOperation({ summary: 'Listar todos os vínculos de obras de um responsável técnico' })
+  @HttpCode(204)
   @ApiResponse({ status: 200, description: 'Lista de vínculos retornada com sucesso.', type: [ObraResponsavelTecnico] })
   async findAllVinculoObras(@Param('id') id: number): Promise<ObraResponsavelTecnico[]> 
   {
@@ -113,6 +118,7 @@ export class ResponsaveisTecnicosController
 
   @Get(':id/obras/:obraId')
   @ApiOperation({ summary: 'Buscar vínculo específico entre responsável técnico e obra' })
+  @HttpCode(204)
   @ApiResponse({ status: 200, description: 'Vínculo encontrado com sucesso.', type: ObraResponsavelTecnico })
   async findVinculoObra(@Param('id') responsavelId: number, @Param('obraId') obraId: number ): Promise<ObraResponsavelTecnico> 
   {

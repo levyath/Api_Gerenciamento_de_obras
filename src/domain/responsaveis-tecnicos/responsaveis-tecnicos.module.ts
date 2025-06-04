@@ -11,6 +11,7 @@ import { ObraResponsavelTecnicoRepository } from '../obra-responsavel-tecnico/ob
 import { DocumentValidatorService } from '../shared/document-validator.service';
 
 import { ObrasModule } from '../obras/obras.module'; // <- aqui
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ObrasModule } from '../obras/obras.module'; // <- aqui
       ResponsavelTecnico,
       ObraResponsavelTecnico,
     ]),
+    AuthModule,
     forwardRef(() => ObrasModule), // <- adicionado corretamente
   ],
   controllers: [ResponsaveisTecnicosController],
