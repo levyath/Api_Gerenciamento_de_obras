@@ -13,7 +13,7 @@ import { ObrasEquipamentos } from 'src/domain/obra-equipamento/entities/obras-eq
 import { Fornecedores } from '../../fornecedores/entities/fornecedores.entity';
 import { Obras } from 'src/domain/obras/entities/obras.entity';
 
-@Table({ tableName: 'equipamentos', timestamps: false })
+@Table({ tableName: 'equipamentos', timestamps: true })
 export class Equipamentos extends Model<Equipamentos> {
   @PrimaryKey
   @AutoIncrement

@@ -15,7 +15,7 @@ import { Obras } from 'src/domain/obras/entities/obras.entity';
 
 @Table({
   tableName: 'fornecedores',
-  timestamps: false,
+  timestamps: true,
 })
 export class Fornecedores extends Model<Fornecedores> {
   @PrimaryKey

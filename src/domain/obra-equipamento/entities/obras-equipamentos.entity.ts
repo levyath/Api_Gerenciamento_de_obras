@@ -2,7 +2,7 @@ import { Table, Column, Model, ForeignKey, PrimaryKey } from 'sequelize-typescri
 import { Obras } from '../../obras/entities/obras.entity';
 import { Equipamentos } from '../../equipamentos/entities/equipamento.entity';
 
-@Table({ tableName: 'obras_equipamentos', timestamps: false })
+@Table({ tableName: 'obras_equipamentos', timestamps: true })
 export class ObrasEquipamentos extends Model {
   @PrimaryKey
   @ForeignKey(() => Obras)

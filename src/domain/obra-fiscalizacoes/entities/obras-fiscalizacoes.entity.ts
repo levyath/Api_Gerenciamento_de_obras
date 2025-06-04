@@ -2,7 +2,7 @@ import { Table, Column, Model, ForeignKey, BelongsTo, DataType } from 'sequelize
 import { Obras } from '../../obras/entities/obras.entity';
 import { Fiscalizacoes } from '../../fiscalizacoes/entities/fiscalizacoes.entity';
 
-@Table({ tableName: 'obras_fiscalizacoes' })
+@Table({ tableName: 'obras_fiscalizacoes', timestamps: true})
 export class ObrasFiscalizacoes extends Model {
     @ForeignKey(() => Obras)
     @Column({ type: DataType.INTEGER, allowNull: false })

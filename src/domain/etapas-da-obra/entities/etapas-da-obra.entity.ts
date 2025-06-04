@@ -18,7 +18,7 @@ export enum EtapaStatus {
   ATRASADA = 'Atrasada',
 }
 
-@Table({ tableName: 'etapas_obra' })
+@Table({ tableName: 'etapas_obra', timestamps: true })
 export class EtapasDaObra extends Model<EtapasDaObra> {
   @PrimaryKey
   @AutoIncrement

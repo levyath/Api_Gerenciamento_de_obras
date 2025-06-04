@@ -12,7 +12,7 @@ import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/re
 import { TipoVinculoObra } from '../enums/tipo-vinculo-obra.enum';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-@Table({ tableName: 'obra_responsavel_tecnico', timestamps: false })
+@Table({ tableName: 'obra_responsavel_tecnico', timestamps: true })
 export class ObraResponsavelTecnico extends Model {
   @PrimaryKey
   @ForeignKey(() => Obras)

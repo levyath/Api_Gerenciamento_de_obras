@@ -1,7 +1,7 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, PrimaryKey, AutoIncrement } from 'sequelize-typescript';
 import { Fiscalizacoes } from '../../fiscalizacoes/entities/fiscalizacoes.entity';
 
-@Table({ tableName: 'relatorios' })
+@Table({ tableName: 'relatorios', timestamps: true })
 export class Relatorios extends Model<Relatorios> {
 
     @PrimaryKey
