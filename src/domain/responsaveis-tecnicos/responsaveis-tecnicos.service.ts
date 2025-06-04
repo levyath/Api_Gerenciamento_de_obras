@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException, InternalServerError
 import { ResponsavelTecnico } from './entities/responsavel-tecnico.entity';
 import { ResponsaveisTecnicosRepository } from './responsaveis-tecnicos.repository';
 import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dto';
-import { CpfValidatorService } from '../cpf-validator.service';
+import { CpfValidatorService } from '../shared/cpf-validator.service';
 import { UpdateResponsavelTecnicoDto } from './dto/update-responsavel-tecnico.dto';
 import { ObraResponsavelTecnicoRepository } from '../obra-responsavel-tecnico/obra-responsavel-tecnico.repository';
 import { CreateVinculoObraDto } from '../obra-responsavel-tecnico/dto/create-obra-responsavel-tecnico.dto';
