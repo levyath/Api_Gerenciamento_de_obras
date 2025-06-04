@@ -4,6 +4,8 @@ import { Fiscalizacoes } from "./entities/fiscalizacoes.entity";
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
 import { Obras } from "../obras/entities/obras.entity";
+import { ResponsavelTecnico } from "../responsaveis-tecnicos/entities/responsavel-tecnico.entity";
+import { ObrasFiscalizacoes } from "../obra-fiscalizacoes/entities/obras-fiscalizacoes.entity";
 
 @Injectable()
 export class FiscalizacoesRepository {
@@ -21,6 +23,7 @@ export class FiscalizacoesRepository {
     async findOne(id: number): Promise<Fiscalizacoes | null> {
         return await this.fiscalizacoesModel.findOne({
             where: { id },
+            //include: [Obras, ResponsavelTecnico],
         })
     }
 
@@ -28,7 +31,7 @@ export class FiscalizacoesRepository {
     async findDetalhes(id: number): Promise<Fiscalizacoes | null>{
         return await this.fiscalizacoesModel.findOne({
             where: { id },
-            include: [Obras],
+            include: [Obras, ResponsavelTecnico],
         })
     }
 
@@ -50,21 +53,24 @@ export class FiscalizacoesRepository {
         return await this.fiscalizacoesModel.findAll({
             include: [{
                 where: { id: obraId },
-                include: [Obras],
-               // model: Obras,
+                model: Obras,
             }],
         });
     }
 
-    //post /obras/:id/fiscalizacao
-    async create(obraId: number, dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
+    //post /obras/fiscalizacao
+    async create(dto: CreateFiscalizacoesDto): Promise<Fiscalizacoes> {
         const fiscalizacao = await this.fiscalizacoesModel.create(dto as any);
-        
-        const obra = await Obras.findByPk(obraId);
-        if (!obra)
-            throw new NotFoundException(`Obra com ID ${obraId} não encontrada`);
+        const { obraIds } = dto;
     
-        await obra.$add('fiscalizacoes', fiscalizacao);
+        for (const obraId of obraIds) {
+            const obra = await Obras.findByPk(obraId);
+            if (!obra) {
+                throw new NotFoundException(`Obra com ID ${obraId} não encontrada.`);
+            }
+            await obra.$add('fiscalizacoes', fiscalizacao);
+        }
+
         return fiscalizacao;
     }
     
@@ -93,15 +99,19 @@ export class FiscalizacoesRepository {
         await fiscalizacao.destroy();
     }
 
-    //delete /obras/:id/fiscalizacoes
-    async deleteAllByObraId(obraId: number): Promise<void>{
-        const obra = await Obras.findByPk(obraId, {
-            include: [Fiscalizacoes],
+    async deleteAllByObraId(obraId: number): Promise<void> {
+        const fiscalizacoes = await this.fiscalizacoesModel.findAll({
+            include: [{ model: Obras, where: { id: obraId } }]
         });
-
-        if (!obra)
-            throw new NotFoundException(`Obra com ID ${obraId} não encontrada.`);
-        if (obra.fiscalizacoes.length > 0)
-            await obra.$remove('fiscalizacoes', obra.fiscalizacoes);
+    
+        if (fiscalizacoes.length === 0) {
+            throw new NotFoundException(`Nenhuma fiscalização encontrada para a obra com ID ${obraId}.`);
+        }
+        
+        await Promise.all(fiscalizacoes.map(async (fiscalizacao) => {
+            await ObrasFiscalizacoes.destroy({
+                where: { obraId, fiscalizacaoId: fiscalizacao.id }
+            });
+        }));
     }
 }

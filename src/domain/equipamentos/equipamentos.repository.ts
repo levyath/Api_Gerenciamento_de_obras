@@ -67,9 +67,12 @@ export class EquipamentosRepository {
     return equipamento;
   }
 
-  async update(id: number, data: Partial<UpdateEquipamentoDto>): Promise<Equipamentos | null> {
+  async update(id: number, data: Partial<UpdateEquipamentoDto>): Promise<void> {
     const equipamento = await this.equipamentosModel.findByPk(id);
-    if (!equipamento) return null;
+
+    if (!equipamento) {
+      throw new Error('Equipamento não encontrado');
+    }
 
     const { obrasId, ...equipamentoData } = data;
 
@@ -78,21 +81,19 @@ export class EquipamentosRepository {
     if (obrasId) {
       await equipamento.$set('obras', obrasId);
     }
-
-    return this.findById(id);
   }
 
-    async updateObras(equipamento: Equipamentos, obras: Obras[]): Promise<Equipamentos | null> {
+    async updateObras(equipamento: Equipamentos, obras: Obras[]): Promise<void> {
       await equipamento.$set('obras', obras);
 
-      return this.equipamentosModel.findByPk(equipamento.id, {
+      this.equipamentosModel.findByPk(equipamento.id, {
         include: ['obras'], 
       });
   }
 
-  async remove(id: number): Promise<boolean> {
+  async remove(id: number): Promise<void> {
   const deletedCount = await this.equipamentosModel.destroy({ where: { id } });
-  return deletedCount > 0;
+  deletedCount > 0;
 }
 
   async findByObraId(obraId: number): Promise<Equipamentos[]> {

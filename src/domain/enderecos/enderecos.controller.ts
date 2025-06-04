@@ -7,6 +7,7 @@ import {
   Body,
   ParseIntPipe,
   BadRequestException,
+  HttpCode,
 } from '@nestjs/common';
 import { EnderecosService } from './enderecos.service';
 import { Endereco } from './entities/endereco.entity';
@@ -78,6 +79,7 @@ export class ObrasEnderecosController {
   }
 
   @Put(':id/endereco')
+  @HttpCode(204)
   @ApiOperation({ summary: 'Atualizar o endereço de uma obra' })
   @ApiResponse({ status: 200, description: 'Endereço atualizado com sucesso.', type: Endereco })
   @ApiNotFoundResponse({ description: 'Endereço não encontrado.' })
@@ -85,9 +87,9 @@ export class ObrasEnderecosController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() endereco: UpdateEnderecoDto,
-  ): Promise<Endereco | null> {
+  ): Promise<void> {
     try {
-      return await this.enderecosService.update(id, endereco);
+      await this.enderecosService.update(id, endereco);
     } catch (error) {
       throw new BadRequestException('Erro ao atualizar endereço da obra: ' + error.message);
     }

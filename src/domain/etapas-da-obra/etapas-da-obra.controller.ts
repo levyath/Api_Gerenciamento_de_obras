@@ -8,7 +8,8 @@ import {
   Put,
   Delete,
   ParseIntPipe,
-  BadRequestException,
+  NotFoundException,
+  HttpCode,
 } from '@nestjs/common';
 import { EtapasDaObraService } from './etapas-da-obra.service';
 import { CreateEtapasDaObraDto } from './dto/create-etapas-da-obra.dto';
@@ -26,7 +27,7 @@ export class EtapasDaObraController {
     try {
       return await this.etapaObraService.create({ ...dto, obraId: idObra });
     } catch (error) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Erro ao criar etapa da obra: ${error.message}`,
       );
     }
@@ -37,7 +38,7 @@ export class EtapasDaObraController {
     try {
       return await this.etapaObraService.findAllByObra(idObra);
     } catch (error) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Erro ao buscar etapas da obra: ${error.message}`,
       );
     }
@@ -49,38 +50,40 @@ export class EtapasDaObraController {
     @Param('etapaId', ParseIntPipe) etapaId: number,
   ) {
     try {
-      return await this.etapaObraService.findById(etapaId);
+      return await this.etapaObraService.findById(etapaId, idObra);
     } catch (error) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Erro ao buscar etapa da obra: ${error.message}`,
       );
     }
   }
 
   @Put(':etapaId')
+  @HttpCode(204)
   async update(
     @Param('idObra', ParseIntPipe) idObra: number,
     @Param('etapaId', ParseIntPipe) etapaId: number,
     @Body() dto: UpdateEtapasDaObraDto,
   ) {
     try {
-      return await this.etapaObraService.update(etapaId, dto);
+      return await this.etapaObraService.update(etapaId, dto, idObra);
     } catch (error) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Erro ao atualizar etapa da obra: ${error.message}`,
       );
     }
   }
 
+  @HttpCode(204)
   @Delete(':etapaId')
   async remove(
     @Param('idObra', ParseIntPipe) idObra: number,
     @Param('etapaId', ParseIntPipe) etapaId: number,
   ) {
     try {
-      return await this.etapaObraService.remove(etapaId);
+      return await this.etapaObraService.remove(etapaId, idObra);
     } catch (error) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Erro ao remover etapa da obra: ${error.message}`,
       );
     }

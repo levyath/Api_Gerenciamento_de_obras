@@ -1,8 +1,8 @@
-import { Table, Column, Model, DataType, BelongsToMany, PrimaryKey, AutoIncrement, HasMany, AllowNull } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, BelongsToMany, PrimaryKey, AutoIncrement, HasMany, AllowNull, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { Obras } from '../../obras/entities/obras.entity';
 import { ObrasFiscalizacoes } from 'src/domain/obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
 import { Relatorios } from 'src/domain/relatorios/entities/relatorios.entity';
-//import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel.entity'; pendente Levy
+import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel-tecnico.entity';
 
 @Table({ tableName: 'fiscalizacoes', timestamps: false })
 export class Fiscalizacoes extends Model<Fiscalizacoes> {
@@ -33,8 +33,10 @@ export class Fiscalizacoes extends Model<Fiscalizacoes> {
     @HasMany(() => Relatorios)
     relatorios: Relatorios[];
 
-    //pendente Levy
-    //@ManyToOne(() => ResponsavelTecnico, { nullable: true })
-    //responsavel: ResponsavelTecnico;
+    @ForeignKey(() => ResponsavelTecnico)
+    @Column({ type: DataType.INTEGER, allowNull: false })
+    responsavelTecnicoId: number;
 
+    @BelongsTo(() => ResponsavelTecnico)
+    responsavelTecnico: ResponsavelTecnico;
 }

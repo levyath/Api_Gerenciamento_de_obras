@@ -6,9 +6,10 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { EtapasDaObra } from './entities/etapas-da-obra.entity';
 import { EtapasDaObraService } from './etapas-da-obra.service';
 import { EtapasDaObraRepository } from './etapas-da-obra.repository';
+import { Obras } from '../obras/entities/obras.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([EtapasDaObra])],
+  imports: [SequelizeModule.forFeature([EtapasDaObra, Obras])],
   controllers: [EtapasDaObraController],
   providers: [EtapasDaObraService, EtapasDaObraRepository],
 })

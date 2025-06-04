@@ -24,14 +24,13 @@ export class CreateFiscalizacoesDto {
     @IsString()
     status: string;
 
-    @ApiProperty({ description: 'IDs das obras associadas', example: '[1, 2, 3, 4]' })
+    @ApiProperty({ description: 'ID do responsável técnico', example: 1 })
+    @IsInt()
+    responsavelTecnicoId: number;
+
+    @ApiProperty({ description: 'Lista de IDs das obras associadas', example: '[1, 2, 3]' })
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => Number)
-    obra_ids: number[];
-
-    // // pendente levy
-    // @IsInt()
-    // responsavel_id?: number;
-
+    obraIds: number[];
 }

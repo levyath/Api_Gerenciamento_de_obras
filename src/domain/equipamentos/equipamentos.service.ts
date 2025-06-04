@@ -82,7 +82,7 @@ export class EquipamentosService {
     return this.equipamentosRepository.create(data);
   }
 
-  async update(id: number, data: Partial<UpdateEquipamentoDto>): Promise<Equipamentos | null> {
+  async update(id: number, data: Partial<UpdateEquipamentoDto>): Promise<void> {
 
     const existeEquipamento = await this.equipamentosRepository.findById(id);
 
@@ -137,7 +137,7 @@ export class EquipamentosService {
       data.obrasId = obrasExistentes.map((obra) => obra.id);
     }
     
-    return this.equipamentosRepository.update(id, data);
+    await this.equipamentosRepository.update(id, data);
   }
 
 
@@ -163,17 +163,17 @@ export class EquipamentosService {
       );
     }
 
-    return await this.equipamentosRepository.updateObras(equipamento, obras);
+    await this.equipamentosRepository.updateObras(equipamento, obras);
   }
 
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: number): Promise<void> {
     const existeEquipamento = await this.equipamentosRepository.findById(id);
     if (!existeEquipamento) {
       throw new NotFoundException('O equipamento buscado não existe!');
     }
 
-    return this.equipamentosRepository.remove(id);
+    this.equipamentosRepository.remove(id);
   }
 
   async getEquipamentosByObraId(obraId: number) {

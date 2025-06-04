@@ -51,19 +51,15 @@ export class EnderecoRepository {
     return this.enderecoModel.findByPk(obra.enderecoId);
   }
 
-  async update(obraId: number, enderecoData: Partial<Endereco>): Promise<Endereco | null> {
+  async update(obraId: number, enderecoData: Partial<Endereco>): Promise<void> {
     const obra = await this.obraModel.findByPk(obraId);
 
-    if (!obra || !obra.enderecoId) {
-      return null;
+    if (!obra || obra.enderecoId == null) {
+      throw new Error('Obra não encontrada ou sem endereço associado.');
     }
 
-    const [affectedRows] = await this.enderecoModel.update(enderecoData, {
+    await this.enderecoModel.update(enderecoData, {
       where: { id: obra.enderecoId },
     });
-
-    if (affectedRows === 0) return null;
-
-    return this.findById(obra.enderecoId);
   }
 }
