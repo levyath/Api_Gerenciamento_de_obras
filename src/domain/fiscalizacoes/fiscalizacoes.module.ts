@@ -10,10 +10,17 @@ import { Relatorios } from '../relatorios/entities/relatorios.entity';
 import { RelatoriosModule } from '../relatorios/relatorios.module';
 import { ResponsaveisTecnicosModule } from '../responsaveis-tecnicos/responsaveis-tecnicos.module';
 import { ObrasFiscalizacoes } from '../obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Obras, ObrasFiscalizacoes, Fiscalizacoes, Relatorios]),
+    SequelizeModule.forFeature([
+      Obras,
+      ObrasFiscalizacoes,
+      Fiscalizacoes,
+      Relatorios
+    ]),
+    AuthModule,
     ObrasModule,
     RelatoriosModule,
     ResponsaveisTecnicosModule,
