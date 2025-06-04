@@ -9,6 +9,7 @@ import {
   Body,
   ParseIntPipe,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 
 import { FornecedoresService } from './fornecedores.service';
@@ -22,12 +23,16 @@ import {
   ApiResponse,
   ApiNotFoundResponse,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 const ParseIntPipeCustom = new ParseIntPipe({
   exceptionFactory: () => new BadRequestException('O parâmetro id deve ser um número válido'),
 });
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Fornecedores')
 @Controller('fornecedores')
 export class FornecedoresController {
@@ -112,6 +117,8 @@ export class FornecedoresController {
   }
 }
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Fornecedores')
 @Controller('obras')
 export class ObrasController {

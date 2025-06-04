@@ -5,10 +5,14 @@ import { RelatoriosController } from './relatorios.controller';
 import { RelatoriosRepository } from './relatorios.repository';
 import { RelatoriosService } from './relatorios.service';
 import { FiscalizacoesModule } from '../fiscalizacoes/fiscalizacoes.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
     imports: [
-        SequelizeModule.forFeature([Relatorios]),
+        SequelizeModule.forFeature([
+            Relatorios
+        ]),
+        AuthModule
     ],
     controllers: [RelatoriosController],
     providers: [RelatoriosService, RelatoriosRepository],

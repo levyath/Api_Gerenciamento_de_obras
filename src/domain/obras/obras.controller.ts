@@ -8,6 +8,7 @@ import {
   Body,
   ParseIntPipe,
   BadRequestException,
+  UseGuards
 } from '@nestjs/common';
 import { ObrasService } from './obras.service';
 import { Obras } from './entities/obras.entity';
@@ -19,13 +20,17 @@ import {
   ApiResponse,
   ApiNotFoundResponse,
   ApiBody,
+  ApiBearerAuth
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Obras')
 @Controller('obras')
 export class ObrasController {
   constructor(private readonly obrasService: ObrasService) {}
 
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Listar todas as obras' })
   @ApiResponse({ status: 200, description: 'Lista de obras retornada com sucesso.', type: [Obras] })
@@ -37,6 +42,8 @@ export class ObrasController {
     }
   }
 
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Buscar uma obra por ID' })
   @ApiResponse({ status: 200, description: 'Obra encontrada.', type: Obras })
@@ -49,6 +56,8 @@ export class ObrasController {
     }
   }
 
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Criar uma nova obra' })
   @ApiResponse({ status: 201, description: 'Obra criada com sucesso.', type: Obras })
@@ -61,6 +70,8 @@ export class ObrasController {
     }
   }
 
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar uma obra existente' })
   @ApiResponse({ status: 200, description: 'Obra atualizada com sucesso.', type: Obras })
@@ -77,7 +88,8 @@ export class ObrasController {
     }
   }
 
-
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Remover uma obra por ID' })
   @ApiResponse({ status: 200, description: 'Obra removida com sucesso.' })

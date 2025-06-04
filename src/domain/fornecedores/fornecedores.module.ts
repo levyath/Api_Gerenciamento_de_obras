@@ -11,10 +11,17 @@ import { ObrasFornecedores } from '../obra-fornecedor/entities/obras-fornecedore
 import { Equipamentos } from '../equipamentos/entities/equipamento.entity';
 
 import { ObrasModule } from '../obras/obras.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Fornecedores, Obras, ObrasFornecedores, Equipamentos]), 
+    SequelizeModule.forFeature([
+      Fornecedores,
+      Obras,
+      ObrasFornecedores,
+      Equipamentos
+    ]),
+    AuthModule, 
     forwardRef(() => ObrasModule),
   ],
   controllers: [

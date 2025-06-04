@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiConflictResponse, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Put, Delete, HttpCode, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiConflictResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { MateriaisService } from './materiais.service';
 import { CreateMaterialDto } from './dto/create-material.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Materiais')
 @Controller('materiais')
 export class MateriaisController {
@@ -11,6 +14,7 @@ export class MateriaisController {
 
   @Post()
   @ApiOperation({ summary: 'Criar um novo material' })
+  @HttpCode(201)
   @ApiResponse({ status: 201, description: 'Material criado com sucesso.' })
   @ApiBadRequestResponse({ description: 'Dados inválidos ou incompletos.' })
   @ApiConflictResponse({ description: 'Material com este nome/código já existe.' })
@@ -21,6 +25,7 @@ export class MateriaisController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os materiais' })
+  @HttpCode(200)
   @ApiResponse({ status: 200, description: 'Lista de materiais retornada com sucesso.' })
   async findAll() 
   {
@@ -29,6 +34,7 @@ export class MateriaisController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Obter um material por ID' })
+  @HttpCode(200)
   @ApiResponse({ status: 200, description: 'Material encontrado com sucesso.' })
   @ApiNotFoundResponse({ description: 'Material não encontrado.' })
   async findOne(@Param('id') id: number) 

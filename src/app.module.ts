@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 
 import 'dotenv/config';
 
+import { AuthModule } from './domain/auth/auth.module';
 import { EnderecosModule } from './domain/enderecos/enderecos.module';
 import { EquipamentosModule } from './domain/equipamentos/equipamentos.module';
 import { FornecedoresModule } from './domain/fornecedores/fornecedores.module';
@@ -81,6 +82,7 @@ const { NODE_ENV, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = proces
       ObrasFiscalizacoes,
       Relatorios,
     ]),
+    AuthModule,
     EnderecosModule,
     EquipamentosModule,
     FornecedoresModule,

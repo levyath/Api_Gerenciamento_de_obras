@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   NotFoundException,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateDiarioDeObraDto } from './dto/create-diario-de-obra.dto';
 import { DiarioDeObraService } from './diario-de-obra.service';
@@ -20,10 +21,14 @@ import {
   ApiResponse,
   ApiNotFoundResponse,
   ApiBody,
-  ApiBadRequestResponse
+  ApiBadRequestResponse,
+  ApiBearerAuth
 } from '@nestjs/swagger';
 import { DiarioDeObra } from './entities/diario-de-obra.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Diarios de Obra')
 @Controller('obras/:idObra/diarios')
 export class DiarioDeObraController {
@@ -31,6 +36,7 @@ export class DiarioDeObraController {
 
   @Post()
   @ApiOperation({ summary: 'Criar novo diário de obra', description: 'Registra um novo diário de obra para a obra especificada' })
+  @HttpCode(201)
   @ApiResponse({ status: 201, description: 'Diário de obra criado com sucesso', type: DiarioDeObra })
   @ApiBadRequestResponse({ description: 'Dados inválidos ou erro na criação' })
   @ApiNotFoundResponse({ description: 'Obra não encontrada' })
@@ -47,6 +53,7 @@ export class DiarioDeObraController {
 
   @Get()
   @ApiOperation({ summary: 'Listar diários de obra', description: 'Retorna todos os diários de obra associados à obra especificada' })
+  @HttpCode(200)
   @ApiResponse({ status: 200, description: 'Lista de diários de obra retornada com sucesso', type: [DiarioDeObra] })
   @ApiBadRequestResponse({ description: 'Erro ao buscar diários' })
   async findAll(@Param('idObra', ParseIntPipe) idObra: number) 
@@ -62,6 +69,7 @@ export class DiarioDeObraController {
 
   @Get(':diarioId')
   @ApiOperation({ summary: 'Obter diário específico', description: 'Retorna um diário de obra específico pelo seu ID' })
+  @HttpCode(200)
   @ApiResponse({ status: 200, description: 'Diário de obra retornado com sucesso', type: DiarioDeObra })
   @ApiNotFoundResponse({ description: 'Diário não encontrado' })
   async findOne(@Param('idObra', ParseIntPipe) idObra: number, @Param('diarioId', ParseIntPipe) diarioId: number )

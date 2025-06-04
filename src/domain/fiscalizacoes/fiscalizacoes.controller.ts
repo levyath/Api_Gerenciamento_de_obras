@@ -1,11 +1,14 @@
-import { Controller, Get, Param, Post, Body, Put, Patch, Delete, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Put, Patch, Delete, BadRequestException, NotFoundException, UseGuards } from '@nestjs/common';
 import { Fiscalizacoes } from './entities/fiscalizacoes.entity';
 import { FiscalizacoesService } from './fiscalizacoes.service';
 import { CreateFiscalizacoesDto } from './dto/create-fiscalizacoes.dto';
 import { UpdateFiscalizacoesDto } from './dto/update-fiscalizacoes.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateFiscalizacaoStatusDto } from './dto/update-fiscalizacoes-status.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Fiscalizações')
 @Controller('fiscalizacoes')
 export class FiscalizacoesController {

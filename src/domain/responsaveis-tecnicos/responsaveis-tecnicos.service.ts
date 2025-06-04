@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException, InternalServerError
 import { ResponsavelTecnico } from './entities/responsavel-tecnico.entity';
 import { ResponsaveisTecnicosRepository } from './responsaveis-tecnicos.repository';
 import { CreateResponsavelTecnicoDto } from './dto/create-responsavel-tecnico.dto';
-import { CpfValidatorService } from '../cpf-validator.service';
+import { DocumentValidatorService } from '../shared/document-validator.service';
 import { UpdateResponsavelTecnicoDto } from './dto/update-responsavel-tecnico.dto';
 import { ObraResponsavelTecnicoRepository } from '../obra-responsavel-tecnico/obra-responsavel-tecnico.repository';
 import { CreateVinculoObraDto } from '../obra-responsavel-tecnico/dto/create-obra-responsavel-tecnico.dto';
@@ -18,7 +18,7 @@ export class ResponsaveisTecnicosService
         private readonly responsaveisTecnicosRepository: ResponsaveisTecnicosRepository,
         private readonly obrasRepository: ObrasRepository,
         private readonly obrasResponsavelTecnicoRepository: ObraResponsavelTecnicoRepository,
-        private readonly cpfValidator: CpfValidatorService 
+        private readonly documentValidatorService: DocumentValidatorService 
     ) {}
 
     async findAll(): Promise<ResponsavelTecnico[]> 
@@ -324,13 +324,13 @@ export class ResponsaveisTecnicosService
     }
     
     private validarFormatoCPF(cpf: string): void {
-        if (!this.cpfValidator.validarRegex(cpf)) {
+        if (!this.documentValidatorService.validarCpfFormatado(cpf)) {
             throw new BadRequestException('CPF inválido. Formato esperado: xxx.xxx.xxx-xx');
         }
     }
 
     private validarCPF(cpf: string): void {
-        if (!this.cpfValidator.validarAlgoritmo(cpf)) {
+        if (!this.documentValidatorService.validarCpf(cpf)) {
             throw new BadRequestException('CPF inválido.');
         }
     }

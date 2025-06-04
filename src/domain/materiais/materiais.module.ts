@@ -4,21 +4,17 @@ import { MateriaisController } from './materiais.controller';
 import { MateriaisService } from './materiais.service';
 import { MaterialRepository } from './materiais.repository';
 import { Material } from './entities/material.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([
       Material
-    ])
+    ]),
+    AuthModule
   ],
   controllers: [MateriaisController],
-  providers: [
-    MateriaisService,
-    MaterialRepository,
-  ],
-  exports: [
-    MaterialRepository,
-    MateriaisService,
-  ],
+  providers: [MateriaisService, MaterialRepository],
+  exports: [MaterialRepository, MateriaisService],
 })
 export class MateriaisModule {}

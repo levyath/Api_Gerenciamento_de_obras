@@ -14,6 +14,7 @@ import { FornecedoresModule } from '../fornecedores/fornecedores.module';
 import { ObrasModule } from '../obras/obras.module';
 
 import { ObrasEquipamentoController } from './equipamentos.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ObrasEquipamentoController } from './equipamentos.controller';
       ObrasEquipamentos,
       Fornecedores,
     ]),
+    AuthModule,
     forwardRef(() => FornecedoresModule),
     forwardRef(() => ObrasModule),
   ],

@@ -13,10 +13,15 @@ import {
 } from './enderecos.controller';
 
 import { EnderecosService } from './enderecos.service';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Endereco, Obras]),
+    SequelizeModule.forFeature([
+      Endereco,
+      Obras
+    ]),
+    AuthModule,
     forwardRef(() => ObrasModule),
   ],
   controllers: [EnderecosGlobalController, ObrasEnderecosController],
