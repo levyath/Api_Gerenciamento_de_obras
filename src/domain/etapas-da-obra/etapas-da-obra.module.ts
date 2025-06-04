@@ -7,9 +7,16 @@ import { EtapasDaObra } from './entities/etapas-da-obra.entity';
 import { EtapasDaObraService } from './etapas-da-obra.service';
 import { EtapasDaObraRepository } from './etapas-da-obra.repository';
 import { Obras } from '../obras/entities/obras.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([EtapasDaObra, Obras])],
+  imports: [
+    SequelizeModule.forFeature([
+      EtapasDaObra,
+       Obras
+      ]),
+      AuthModule
+    ],
   controllers: [EtapasDaObraController],
   providers: [EtapasDaObraService, EtapasDaObraRepository],
 })

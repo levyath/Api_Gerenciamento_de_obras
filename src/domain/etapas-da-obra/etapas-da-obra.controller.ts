@@ -10,11 +10,16 @@ import {
   ParseIntPipe,
   NotFoundException,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { EtapasDaObraService } from './etapas-da-obra.service';
 import { CreateEtapasDaObraDto } from './dto/create-etapas-da-obra.dto';
 import { UpdateEtapasDaObraDto } from './dto/update-etapas-da-obra.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @Controller('obras/:idObra/etapas')
 export class EtapasDaObraController {
   constructor(private readonly etapaObraService: EtapasDaObraService) {}
