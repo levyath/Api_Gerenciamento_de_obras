@@ -5,9 +5,16 @@ import { DiarioDeObraRepository } from './diario-de-obra.repository';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { DiarioDeObra } from './entities/diario-de-obra.entity';
 import { Obras } from '../obras/entities/obras.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([DiarioDeObra, Obras])],
+  imports: [
+    SequelizeModule.forFeature([
+      DiarioDeObra,
+       Obras
+    ]),
+    AuthModule
+  ],
   controllers: [DiarioDeObraController],
   providers: [DiarioDeObraService, DiarioDeObraRepository],
 })
