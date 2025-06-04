@@ -8,7 +8,7 @@ import { ResponsavelTecnico } from './entities/responsavel-tecnico.entity';
 import { ObraResponsavelTecnico } from '../obra-responsavel-tecnico/entities/obra-responsavel-tecnico.entity';
 import { ObraResponsavelTecnicoRepository } from '../obra-responsavel-tecnico/obra-responsavel-tecnico.repository';
 
-import { CpfValidatorService } from '../shared/cpf-validator.service';
+import { DocumentValidatorService } from '../shared/document-validator.service';
 
 import { ObrasModule } from '../obras/obras.module'; // <- aqui
 
@@ -25,7 +25,7 @@ import { ObrasModule } from '../obras/obras.module'; // <- aqui
     ResponsaveisTecnicosService,
     ResponsaveisTecnicosRepository,
     ObraResponsavelTecnicoRepository,
-    CpfValidatorService
+    DocumentValidatorService
   ],
   exports: [ResponsaveisTecnicosService]
 })
