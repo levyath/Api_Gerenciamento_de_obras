@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   BadRequestException,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { EnderecosService } from './enderecos.service';
 import { Endereco } from './entities/endereco.entity';
@@ -19,24 +20,21 @@ import {
   ApiResponse,
   ApiBody,
   ApiNotFoundResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Enderecos')
 @Controller('enderecos')
 export class EnderecosGlobalController {
   constructor(private readonly enderecosService: EnderecosService) {}
 
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Listar todos os endereços cadastrados' })
-  @ApiResponse({
-    status: 200,
-    description: 'Lista de endereços retornada com sucesso.',
-    type: [Endereco],
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Erro ao listar endereços.',
-  })
+  @ApiResponse({ status: 200, description: 'Lista de endereços retornada com sucesso.', type: [Endereco] })
+  @ApiResponse({ status: 400, description: 'Erro ao listar endereços.', })
   async findAll(): Promise<Endereco[]> {
     try {
       return await this.enderecosService.findAll();
@@ -51,6 +49,8 @@ export class EnderecosGlobalController {
 export class ObrasEnderecosController {
   constructor(private readonly enderecosService: EnderecosService) {}
 
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @Post(':id/endereco')
   @ApiOperation({ summary: 'Criar um novo endereço para uma obra' })
   @ApiResponse({ status: 201, description: 'Endereço criado com sucesso.', type: Endereco })
@@ -66,6 +66,8 @@ export class ObrasEnderecosController {
     }
   }
 
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @Get(':id/endereco')
   @ApiOperation({ summary: 'Buscar o endereço de uma obra' })
   @ApiResponse({ status: 200, description: 'Endereço encontrado.', type: Endereco })
@@ -78,6 +80,8 @@ export class ObrasEnderecosController {
     }
   }
 
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   @Put(':id/endereco')
   @HttpCode(204)
   @ApiOperation({ summary: 'Atualizar o endereço de uma obra' })
