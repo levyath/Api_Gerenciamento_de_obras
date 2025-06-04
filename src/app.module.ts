@@ -12,6 +12,7 @@ import { EtapasDaObraModule } from './domain/etapas-da-obra/etapas-da-obra.modul
 import { ResponsaveisTecnicosModule } from './domain/responsaveis-tecnicos/responsaveis-tecnicos.module';
 import { DiarioDeObraModule } from './domain/diario-de-obra/diario-de-obra.module';
 import { MateriaisModule } from './domain/materiais/materiais.module';
+import { AuthModule } from './domain/auth/auth.module';
 const { DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = process.env;
 
 @Module({
@@ -58,6 +59,7 @@ const { DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = process.env;
         };
       },
     }),
+    AuthModule,
     EnderecosModule,
     EquipamentosModule,
     FornecedoresModule,
