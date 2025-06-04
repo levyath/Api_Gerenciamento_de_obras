@@ -10,6 +10,7 @@ import {
   BadRequestException,
   Put,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { EquipamentosService } from './equipamentos.service';
 import { CreateEquipamentoDto } from './dto/create-equipamento.dto';
@@ -21,8 +22,12 @@ import {
   ApiResponse,
   ApiNotFoundResponse,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Equipamentos')
 @Controller('equipamentos')
 export class EquipamentosController {
@@ -30,6 +35,7 @@ export class EquipamentosController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os equipamentos' })
+  @HttpCode(200)
   @ApiResponse({ status: 200, description: 'Lista de equipamentos retornada com sucesso.', type: [Equipamentos] })
   async findAll(): Promise<Equipamentos[]> {
     try {
@@ -41,6 +47,7 @@ export class EquipamentosController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar equipamento por ID' })
+  @HttpCode(200)
   @ApiResponse({ status: 200, description: 'Equipamento encontrado.', type: Equipamentos })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Equipamentos | null> {
@@ -53,6 +60,7 @@ export class EquipamentosController {
 
   @Post()
   @ApiOperation({ summary: 'Criar um novo equipamento' })
+  @HttpCode(201)
   @ApiResponse({ status: 201, description: 'Equipamento criado com sucesso.', type: Equipamentos })
   @ApiBody({ type: CreateEquipamentoDto })
   async create(@Body() equipamentos: CreateEquipamentoDto): Promise<Equipamentos> {
@@ -64,9 +72,9 @@ export class EquipamentosController {
   }
 
   @Put(':id')
-  @HttpCode(204)
   @ApiOperation({ summary: 'Atualizar um equipamento existente' })
-  @ApiResponse({ status: 200, description: 'Equipamento atualizado com sucesso.', type: Equipamentos })
+  @HttpCode(204)
+  @ApiResponse({ status: 204, description: 'Equipamento atualizado com sucesso.', type: Equipamentos })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -80,9 +88,9 @@ export class EquipamentosController {
   }
 
   @Patch(':id')
-  @HttpCode(204)
   @ApiOperation({ summary: 'Atualizar as obras associadas a um equipamento' })
-  @ApiResponse({ status: 200, description: 'Obras do equipamento atualizadas com sucesso.', type: Equipamentos })
+  @HttpCode(204)
+  @ApiResponse({ status: 204, description: 'Obras do equipamento atualizadas com sucesso.', type: Equipamentos })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
   @ApiBody({ schema: { type: 'object', properties: { obras: { type: 'array', items: { type: 'number' } } } } })
   async updateObras(
@@ -97,9 +105,9 @@ export class EquipamentosController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
   @ApiOperation({ summary: 'Remover equipamento por ID' })
-  @ApiResponse({ status: 200, description: 'Equipamento removido com sucesso.' })
+  @HttpCode(204)
+  @ApiResponse({ status: 204, description: 'Equipamento removido com sucesso.' })
   @ApiNotFoundResponse({ description: 'Equipamento não encontrado.' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
     try {
@@ -111,6 +119,8 @@ export class EquipamentosController {
   }
 }
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @ApiTags('Equipamentos')
 @Controller('obras')
 export class ObrasEquipamentoController {
@@ -118,6 +128,7 @@ export class ObrasEquipamentoController {
 
   @Get(':id/equipamentos')
   @ApiOperation({ summary: 'Listar equipamentos de uma obra pelo ID da obra' })
+  @HttpCode(200)
   @ApiResponse({ status: 200, description: 'Equipamentos da obra retornados com sucesso.', type: [Equipamentos] })
   async findEquipamentosByObra(@Param('id', ParseIntPipe) id: number) {
     try {
