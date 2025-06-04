@@ -23,7 +23,7 @@ import { ObraResponsavelTecnico } from 'src/domain/obra-responsavel-tecnico/enti
 
 @Table({
   tableName: 'obras',
-  timestamps: false,
+  timestamps: true,
 })
 export class Obras extends Model<Obras> {
   @PrimaryKey

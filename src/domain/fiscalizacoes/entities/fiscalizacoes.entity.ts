@@ -4,7 +4,7 @@ import { ObrasFiscalizacoes } from 'src/domain/obra-fiscalizacoes/entities/obras
 import { Relatorios } from 'src/domain/relatorios/entities/relatorios.entity';
 import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel-tecnico.entity';
 
-@Table({ tableName: 'fiscalizacoes', timestamps: false })
+@Table({ tableName: 'fiscalizacoes', timestamps: true })
 export class Fiscalizacoes extends Model<Fiscalizacoes> {
     @PrimaryKey
     @AutoIncrement
