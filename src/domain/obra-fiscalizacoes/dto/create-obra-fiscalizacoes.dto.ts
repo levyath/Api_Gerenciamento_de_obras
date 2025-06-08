@@ -1,9 +1,12 @@
 import { IsInt } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateObraFiscalizacaoDto {
-    @IsInt()
-    obra_id: number;
+  @IsInt()
+  @ApiProperty({ example: 1, description: 'ID da obra associada' })
+  obraId: number;
 
-    @IsInt()
-    fiscalizacoes_id: number;
+  @IsInt()
+  @ApiProperty({ example: 10, description: 'ID da fiscalização associada' })
+  fiscalizacaoId: number;
 }
