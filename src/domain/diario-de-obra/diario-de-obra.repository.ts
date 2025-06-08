@@ -10,12 +10,13 @@ export class DiarioDeObraRepository {
   constructor(
     @InjectModel(DiarioDeObra)
     private readonly diarioDeObraModel: typeof DiarioDeObra,
-    
-  @InjectModel(Obras)
-  private readonly obraModel: typeof Obras,
+
+    @InjectModel(Obras)
+    private readonly obraModel: typeof Obras,
   ) {}
 
   async create(data: CreateDiarioDeObraDto): Promise<DiarioDeObra> {
+    // Cria o diário sem associar os materiais ainda
     return this.diarioDeObraModel.create(data as any);
   }
 
@@ -28,11 +29,26 @@ export class DiarioDeObraRepository {
     return this.diarioDeObraModel.findAll({
       where: { obraId },
       order: [['data', 'ASC']],
+      include: [
+        {
+          association: 'materiaisUtilizados',
+          attributes: ['id', 'nome'],  // Exemplo, pode ajustar os campos que quiser
+          through: { attributes: [] }, // Não retorna dados da tabela pivô
+        },
+      ],
     });
   }
 
   async findById(id: number): Promise<DiarioDeObra | null> {
-    return this.diarioDeObraModel.findByPk(id);
+    return this.diarioDeObraModel.findByPk(id, {
+      include: [
+        {
+          association: 'materiaisUtilizados',
+          attributes: ['id', 'nome'],
+          through: { attributes: [] },
+        },
+      ],
+    });
   }
 
   async update(

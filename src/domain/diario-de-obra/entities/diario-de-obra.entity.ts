@@ -5,7 +5,10 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  BelongsToMany,
 } from 'sequelize-typescript';
+import { DiarioMaterial } from 'src/domain/diario-materiais/diario-material.entity';
+import { Material } from 'src/domain/materiais/entities/material.entity';
 import { Obras } from 'src/domain/obras/entities/obras.entity';
 
 @Table({ tableName: 'diarios_obra', timestamps: true })
@@ -28,11 +31,8 @@ export class DiarioDeObra extends Model<DiarioDeObra> {
   })
   atividadesExecutadas: string;
 
-  @Column({
-    type: DataType.TEXT,
-    allowNull: true,
-  })
-  materiaisUtilizados: string;
+ @BelongsToMany(() => Material, () => DiarioMaterial)
+  materiaisUtilizados: Material[];
 
   @Column({
     type: DataType.TEXT,

@@ -17,6 +17,7 @@ import { Fiscalizacoes } from 'src/domain/fiscalizacoes/entities/fiscalizacoes.e
 import { ObrasFiscalizacoes } from 'src/domain/obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
 import { Relatorios } from 'src/domain/relatorios/entities/relatorios.entity';
 import { Material } from 'src/domain/materiais/entities/material.entity';
+import { DiarioMaterial } from 'src/domain/diario-materiais/diario-material.entity';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { Material } from 'src/domain/materiais/entities/material.entity';
       ObrasFornecedores,
       ObraResponsavelTecnico,
       ObrasFiscalizacoes,
+      DiarioMaterial
     ]),
   ],
   providers: [SeedService],

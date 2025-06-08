@@ -4,11 +4,12 @@ import { MateriaisController } from './materiais.controller';
 import { MateriaisService } from './materiais.service';
 import { MaterialRepository } from './materiais.repository';
 import { Material } from './entities/material.entity';
+import { DiarioMaterial } from '../diario-materiais/diario-material.entity';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([
-      Material
+      Material,DiarioMaterial
     ])
   ],
   controllers: [MateriaisController],
@@ -19,6 +20,7 @@ import { Material } from './entities/material.entity';
   exports: [
     MaterialRepository,
     MateriaisService,
+    MateriaisModule
   ],
 })
 export class MateriaisModule {}
