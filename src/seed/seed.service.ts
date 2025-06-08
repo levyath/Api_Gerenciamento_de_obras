@@ -18,6 +18,8 @@ import { Fiscalizacoes } from 'src/domain/fiscalizacoes/entities/fiscalizacoes.e
 import { ObrasFiscalizacoes } from 'src/domain/obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
 import { Relatorios } from 'src/domain/relatorios/entities/relatorios.entity';
 import { Material } from 'src/domain/materiais/entities/material.entity';
+import { DiarioMaterial } from 'src/domain/diario-materiais/diario-material.entity';
+
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -36,6 +38,8 @@ export class SeedService implements OnModuleInit {
     @InjectModel(ObrasFornecedores) private obrasFornecedoresModel: typeof ObrasFornecedores,
     @InjectModel(ObraResponsavelTecnico) private obraResponsavelTecnicoModel: typeof ObraResponsavelTecnico,
     @InjectModel(ObrasFiscalizacoes) private obrasFiscalizacoesModel: typeof ObrasFiscalizacoes,
+    @InjectModel(DiarioMaterial) private diarioMateriaisModel: typeof DiarioMaterial,
+
     private configService: ConfigService,
     private sequelize: Sequelize,
   ) {}
@@ -264,30 +268,41 @@ export class SeedService implements OnModuleInit {
       }
 
       // Etapas e Diários
-      for (let j = 0; j < 2; j++) {
-        const dataInicioPrevista = faker.date.future({ years: 1 });
-        const dataFimPrevista = faker.date.future({ years: 1, refDate: dataInicioPrevista });
+      // Etapas e Diários
+for (let j = 0; j < 2; j++) {
+  const dataInicioPrevista = faker.date.future({ years: 1 });
+  const dataFimPrevista = faker.date.future({ years: 1, refDate: dataInicioPrevista });
 
-        await this.etapasModel.create({
-          nome: `Etapa ${j + 1} da ${obra.nome}`,
-          descricao: faker.lorem.words(20),
-          dataInicioPrevista,
-          dataFimPrevista,
-          dataInicioReal: faker.date.between({ from: dataInicioPrevista, to: dataFimPrevista }),
-          dataFimReal: faker.date.between({ from: dataInicioPrevista, to: dataFimPrevista }),
-          status: faker.helpers.arrayElement(Object.values(EtapaStatus)),
-          obraId: obra.id,
-        } as any);
+  await this.etapasModel.create({
+    nome: `Etapa ${j + 1} da ${obra.nome}`,
+    descricao: faker.lorem.words(20),
+    dataInicioPrevista,
+    dataFimPrevista,
+    dataInicioReal: faker.date.between({ from: dataInicioPrevista, to: dataFimPrevista }),
+    dataFimReal: faker.date.between({ from: dataInicioPrevista, to: dataFimPrevista }),
+    status: faker.helpers.arrayElement(Object.values(EtapaStatus)),
+    obraId: obra.id,
+  } as any);
 
-        await this.diariosModel.create({
-          data: faker.date.recent().toISOString().split('T')[0], // Formato YYYY-MM-DD
-          clima: faker.helpers.arrayElement(['Ensolarado', 'Nublado', 'Chuvoso']),
-          atividadesExecutadas: faker.lorem.sentences(2),
-          materiaisUtilizados: faker.commerce.product(),
-          observacoes: faker.lorem.sentence(),
-          obraId: obra.id,
-        } as any);
-      }
+  const diario = await this.diariosModel.create({
+    data: faker.date.recent().toISOString().split('T')[0], // Formato YYYY-MM-DD
+    clima: faker.helpers.arrayElement(['Ensolarado', 'Nublado', 'Chuvoso']),
+    atividadesExecutadas: faker.lorem.sentences(2),
+    materiaisUtilizados: faker.commerce.product(),
+    observacoes: faker.lorem.sentence(),
+    obraId: obra.id,
+  } as any);
+
+  // Associa de 2 a 3 materiais ao diário
+  const selectedMateriais = faker.helpers.arrayElements(await this.materialModel.findAll(), faker.number.int({ min: 2, max: 3 }));
+  for (const material of selectedMateriais) {
+    await this.diarioMateriaisModel.create({
+      diarioDeObraId: diario.id,
+      materialId: material.id,
+    } as any);
+  }
+}
+
     }
 
     console.log(`Seed ${isProd ? 'fixa (produção)' : 'aleatória (desenvolvimento)'} gerada com sucesso.`);
