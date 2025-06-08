@@ -6,37 +6,37 @@ import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/re
 
 @Table({ tableName: 'fiscalizacoes', timestamps: true })
 export class Fiscalizacoes extends Model<Fiscalizacoes> {
-    @PrimaryKey
-    @AutoIncrement
-    @Column
-    declare id: number;
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  declare id: number;
 
-    @Column({ type: DataType.STRING(50), allowNull: false })
-    titulo: string;
+  @Column({ type: DataType.STRING(50), allowNull: false })
+  declare titulo: string;
 
-    @Column({ type: DataType.STRING(255), allowNull: false })
-    descricao: string;
+  @Column({ type: DataType.STRING(255), allowNull: false })
+  declare descricao: string;
 
-    @Column({ type: DataType.DATE, allowNull: false })
-    data_inicio: Date;
+  @Column({ type: DataType.DATE, allowNull: false })
+  declare data_inicio: Date;
 
-    @AllowNull
-    @Column({ type: DataType.DATE })
-    data_fim: Date;
+  @AllowNull
+  @Column({ type: DataType.DATE })
+  declare data_fim: Date;
 
-    @Column({ type: DataType.STRING(20), allowNull: false})
-    status: string;
+  @Column({ type: DataType.STRING(20), allowNull: false })
+  declare status: string;
 
-    @BelongsToMany(() => Obras, () => ObrasFiscalizacoes)
-    obras: Obras[];
+  @BelongsToMany(() => Obras, () => ObrasFiscalizacoes)
+  declare obras: Obras[];
 
-    @HasMany(() => Relatorios)
-    relatorios: Relatorios[];
+  @HasMany(() => Relatorios)
+  declare relatorios: Relatorios[];
 
-    @ForeignKey(() => ResponsavelTecnico)
-    @Column({ type: DataType.INTEGER, allowNull: false })
-    responsavelTecnicoId: number;
+  @ForeignKey(() => ResponsavelTecnico)
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  declare responsavelTecnicoId: number;
 
-    @BelongsTo(() => ResponsavelTecnico)
-    responsavelTecnico: ResponsavelTecnico;
+  @BelongsTo(() => ResponsavelTecnico)
+  declare responsavelTecnico: ResponsavelTecnico;
 }
