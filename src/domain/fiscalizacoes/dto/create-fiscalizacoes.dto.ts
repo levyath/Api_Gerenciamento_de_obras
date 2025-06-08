@@ -37,9 +37,8 @@ export class CreateFiscalizacoesDto {
   responsavelTecnicoId: number;
 
   @ApiPropertyOptional({ description: 'Lista de IDs das obras associadas', example: [1, 2, 3] })
-  @IsOptional()
   @IsArray()
   @IsInt({ each: true, message: 'Cada ID de obra deve ser um número inteiro.' })
   @Type(() => Number)
-  obraIds?: number[];
+  obraIds: number[];
 }
