@@ -10,34 +10,49 @@ import {
 export class CreateDiarioDeObraDto {
   @IsNotEmpty()
   @IsDateString()
-  @ApiProperty({ example: '2023-03-15' })
+  @ApiProperty({
+    example: '2023-03-15',
+    description: 'Data do registro no diário de obra (formato ISO 8601)',
+  })
   data: string;
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ example: 'Ensolarado' })
+  @ApiPropertyOptional({
+    example: 'Ensolarado',
+    description: 'Condições climáticas no dia',
+  })
   clima?: string;
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ example: 'Atividade 1, Atividade 2' })
+  @ApiPropertyOptional({
+    example: 'Execução de fundação, montagem de formas',
+    description: 'Atividades executadas no dia',
+  })
   atividadesExecutadas?: string;
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ example: 'Cimento, Areia' })
+  @ApiPropertyOptional({
+    example: 'Cimento, Areia, Brita',
+    description: 'Materiais utilizados durante o dia',
+  })
   materiaisUtilizados?: string;
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ example: 'Observação 1' })
+  @ApiPropertyOptional({
+    example: 'Início da concretagem atrasado por logística',
+    description: 'Observações gerais do dia',
+  })
   observacoes?: string;
 
   @IsNotEmpty()
   @IsInt()
   @ApiProperty({
     example: 1,
-    description: 'ID da obra associada',
+    description: 'ID da obra associada ao diário',
     type: Number,
   })
   obraId: number;
