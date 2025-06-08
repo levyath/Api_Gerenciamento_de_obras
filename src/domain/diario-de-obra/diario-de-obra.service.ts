@@ -70,20 +70,41 @@ export class DiarioDeObraService {
     return diario;
   }
 
-  async update(id: number, dto: UpdateDiarioDeObraDto, idObra: number): Promise<void> {
-    const obraExists = await this.diarioDeObraRepository.checkObraExists(idObra);
-    if (!obraExists) {
-      throw new NotFoundException(`Obra com ID ${idObra} não encontrada`);
-    }
-
-    const [count] = await this.diarioDeObraRepository.update(id, dto);
-
-    if (count === 0) {
-      throw new NotFoundException(`Diário de obra com ID ${id} não encontrado`);
-    }
-
-    // Se quiser atualizar materiais aqui, faça lógica similar à create
+async update(id: number, dto: UpdateDiarioDeObraDto, idObra: number): Promise<void> {
+  const obraExists = await this.diarioDeObraRepository.checkObraExists(idObra);
+  if (!obraExists) {
+    throw new NotFoundException(`Obra com ID ${idObra} não encontrada`);
   }
+
+  // Primeiro atualiza os campos simples
+  const [count] = await this.diarioDeObraRepository.update(id, dto);
+  if (count === 0) {
+    throw new NotFoundException(`Diário de obra com ID ${id} não encontrado`);
+  }
+
+  // Atualiza associação de materiais se materiaisId for passado
+  if (dto.materiaisId) {
+    // Busca o diário criado para setar associação
+    const diario = await this.diarioDeObraRepository.findById(id);
+    if (!diario) {
+      throw new NotFoundException(`Diário de obra com ID ${id} não encontrado após atualização`);
+    }
+
+    // Busca os materiais pelo id
+    const todosMateriais = await this.materiaisRepository.findAll();
+    const materiais = todosMateriais.filter(m => dto.materiaisId?.includes(m.id));
+
+    if (materiais.length !== dto.materiaisId.length) {
+      const idsInvalidos = dto.materiaisId.filter(
+        id => !materiais.some(m => m.id === id),
+      );
+      throw new NotFoundException(`Materiais não encontrados: ${idsInvalidos.join(', ')}`);
+    }
+
+    // Atualiza a associação via método gerado pelo Sequelize
+    await diario.$set('materiaisUtilizados', materiais);
+  }
+}
 
   async remove(id: number, idObra: number): Promise<void> {
     const obraExists = await this.diarioDeObraRepository.checkObraExists(idObra);

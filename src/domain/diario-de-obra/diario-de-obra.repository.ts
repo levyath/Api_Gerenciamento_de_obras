@@ -16,7 +16,6 @@ export class DiarioDeObraRepository {
   ) {}
 
   async create(data: CreateDiarioDeObraDto): Promise<DiarioDeObra> {
-    // Cria o diário sem associar os materiais ainda
     return this.diarioDeObraModel.create(data as any);
   }
 
@@ -32,8 +31,8 @@ export class DiarioDeObraRepository {
       include: [
         {
           association: 'materiaisUtilizados',
-          attributes: ['id', 'nome'],  // Exemplo, pode ajustar os campos que quiser
-          through: { attributes: [] }, // Não retorna dados da tabela pivô
+          attributes: ['id', 'nome'],
+          through: { attributes: [] },
         },
       ],
     });
