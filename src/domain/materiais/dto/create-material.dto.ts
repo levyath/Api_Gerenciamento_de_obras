@@ -22,7 +22,7 @@ export class CreateMaterialDto {
   @ApiPropertyOptional({ example: 'Cimento Portland Composto', description: 'Descrição detalhada do material' })
   descricao?: string;
 
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @IsPositive()
   @ApiProperty({ example: 25.99, description: 'Preço unitário do material' })
   precoUnitario: number;

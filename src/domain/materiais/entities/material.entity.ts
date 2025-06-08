@@ -13,11 +13,11 @@ import { ApiProperty, ApiPropertyOptional  } from '@nestjs/swagger';
 @Table({ 
   tableName: 'materiais',
   timestamps: true,
-  createdAt: 'created_at',
-  updatedAt: 'updated_at',
 })
-export class Material extends Model {
-  @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
+export class Material extends Model<Material> {
+  @PrimaryKey
+  @AutoIncrement
+  @Column({ type: DataType.INTEGER })
   @ApiProperty({ example: 1, description: 'ID do material' })
   declare readonly id: number;
 
