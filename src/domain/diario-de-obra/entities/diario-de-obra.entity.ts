@@ -5,7 +5,10 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  BelongsToMany,
 } from 'sequelize-typescript';
+import { DiarioMaterial } from 'src/domain/diario-materiais/diario-material.entity';
+import { Material } from 'src/domain/materiais/entities/material.entity';
 import { Obras } from 'src/domain/obras/entities/obras.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -32,12 +35,9 @@ export class DiarioDeObra extends Model<DiarioDeObra> {
   @ApiPropertyOptional({ example: 'Fundação concluída, início da alvenaria', description: 'Atividades executadas no dia' })
   declare atividadesExecutadas?: string;
 
-  @Column({
-    type: DataType.TEXT,
-    allowNull: true,
-  })
+  @BelongsToMany(() => Material, () => DiarioMaterial)
   @ApiPropertyOptional({ example: 'Cimento, areia, blocos de concreto', description: 'Materiais utilizados na obra' })
-  declare materiaisUtilizados?: string;
+  declare materiaisUtilizados: Material[];
 
   @Column({
     type: DataType.TEXT,

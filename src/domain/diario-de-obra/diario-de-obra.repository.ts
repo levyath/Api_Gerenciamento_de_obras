@@ -10,9 +10,9 @@ export class DiarioDeObraRepository {
   constructor(
     @InjectModel(DiarioDeObra)
     private readonly diarioDeObraModel: typeof DiarioDeObra,
-    
-  @InjectModel(Obras)
-  private readonly obraModel: typeof Obras,
+
+    @InjectModel(Obras)
+    private readonly obraModel: typeof Obras,
   ) {}
 
   async create(data: CreateDiarioDeObraDto): Promise<DiarioDeObra> {
@@ -28,11 +28,26 @@ export class DiarioDeObraRepository {
     return this.diarioDeObraModel.findAll({
       where: { obraId },
       order: [['data', 'ASC']],
+      include: [
+        {
+          association: 'materiaisUtilizados',
+          attributes: ['id', 'nome'],
+          through: { attributes: [] },
+        },
+      ],
     });
   }
 
   async findById(id: number): Promise<DiarioDeObra | null> {
-    return this.diarioDeObraModel.findByPk(id);
+    return this.diarioDeObraModel.findByPk(id, {
+      include: [
+        {
+          association: 'materiaisUtilizados',
+          attributes: ['id', 'nome'],
+          through: { attributes: [] },
+        },
+      ],
+    });
   }
 
   async update(

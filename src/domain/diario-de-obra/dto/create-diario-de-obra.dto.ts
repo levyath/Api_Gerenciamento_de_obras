@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsArray,
 } from 'class-validator';
 
 export class CreateDiarioDeObraDto {
@@ -35,18 +36,24 @@ export class CreateDiarioDeObraDto {
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({
-    example: 'Cimento, Areia, Brita',
-    description: 'Materiais utilizados durante o dia',
-  })
-  materiaisUtilizados?: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiPropertyOptional({
     example: 'Início da concretagem atrasado por logística',
     description: 'Observações gerais do dia',
   })
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ example: 'Observação 1' })
   observacoes?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  @ApiPropertyOptional({
+    example: [1, 2],
+    description: 'IDs dos Materiais associados à obra',
+    type: [Number],
+  })
+  materiaisId?: number[];
 
   @IsNotEmpty()
   @IsInt()

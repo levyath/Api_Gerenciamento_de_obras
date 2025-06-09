@@ -30,6 +30,7 @@ import { ObrasFiscalizacoes } from './domain/obra-fiscalizacoes/entities/obras-f
 import { Relatorios } from './domain/relatorios/entities/relatorios.entity';
 import { FiscalizacoesModule } from './domain/fiscalizacoes/fiscalizacoes.module';
 import { RelatoriosModule } from './domain/relatorios/relatorios.module';
+import { DiarioMaterial } from './domain/diario-materiais/diario-material.entity';
 
 const { NODE_ENV, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = process.env;
 
@@ -81,6 +82,7 @@ const { NODE_ENV, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD } = proces
       Fiscalizacoes,
       ObrasFiscalizacoes,
       Relatorios,
+      DiarioMaterial
     ]),
     AuthModule,
     EnderecosModule,

@@ -7,8 +7,11 @@ import {
   AutoIncrement,
   CreatedAt,
   UpdatedAt,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import { ApiProperty, ApiPropertyOptional  } from '@nestjs/swagger';
+import { DiarioDeObra } from 'src/domain/diario-de-obra/entities/diario-de-obra.entity';
+import { DiarioMaterial } from 'src/domain/diario-materiais/diario-material.entity';
 
 @Table({ 
   tableName: 'materiais',
@@ -48,4 +51,7 @@ export class Material extends Model<Material> {
   @Column({ type: DataType.STRING(100), allowNull: true })
   @ApiPropertyOptional({ example: 'CPB-40', description: 'Modelo/Referência do fabricante' })
   declare modelo?: string;
+
+  @BelongsToMany(() => DiarioDeObra, () => DiarioMaterial)
+  diarios: DiarioDeObra[];
 }
