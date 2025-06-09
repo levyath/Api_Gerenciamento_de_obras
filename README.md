@@ -57,6 +57,7 @@ DB_EXT_PORT=15432
 DB_DATABASE=[nome-database]
 DB_USER=[nome-user]
 DB_PASSWORD=[senha-user]
+TOKEN_VALIDATOR_API_URL=http://localhost:3001/auth/validate
 
 //salvar e fechar o arquivo
 Ctrl+S + Ctrl+X
