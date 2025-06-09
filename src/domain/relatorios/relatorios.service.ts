@@ -25,9 +25,9 @@ export class RelatoriosService {
     }
 
     async create(fiscalizacaoId: number, dto: CreateRelatoriosDto): Promise<Relatorios> {
-        const { titulo, data_criacao } = dto;
+        const { titulo, dataCriacao } = dto;
         const hoje = new Date();
-        const dataRelatorio = new Date(data_criacao);
+        const dataRelatorio = new Date(dataCriacao);
         const relatoriosExistentes = await this.findByFiscalizacao(fiscalizacaoId);
         const tituloDuplicado = relatoriosExistentes.some(r => r.titulo === titulo);
 
@@ -44,8 +44,8 @@ export class RelatoriosService {
         if (!relatorio)
             throw new NotFoundException(`Relatório com o ID ${id} não foi encontrado.`);
 
-        if (dto.data_criacao) {
-            const novaData = new Date(dto.data_criacao);
+        if (dto.dataCriacao) {
+            const novaData = new Date(dto.dataCriacao);
             if (novaData > new Date())
                 throw new BadRequestException('A data de criação do relatório não pode ser alterada para o futuro.');
         }

@@ -3,6 +3,7 @@ import { Obras } from '../../obras/entities/obras.entity';
 import { ObrasFiscalizacoes } from 'src/domain/obra-fiscalizacoes/entities/obras-fiscalizacoes.entity';
 import { Relatorios } from 'src/domain/relatorios/entities/relatorios.entity';
 import { ResponsavelTecnico } from 'src/domain/responsaveis-tecnicos/entities/responsavel-tecnico.entity';
+import { FiscalizacaoStatus } from '../enums/fiscalizacoes-status.enum';
 
 @Table({ tableName: 'fiscalizacoes', timestamps: true })
 export class Fiscalizacoes extends Model<Fiscalizacoes> {
@@ -25,7 +26,7 @@ export class Fiscalizacoes extends Model<Fiscalizacoes> {
   declare data_fim: Date;
 
   @Column({ type: DataType.STRING(20), allowNull: false })
-  declare status: string;
+  declare status: FiscalizacaoStatus;
 
   @BelongsToMany(() => Obras, () => ObrasFiscalizacoes)
   declare obras: Obras[];
