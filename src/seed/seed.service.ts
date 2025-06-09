@@ -40,6 +40,7 @@ import {
   sufixosComerciais,
   templatesDeMaterial,
 } from './seed.constants';
+import { DiarioMaterial } from 'src/domain/diario-materiais/diario-material.entity';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -59,11 +60,12 @@ export class SeedService implements OnModuleInit {
     @InjectModel(ObrasFornecedores) private obrasFornecedoresModel: typeof ObrasFornecedores,
     @InjectModel(Relatorios) private relatoriosModel: typeof Relatorios,
     @InjectModel(ResponsavelTecnico) private responsavelTecnicoModel: typeof ResponsavelTecnico,
-    
+    @InjectModel(DiarioMaterial) private diarioMateriaisModel: typeof DiarioMaterial,
+
     // Services
     private configService: ConfigService,
     private sequelize: Sequelize,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     const env = this.configService.get<string>('NODE_ENV');
@@ -134,14 +136,14 @@ export class SeedService implements OnModuleInit {
       console.log('Banco de dados de produção vazio. Gerando seed inicial...');
       await this.seedData();
     } catch (error) {
-        // Se a tabela não existe, o count() vai falhar. Isso é esperado na primeira execução.
-        if (error.name === 'SequelizeDatabaseError') {
-            console.log('Tabelas não encontradas. Gerando seed inicial para produção...');
-            await this.seedData();
-        } else {
-            // Lança outros erros inesperados
-            throw error;
-        }
+      // Se a tabela não existe, o count() vai falhar. Isso é esperado na primeira execução.
+      if (error.name === 'SequelizeDatabaseError') {
+        console.log('Tabelas não encontradas. Gerando seed inicial para produção...');
+        await this.seedData();
+      } else {
+        // Lança outros erros inesperados
+        throw error;
+      }
     }
   }
 
@@ -212,7 +214,7 @@ export class SeedService implements OnModuleInit {
       fornecedores.push(fornecedor);
     }
 
-     // Equipamentos
+    // Equipamentos
     for (let i = 0; i < 12; i++) {
       const fornecedor = faker.helpers.arrayElement(fornecedores);
       const equipamentoInfo = faker.helpers.arrayElement(equipamentosInfo);
@@ -272,7 +274,7 @@ export class SeedService implements OnModuleInit {
     for (let i = 0; i < numeroDeFiscalizacoesACriar; i++) {
       const info = faker.helpers.arrayElement(opcoesDeFiscalizacao);
       const responsavel = faker.helpers.arrayElement(responsaveisTecnicos);
-      
+
       const fiscalizacao = await this.fiscalizacoesModel.create({
         titulo: info.titulo,
         descricao: info.descricao,
@@ -361,7 +363,7 @@ export class SeedService implements OnModuleInit {
       const atividadeObs = faker.helpers.arrayElement(atividadesEObservacoes);
       const materiaisUsados = faker.helpers.arrayElements(materiaisDeObra, { min: 2, max: 5 }).join(', ');
 
-      await this.diariosModel.create({
+      const diario = await this.diariosModel.create({
         data: faker.date.recent().toISOString().split('T')[0],
         clima: faker.helpers.arrayElement(['Ensolarado', 'Nublado', 'Chuvoso', 'Parcialmente Nublado']),
         atividadesExecutadas: atividadeObs.atividade,
@@ -369,6 +371,14 @@ export class SeedService implements OnModuleInit {
         observacoes: atividadeObs.observacao,
         obraId: obraAleatoria.id,
       } as any);
+
+      const selectedMateriais = faker.helpers.arrayElements(await this.materialModel.findAll(), faker.number.int({ min: 2, max: 3 }));
+      for (const material of selectedMateriais) {
+        await this.diarioMateriaisModel.create({
+          diarioDeObraId: diario.id,
+          materialId: material.id,
+        } as any);
+      }
     }
 
     const env = this.configService.get<string>('NODE_ENV');
