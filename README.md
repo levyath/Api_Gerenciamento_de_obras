@@ -622,4 +622,4 @@ $ sudo docker run hello-world.
 4. Transforme o seu pendrive em um drive bootável através do Balena Etcher com a ISO do """Windows""".
 5. Desligue seu computador, entre na BIOS, e altere o drive de boot para o pendrive.
 6. Salve as alterações, e reinicie o sistema.
-7. Ao bootar no """Windows""", instale-o em seu sistema, e volte ao tópico anterior (Instalação do Docker (Linux)) para prosseguir com o tutorial.
+7. Ao bootar no """Windows""", instale-o em seu sistema, e volte ao tópico anterior (Instalação do Docker (Linux)) para prosseguir com o tutorial
