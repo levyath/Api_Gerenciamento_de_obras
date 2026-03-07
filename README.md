@@ -611,7 +611,7 @@ $ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugi
 ```
 4. Valide sua instalação rodando o `hello world` do Docker:
 ```
-$ sudo docker run hello-world
+$ sudo docker run hello-world.
 ```
 
 ## Instalação do Docker (Windows)
